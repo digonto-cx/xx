@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 style="margin-bottom: 20px;">উপলব্ধ কাজের তালিকা</h2>
+
+<div class="grid">
+    {% for task in tasks %}
+    <div class="card">
+        <div class="card-title">{{ task.title }}</div>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 10px 0;">
+            {{ task.description[:100] }}...
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+            <span style="font-weight: 800; color: var(--secondary); font-size: 1.1rem;">৳ {{ "%.2f"|format(task.amount) }}</span>
+            <a href="/task/{{ task.id }}" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.85rem;">কাজ শুরু করুন</a>
+        </div>
+    </div>
+    {% else %}
+    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+        <p style="color: var(--text-muted);">বর্তমানে কোনো নতুন টাস্ক উপলব্ধ নেই। কিছুক্ষণ পর পুনরায় চেক করুন।</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
