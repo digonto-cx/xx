@@ -10,6 +10,8 @@ from flask import (
 )
 from supabase import create_client, Client
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.exceptions import HTTPException
+
 
 # ==========================================================
 # Application Configuration
@@ -42,6 +44,18 @@ def server_error_handler(e):
         content="সার্ভারে অতিরিক্ত লোড রয়েছে। অনুগ্রহ করে ১ মিনিট পর আবার চেষ্টা করুন।"
     ), 200
 
+
+# --- Crash Handler Update ---
+@app.errorhandler(Exception)
+def global_exception_handler(e):
+    # 404, 403, 405 এররগুলোকে Flask-এর স্বাভাবিক কাজ করতে দিন
+    if isinstance(e, HTTPException):
+        return e
+    
+    # সত্যিকারের সার্ভার ক্র্যাশ হলে হোমপেজে পাঠাবে
+    flash("সার্ভারে সমস্যা হয়েছে, পুনরায় চেষ্টা করুন।", "warning")
+    return redirect(url_for('index'))
+    
 @app.errorhandler(Exception)
 def global_exception_handler(e):
     # Serverless disconnect hole crash na kore clean JSON/Redirect dibe
