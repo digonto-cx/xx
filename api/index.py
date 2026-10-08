@@ -12,9 +12,8 @@ from supabase import create_client, Client
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.exceptions import HTTPException
 
-
 # ==========================================================
-# Application Configuration
+# Application Initialization & Setup
 # ==========================================================
 app = Flask(
     __name__, 
@@ -23,49 +22,55 @@ app = Flask(
 )
 app.secret_key = os.getenv("SECRET_KEY", "microearnx_prod_secret_key_8829910")
 
-# Supabase Initialization
+# ==========================================================
+# Vercel Path Fixer Middleware (404 এরর স্থায়ী সমাধান)
+# ==========================================================
+class VercelPathFixer:
+    """
+    Vercel Serverless রিকোয়েস্টে হেডার থেকে আসল URL পাথ পুনরুদ্ধার করে
+    যাতে Flask-এর কোনো পেজেই 404 এরর না আসে।
+    """
+    def __init__(self, wsgi_app):
+        self.wsgi_app = wsgi_app
+
+    def __call__(self, environ, start_response):
+        real_path = environ.get('HTTP_X_FORWARDED_URI') or environ.get('HTTP_X_MATCHED_PATH')
+        if real_path:
+            environ['PATH_INFO'] = real_path.split('?')[0]
+        return self.wsgi_app(environ, start_response)
+
+app.wsgi_app = VercelPathFixer(app.wsgi_app)
+
+# ==========================================================
+# Database Connection (Supabase)
+# ==========================================================
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "")
 
 def get_supabase() -> Client:
-    """Creates a connection instance with Supabase."""
+    """Supabase ক্লায়েন্ট রিটার্ন করে"""
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Admin Security Key
+# অ্যাডমিন সিকিউরিটি পাসওয়ার্ড
 ADMIN_SECRET_PASS = os.getenv("ADMIN_KEY", "Admin@MicroEarnX_2026")
 
 # ==========================================================
-# High-Traffic & 500 Crash Handlers
+# Error Handlers (সার্ভার ক্র্যাশ রোধক)
 # ==========================================================
-@app.errorhandler(500)
-def server_error_handler(e):
-    return render_template(
-        'base.html', 
-        content="সার্ভারে অতিরিক্ত লোড রয়েছে। অনুগ্রহ করে ১ মিনিট পর আবার চেষ্টা করুন।"
-    ), 200
-
-
-# --- Crash Handler Update ---
 @app.errorhandler(Exception)
-def global_exception_handler(e):
-    # 404, 403, 405 এররগুলোকে Flask-এর স্বাভাবিক কাজ করতে দিন
+def handle_global_error(e):
+    # সাধারণ HTTP এরর (যেমন 404, 403, 405) স্বাভাবিকভাবে চলতে দেওয়া
     if isinstance(e, HTTPException):
         return e
     
-    # সত্যিকারের সার্ভার ক্র্যাশ হলে হোমপেজে পাঠাবে
-    flash("সার্ভারে সমস্যা হয়েছে, পুনরায় চেষ্টা করুন।", "warning")
-    return redirect(url_for('index'))
-    
-@app.errorhandler(Exception)
-def global_exception_handler(e):
-    # Serverless disconnect hole crash na kore clean JSON/Redirect dibe
-    if request.path.startswith('/api/'):
-        return jsonify({"success": False, "message": "System busy, try again.", "error": str(e)}), 200
-    flash("নেটওয়ার্ক সমস্যা হয়েছে, অনুগ্রহ করে পুনরায় চেষ্টা করুন।", "warning")
-    return redirect(url_for('index'))
+    # ব্যাকএন্ড ক্র্যাশ হলে সেফ রিকভারি
+    return render_template(
+        'base.html', 
+        content="সার্ভারে সাময়িক চাপ রয়েছে। অনুগ্রহ করে রিলোড দিন।"
+    ), 200
 
 # ==========================================================
-# Auth Decorators
+# Authentication Guards (Decorators)
 # ==========================================================
 def login_required(f):
     @wraps(f)
@@ -80,18 +85,18 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not session.get('is_admin'):
-            flash("শুধুমাত্র অ্যাডমিন এক্সেস অনুমোদিত!", "danger")
+            flash("অ্যাডমিন এক্সেস প্রয়োজন!", "danger")
             return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return decorated_function
 
 # ==========================================================
-# ImgBB Failover Engine (Multi-Key Dynamic Fallback)
+# ImgBB Failover Engine (Multi-Key Support)
 # ==========================================================
 def upload_to_imgbb(file_bytes):
     """
-    Loop kore shob active ImgBB key check korbe।
-    Akta key fail hole auto porer key diye try korbe।
+    সবগুলো সক্রিয় ImgBB Key সিরিয়ালি চেষ্টা করে।
+    একটি ফেইল হলে বা লিমিট শেষ হলে স্বয়ংক্রিয়ভাবে পরবর্তী কি ব্যবহার করে।
     """
     sb = get_supabase()
     keys_res = sb.table('imgbb_keys').select('*').eq('is_active', True).execute()
@@ -109,7 +114,6 @@ def upload_to_imgbb(file_bytes):
             if res.status_code == 200 and data.get('success'):
                 return data['data']['url']
             else:
-                # Key er limit sesh ba error, porer key try korbe
                 continue
         except Exception:
             continue
@@ -117,7 +121,7 @@ def upload_to_imgbb(file_bytes):
     return None
 
 # ==========================================================
-# Authentication & Device Protection
+# User Auth & Device Security
 # ==========================================================
 @app.route('/')
 def index():
@@ -138,21 +142,20 @@ def register():
         flash("সবগুলো তথ্য সঠিকভাবে পূরণ করুন!", "danger")
         return redirect(url_for('index'))
 
-    # ১ ডিভাইসে ১ অ্যাকাউন্ট কঠোর চেকিং
+    # শর্ত: ১ ডিভাইসে কেবল ১টি অ্যাকাউন্ট
     existing_device = sb.table('users').select('id').eq('device_id', device_id).execute().data
     if existing_device:
-        flash("এই ডিভাইস থেকে ইতিমধ্যে একটি অ্যাকাউন্ট খোলা হয়েছে! নতুন অ্যাকাউন্ট খোলা সম্ভব নয়।", "danger")
+        flash("এই ডিভাইস থেকে ইতিমধ্যে একটি অ্যাকাউন্ট খোলা হয়েছে! নতুন অ্যাকাউন্ট খোলা যাবে না।", "danger")
         return redirect(url_for('index'))
 
-    # ইমেইল ডুপ্লিকেট চেকিং
+    # ইমেইল চেক
     existing_email = sb.table('users').select('id').eq('email', email).execute().data
     if existing_email:
-        flash("এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট রয়েছে!", "danger")
+        flash("এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট তৈরি করা আছে!", "danger")
         return redirect(url_for('index'))
 
-    # রেফারেল কোড জেনারেশন (৬ ক্যারেক্টার)
     ref_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-    initial_balance = 50.00  # নরমাল সাইন-আপ বোনাস
+    initial_balance = 50.00  # সরাসরি সাইন-আপ বোনাস
 
     # রেফারেল সিস্টেম ভ্যালিডেশন
     valid_referrer = None
@@ -160,7 +163,7 @@ def register():
         referrer_res = sb.table('users').select('*').eq('referral_code', ref_by).execute().data
         if referrer_res:
             referrer = referrer_res[0]
-            # সেইম ডিভাইসে সেলফ-রেফারেল ব্লক
+            # একই ডিভাইসে সেলফ-রেফার ব্লক
             if referrer['device_id'] != device_id:
                 valid_referrer = referrer
                 initial_balance = 100.00  # রেফারে জয়েন করলে ১০০ টাকা
@@ -186,7 +189,7 @@ def register():
             session['user_name'] = name
             flash(f"অভিনন্দন! আপনি ৳{initial_balance:.2f} জয়েনিং বোনাস পেয়েছেন।", "success")
             return redirect(url_for('dashboard'))
-    except Exception as e:
+    except Exception:
         flash("রেজিস্ট্রেশন ব্যর্থ হয়েছে। পরে চেষ্টা করুন।", "danger")
         
     return redirect(url_for('index'))
@@ -229,11 +232,11 @@ def dashboard():
     sb = get_supabase()
     user = sb.table('users').select('*').eq('id', session['user_id']).single().execute().data
     
-    # নোটিশ আনা
+    # নোটিশ লোড করা
     notice_res = sb.table('settings').select('value').eq('key', 'site_notice').execute().data
-    site_notice = notice_res[0]['value'] if notice_res else "MicroEarnX এ আপনাকে স্বাগতম!"
+    site_notice = notice_res[0]['value'] if notice_res else ""
 
-    # মোট রেফারেল সংখ্যা গণনা
+    # মোট রেফার সংখ্যা
     ref_count = len(sb.table('users').select('id').eq('referred_by', user['referral_code']).execute().data or [])
     
     return render_template(
@@ -247,11 +250,11 @@ def dashboard():
 @login_required
 def tasks():
     sb = get_supabase()
-    # ইউজারের পেন্ডিং ও অ্যাপ্রুভড টাস্ক বের করা
+    # ইউজারের পেন্ডিং ও অনুমোদিত টাস্ক তালিকা
     user_subs = sb.table('submissions').select('task_id, status').eq('user_id', session['user_id']).execute().data or []
     hidden_task_ids = [s['task_id'] for s in user_subs if s['status'] in ['pending', 'approved']]
 
-    # শুধু একটিভ এবং পেন্ডিং/অ্যাপ্রুভড ছাড়া বাকি টাস্ক আনা
+    # অ্যাক্টিভ টাস্ক ফিল্টার
     all_tasks = sb.table('tasks').select('*').eq('is_active', True).execute().data or []
     available_tasks = [t for t in all_tasks if t['id'] not in hidden_task_ids]
 
@@ -272,10 +275,10 @@ def task_detail(task_id):
             flash("প্রমাণের স্ক্রিনশট সিলেক্ট করুন!", "danger")
             return redirect(request.url)
 
-        # ImgBB Failover Upload
+        # ImgBB Failover আপলোড
         img_url = upload_to_imgbb(file.read())
         if not img_url:
-            flash("ইমেজ সার্ভার ব্যস্ত! এডমিনের সাথে যোগাযোগ করুন।", "danger")
+            flash("ইমেজ হোস্ট সার্ভার ব্যস্ত! অনুগ্রহ করে এডমিনকে জানান।", "danger")
             return redirect(request.url)
 
         sb.table('submissions').insert({
@@ -285,7 +288,7 @@ def task_detail(task_id):
             'status': 'pending'
         }).execute()
 
-        flash("টাস্ক প্রুফ সফলভাবে জমা হয়েছে! এডমিন রিভিউ করবে।", "success")
+        flash("টাস্ক প্রুফ জমা হয়েছে! এডমিন রিভিউ শেষে টাকা যোগ হবে।", "success")
         return redirect(url_for('tasks'))
 
     return render_template('task_details.html', task=task)
@@ -297,7 +300,6 @@ def spin_wheel():
     sb = get_supabase()
     user_id = session['user_id']
     
-    # আজকের ডেট
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0).isoformat()
     spins_today = sb.table('daily_activities').select('id').eq('user_id', user_id).eq('activity_type', 'spin').gte('created_at', today_start).execute().data
 
@@ -342,7 +344,7 @@ def scratch_card():
     return jsonify({"success": True, "reward": reward, "new_balance": float(user['balance']) + reward})
 
 # ==========================================================
-# Withdrawal System (With Rejection Count & Validation)
+# Withdrawal System
 # ==========================================================
 @app.route('/withdraw', methods=['POST'])
 @login_required
@@ -359,7 +361,7 @@ def withdraw():
     method = request.form.get('method', '').strip()
     account = request.form.get('account', '').strip()
 
-    # শর্ত ১: মিনিমাম উইথড্রয়াল ৫০০ টাকা
+    # শর্ত ১: সর্বনিম্ন ৫০০ টাকা
     if amount < 500:
         flash("সর্বনিম্ন উইথড্রয়াল অ্যামাউন্ট ৫০০ টাকা!", "danger")
         return redirect(url_for('dashboard'))
@@ -368,13 +370,13 @@ def withdraw():
         flash("আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!", "danger")
         return redirect(url_for('dashboard'))
 
-    # শর্ত ২: কমপক্ষে ৪টি সফল রেফারেল থাকতে হবে
+    # শর্ত ২: সর্বনিম্ন ৪টি রেফারেল আবশ্যক
     ref_count = len(sb.table('users').select('id').eq('referred_by', user['referral_code']).execute().data or [])
     if ref_count < 4:
-        flash(f"উইথড্র করতে সর্বনিম্ন ৪টি রেফারেল আবশ্যক! আপনার বর্তমান রেফার: {ref_count} টি।", "danger")
+        flash(f"উইথড্র করতে সর্বনিম্ন ৪টি রেফারেল প্রয়োজন! আপনার বর্তমান রেফারেল: {ref_count} টি।", "danger")
         return redirect(url_for('dashboard'))
 
-    # ব্যালেন্স কেটে পেন্ডিং উইথড্রয়াল ইনসার্ট করা
+    # ব্যালেন্স ডিডাক্ট ও রিকোয়েস্ট তৈরি
     sb.table('users').update({'balance': float(user['balance']) - amount}).eq('id', user_id).execute()
     sb.table('withdrawals').insert({
         'user_id': user_id,
@@ -464,7 +466,11 @@ def admin_toggle_ban(user_id):
 @admin_required
 def admin_modify_balance(user_id):
     sb = get_supabase()
-    amount = float(request.form.get('amount', 0))
+    try:
+        amount = float(request.form.get('amount', 0))
+    except ValueError:
+        amount = 0
+        
     user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
     if user:
         new_balance = float(user['balance']) + amount
@@ -477,17 +483,16 @@ def admin_modify_balance(user_id):
 def admin_delete_user(user_id):
     sb = get_supabase()
     sb.table('users').delete().eq('id', user_id).execute()
-    flash("ইউজার সফলভাবে ডিলিট করা হয়েছে!", "success")
+    flash("ইউজার ডিলিট করা হয়েছে!", "success")
     return redirect(url_for('admin_users'))
 
 @app.route('/admin/withdraw')
 @admin_required
 def admin_withdraw():
     sb = get_supabase()
-    # পেন্ডিং উইথড্রয়াল গুলো আনা
     reqs = sb.table('withdrawals').select('*, users(email, balance)').eq('status', 'pending').order('id', desc=True).execute().data or []
 
-    # প্রত্যেক ইউজারের আগের রিজেকশন কাউন্ট বের করা
+    # ইউজারের আগের মোট রিজেকশন হিস্ট্রি গণনা
     for r in reqs:
         rej_count = len(sb.table('withdrawals').select('id').eq('user_id', r['user_id']).eq('status', 'rejected').execute().data or [])
         r['rejection_count'] = rej_count
@@ -500,18 +505,18 @@ def admin_handle_withdraw(withdraw_id, action):
     sb = get_supabase()
     req = sb.table('withdrawals').select('*').eq('id', withdraw_id).single().execute().data
     if not req or req['status'] != 'pending':
-        flash("ইনভ্যালিড রিকোয়েস্ট!", "danger")
+        flash("অবৈধ রিকোয়েস্ট!", "danger")
         return redirect(url_for('admin_withdraw'))
 
     if action == 'approve':
         sb.table('withdrawals').update({'status': 'approved'}).eq('id', withdraw_id).execute()
-        flash("উইথড্রয়াল অ্যাপ্রুভ করা হয়েছে!", "success")
+        flash("উইথড্রয়াল অ্যাপ্রুভ হয়েছে!", "success")
     elif action == 'reject':
-        # রিজেক্ট হলে ব্যালেন্স ব্যাক দেওয়া হবে
+        # রিজেক্ট হলে ব্যালেন্স ইউজারের একাউন্টে রিফান্ড হবে
         user = sb.table('users').select('balance').eq('id', req['user_id']).single().execute().data
         sb.table('users').update({'balance': float(user['balance']) + float(req['amount'])}).eq('id', req['user_id']).execute()
         sb.table('withdrawals').update({'status': 'rejected'}).eq('id', withdraw_id).execute()
-        flash("উইথড্রয়াল রিজেক্ট করা হয়েছে এবং ব্যালেন্স ফেরত দেওয়া হয়েছে।", "warning")
+        flash("উইথড্রয়াল রিজেক্ট করা হয়েছে এবং টাকা ফেরত দেওয়া হয়েছে।", "warning")
 
     return redirect(url_for('admin_withdraw'))
 
@@ -523,7 +528,7 @@ def admin_imgbb():
         key = request.form.get('api_key', '').strip()
         if key:
             sb.table('imgbb_keys').insert({'api_key': key}).execute()
-            flash("নতুন ImgBB API Key যুক্ত হয়েছে!", "success")
+            flash("ImgBB Key সফলভাবে যুক্ত হয়েছে!", "success")
         return redirect(url_for('admin_imgbb'))
 
     keys = sb.table('imgbb_keys').select('*').order('id', desc=True).execute().data or []
@@ -534,7 +539,7 @@ def admin_imgbb():
 def admin_imgbb_delete(key_id):
     sb = get_supabase()
     sb.table('imgbb_keys').delete().eq('id', key_id).execute()
-    flash("API Key মুছে ফেলা হয়েছে!", "success")
+    flash("API Key ডিলিট করা হয়েছে!", "success")
     return redirect(url_for('admin_imgbb'))
 
 @app.route('/admin/task', methods=['GET', 'POST'])
@@ -553,7 +558,7 @@ def admin_task():
             'amount': amount,
             'link': link
         }).execute()
-        flash("নতুন টাস্ক সফলভাবে তৈরি হয়েছে!", "success")
+        flash("নতুন টাস্ক তৈরি হয়েছে!", "success")
         return redirect(url_for('admin_task'))
 
     all_tasks = sb.table('tasks').select('*').order('id', desc=True).execute().data or []
@@ -573,14 +578,13 @@ def admin_submissions():
 @admin_required
 def admin_bulk_submissions():
     sb = get_supabase()
-    # সর্বোচ্চ ৩০টি পেন্ডিং টাস্ক নেওয়া
     pending = sb.table('submissions').select('*, tasks(amount)').eq('status', 'pending').limit(30).execute().data or []
     
     if not pending:
-        flash("রিভিউ করার জন্য কোনো পেন্ডিং টাস্ক নেই।", "info")
+        flash("কোনো পেন্ডিং টাস্ক নেই।", "info")
         return redirect(url_for('admin_submissions'))
 
-    # র‍্যান্ডম ৩টি রিজেক্ট সিলেক্ট করা
+    # সর্বোচ্চ ৩টি র‍্যান্ডম রিজেক্ট নির্বাচন
     reject_count = min(3, len(pending))
     rejected_items = random.sample(pending, reject_count)
     rejected_ids = [item['id'] for item in rejected_items]
@@ -591,18 +595,18 @@ def admin_bulk_submissions():
             # Reject
             sb.table('submissions').update({'status': 'rejected'}).eq('id', item['id']).execute()
         else:
-            # Approve + ব্যালেন্স অ্যাড
+            # Approve + ইউজারের ব্যালেন্সে টাকা যুক্ত করা
             sb.table('submissions').update({'status': 'approved'}).eq('id', item['id']).execute()
             user = sb.table('users').select('balance').eq('id', item['user_id']).single().execute().data
             reward = float(item['tasks']['amount']) if item.get('tasks') else 0.0
             sb.table('users').update({'balance': float(user['balance']) + reward}).eq('id', item['user_id']).execute()
             approved_count += 1
 
-    flash(f"বাল্ক সম্পন্ন! {approved_count}টি অ্যাপ্রুভ করা হয়েছে এবং {reject_count}টি র‍্যান্ডমলি রিজেক্ট হয়েছে।", "success")
+    flash(f"বাল্ক রিভিউ শেষ! {approved_count}টি অ্যাপ্রুভ এবং {reject_count}টি র‍্যান্ডমলি রিজেক্ট হয়েছে।", "success")
     return redirect(url_for('admin_submissions'))
 
 # ==========================================================
-# Run Locally (Only if not hosted on Vercel)
+# Local Development Execution
 # ==========================================================
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
