@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div style="max-width: 450px; margin: 30px auto;" class="card">
+    <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">MicroEarnX</h2>
+    
+    <!-- Tab Controls -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <button class="btn btn-primary" style="flex: 1;" onclick="toggleAuth('login')">লগইন</button>
+        <button class="btn btn-success" style="flex: 1;" onclick="toggleAuth('register')">রেজিস্ট্রেশন</button>
+    </div>
+
+    <!-- Login Form -->
+    <form id="loginForm" action="/login" method="POST">
+        <div class="form-group">
+            <label>ইমেইল অ্যাড্রেস</label>
+            <input type="email" name="email" class="form-control" required placeholder="example@mail.com">
+        </div>
+        <div class="form-group">
+            <label>পাসওয়ার্ড</label>
+            <input type="password" name="password" class="form-control" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">লগইন করুন</button>
+    </form>
+
+    <!-- Registration Form (Includes Device Fingerprint) -->
+    <form id="registerForm" action="/register" method="POST" style="display: none;">
+        <input type="hidden" name="device_id" id="device_id">
+        <div class="form-group">
+            <label>পূর্ণ নাম</label>
+            <input type="text" name="name" class="form-control" required placeholder="আপনার নাম">
+        </div>
+        <div class="form-group">
+            <label>ইমেইল অ্যাড্রেস</label>
+            <input type="email" name="email" class="form-control" required placeholder="example@mail.com">
+        </div>
+        <div class="form-group">
+            <label>পাসওয়ার্ড</label>
+            <input type="password" name="password" class="form-control" required placeholder="••••••••">
+        </div>
+        <div class="form-group">
+            <label>রেফার কোড (ঐচ্ছিক - ৳১০০ বোনাস)</label>
+            <input type="text" name="ref_by" class="form-control" placeholder="রেফার কোড থাকলে দিন">
+        </div>
+        <button type="submit" class="btn btn-success" style="width: 100%;">রেজিস্টার করুন</button>
+    </form>
+</div>
+
+<script>
+function toggleAuth(type) {
+    document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
+    document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
+}
+</script>
+{% endblock %}
