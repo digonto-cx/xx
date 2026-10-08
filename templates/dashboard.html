@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Site Notice -->
+{% if notice %}
+<div class="site-notice">
+    📢 <strong>নোটিশ:</strong> {{ notice }}
+</div>
+{% endif %}
+
+<!-- Balance & Stats Grid -->
+<div class="grid">
+    <div class="card balance-card">
+        <div class="card-title" style="color: #e0e7ff;">বর্তমান ব্যালেন্স</div>
+        <h2 id="userBalance">৳ {{ "%.2f"|format(user.balance) }}</h2>
+        <p style="font-size: 0.85rem; opacity: 0.9;">সর্বনিম্ন উইথড্র: ৳৫০০</p>
+    </div>
+
+    <div class="card">
+        <div class="card-title">আপনার রেফারেল</div>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">
+            প্রতি সফল রেফারেলে পাবেন <strong>৳১৫</strong>। মোট রেফার: <strong>{{ referral_count }}</strong> টি।
+        </p>
+        <div class="form-group">
+            <input type="text" id="refLink" class="form-control" readonly value="{{ request.host_url }}?ref={{ user.referral_code }}">
+        </div>
+        <button class="btn btn-primary" onclick="copyReferralLink('refLink')" style="width: 100%;">রেফার লিংক কপি করুন</button>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="grid">
+    <a href="/tasks" class="card" style="text-decoration: none; color: inherit; text-align: center;">
+        <h3 style="color: var(--primary);">📝 টাস্ক কমপ্লিট করুন</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">কাজ সম্পন্ন করে প্রমাণ জমা দিন</p>
+    </a>
+
+    <div class="card" style="text-align: center;">
+        <h3>🎡 লাকি স্পিন</h3>
+        <div class="wheel-box">
+            <div class="wheel" id="spinWheel"></div>
+            <button id="spinBtn" class="btn btn-warning" onclick="triggerSpin()" style="margin-top: 15px;">স্পিন করুন</button>
+        </div>
+    </div>
+
+    <div class="card" style="text-align: center;">
+        <h3>🎁 স্ক্র্যাচ কার্ড</h3>
+        <div class="scratch-box" style="margin-top: 15px;">
+            <div class="scratch-reward" id="scratchReward">ঘষুন!</div>
+            <canvas id="scratchCanvas" class="scratch-canvas" width="280" height="140"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Withdraw Form -->
+<div class="card" style="margin-top: 25px;">
+    <h3>টাকা উইথড্র করুন</h3>
+    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">শর্ত: সর্বনিম্ন ৪টি রেফারেল ও ৫০০ টাকা ব্যালেন্স থাকতে হবে।</p>
+    <form action="/withdraw" method="POST">
+        <div class="grid" style="margin: 0 0 15px 0;">
+            <div class="form-group">
+                <label>উইথড্র অ্যামাউন্ট (৳)</label>
+                <input type="number" name="amount" min="500" class="form-control" required placeholder="500">
+            </div>
+            <div class="form-group">
+                <label>পেমেন্ট মাধ্যম</label>
+                <select name="method" class="form-control" required>
+                    <option value="bKash">bKash Personal</option>
+                    <option value="Nagad">Nagad Personal</option>
+                    <option value="Rocket">Rocket</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>অ্যাকাউন্ট নাম্বার</label>
+                <input type="text" name="account" class="form-control" required placeholder="017xxxxxxxx">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-success">উইথড্র রিকোয়েস্ট পাঠান</button>
+    </form>
+</div>
+
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    initScratchCard('scratchCanvas', 'scratchReward');
+});
+</script>
+{% endblock %}
