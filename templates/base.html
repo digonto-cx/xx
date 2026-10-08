@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MicroEarnX - Earn Daily{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/fingerprint.js" defer></script>
+    <script src="/static/js/games.js" defer></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="/" class="brand">⚡ MicroEarnX</a>
+            <div>
+                {% if session.get('user_id') %}
+                    <a href="/app" class="btn btn-primary" style="padding:6px 14px; font-size:0.85rem;">Dashboard</a>
+                    <a href="/logout" class="btn btn-danger" style="padding:6px 14px; font-size:0.85rem;">Logout</a>
+                {% else %}
+                    <a href="/" class="btn btn-primary" style="padding:6px 14px; font-size:0.85rem;">Login / Join</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="flex: 1; padding-top: 15px;">
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="site-notice" style="border-left-color: {% if category == 'success' %}var(--secondary){% else %}var(--danger){% endif %}; color: #1e293b; background: #fff;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <footer style="text-align: center; padding: 20px 0; color: var(--text-muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); margin-top: 30px;">
+        &copy; 2026 MicroEarnX. All rights reserved.
+    </footer>
+</body>
+  </html>
