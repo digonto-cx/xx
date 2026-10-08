@@ -1,54 +1,147 @@
 {% extends 'base.html' %}
 {% block content %}
-<div style="max-width: 450px; margin: 30px auto;" class="card">
-    <h2 style="text-align: center; margin-bottom: 20px; color: var(--primary);">MicroEarnX</h2>
+<div class="min-h-[85vh] flex flex-col items-center justify-center p-2 sm:p-4">
     
-    <!-- Tab Controls -->
-    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-        <button class="btn btn-primary" style="flex: 1;" onclick="toggleAuth('login')">লগইন</button>
-        <button class="btn btn-success" style="flex: 1;" onclick="toggleAuth('register')">রেজিস্ট্রেশন</button>
+    <!-- Floating Main Card -->
+    <div class="w-full max-w-sm bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/50 border border-rose-50/80 flex flex-col relative overflow-hidden">
+        
+        <!-- Brand Header with Flame Icon -->
+        <div class="flex items-center justify-center gap-2 mb-2">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-rose-600 to-red-500 flex items-center justify-center text-white text-sm shadow-md shadow-rose-200">
+                <i class="fa-solid fa-fire"></i>
+            </div>
+            <span class="font-extrabold text-slate-900 text-xl tracking-wider">
+                MICRO<span class="text-rose-600">EARNX</span> ⚡
+            </span>
+        </div>
+        <p class="text-[11px] text-slate-400 text-center font-medium mb-5">
+            ছোট ছোট টাস্ক সম্পন্ন করে প্রতিদিন নিশ্চিত আয় করুন
+        </p>
+
+        <!-- Metric / Offer Status Bar (Like 500 Status Box) -->
+        <div class="w-full bg-rose-50/40 border border-rose-100 rounded-2xl py-2.5 px-1.5 grid grid-cols-3 divide-x divide-rose-100 mb-5 shadow-sm text-center">
+            <div>
+                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">JOIN BONUS</span>
+                <span class="text-[11px] font-extrabold text-rose-600">৳৫০ - ৳১০০</span>
+            </div>
+            <div>
+                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">PER REFER</span>
+                <span class="text-[11px] font-extrabold text-amber-600">৳১৫ বোনাস</span>
+            </div>
+            <div>
+                <span class="text-[8px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">PAYOUT</span>
+                <span class="text-[11px] font-extrabold text-emerald-600">বিকাশ / নগদ</span>
+            </div>
+        </div>
+
+        <!-- Auth Tabs (Pill Switcher) -->
+        <div class="grid grid-cols-2 gap-1 p-1 bg-slate-100/80 rounded-2xl mb-5">
+            <button id="tabLogin" onclick="switchAuth('login')" class="py-2.5 text-xs font-bold rounded-xl transition-all bg-white text-[#E11D48] shadow-sm">
+                লগইন করুন
+            </button>
+            <button id="tabRegister" onclick="switchAuth('register')" class="py-2.5 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800">
+                নতুন অ্যাকাউন্ট
+            </button>
+        </div>
+
+        <!-- 1. LOGIN FORM -->
+        <form id="loginForm" action="/login" method="POST" class="space-y-3.5">
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">ইমেইল অ্যাড্রেস</label>
+                <div class="relative">
+                    <input type="email" name="email" required placeholder="user@gmail.com" 
+                        class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+                    <i class="fa-regular fa-envelope absolute right-4 top-3.5 text-slate-400 text-xs"></i>
+                </div>
+            </div>
+            <div>
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 ml-1">পাসওয়ার্ড</label>
+                <div class="relative">
+                    <input type="password" name="password" required placeholder="••••••••" 
+                        class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+                    <i class="fa-solid fa-lock absolute right-4 top-3.5 text-slate-400 text-xs"></i>
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-sm mt-2">
+                <span>লগইন করুন</span>
+                <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+        </form>
+
+        <!-- 2. REGISTRATION FORM -->
+        <form id="registerForm" action="/register" method="POST" class="space-y-3 hidden">
+            <input type="hidden" name="device_id">
+            
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">আপনার পূর্ণ নাম</label>
+                <input type="text" name="name" required placeholder="আপনার নাম লিখুন" 
+                    class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">ইমেইল অ্যাড্রেস</label>
+                <input type="email" name="email" required placeholder="user@gmail.com" 
+                    class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পাসওয়ার্ড</label>
+                <input type="password" name="password" required placeholder="পাসওয়ার্ড তৈরি করুন" 
+                    class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">
+                    রেফারেল কোড <span class="text-rose-600 font-extrabold">(ঐচ্ছিক - ৳১০০ বোনাস)</span>
+                </label>
+                <input type="text" name="ref_by" placeholder="রেফার কোড থাকলে দিন" 
+                    class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            </div>
+
+            <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-sm mt-2">
+                <span>অ্যাকাউন্ট খুলুন (৳৫০ বোনাস)</span>
+                <i class="fa-solid fa-gift text-xs"></i>
+            </button>
+        </form>
+
+        <!-- Help Support Action (Matches 500 Theme Telegram Support) -->
+        <div class="mt-5 pt-4 border-t border-slate-100">
+            <a href="https://t.me/your_support_channel" target="_blank" 
+                class="w-full bg-white hover:bg-slate-50 border border-slate-200 active:scale-[0.98] transition-all text-slate-700 font-bold py-3 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 text-xs">
+                <i class="fa-brands fa-telegram text-sky-500 text-base"></i>
+                <span>টেলিগ্রাম হেল্পলাইন সাপোর্ট</span>
+            </a>
+        </div>
+
     </div>
 
-    <!-- Login Form -->
-    <form id="loginForm" action="/login" method="POST">
-        <div class="form-group">
-            <label>ইমেইল অ্যাড্রেস</label>
-            <input type="email" name="email" class="form-control" required placeholder="example@mail.com">
-        </div>
-        <div class="form-group">
-            <label>পাসওয়ার্ড</label>
-            <input type="password" name="password" class="form-control" required placeholder="••••••••">
-        </div>
-        <button type="submit" class="btn btn-primary" style="width: 100%;">লগইন করুন</button>
-    </form>
-
-    <!-- Registration Form (Includes Device Fingerprint) -->
-    <form id="registerForm" action="/register" method="POST" style="display: none;">
-        <input type="hidden" name="device_id" id="device_id">
-        <div class="form-group">
-            <label>পূর্ণ নাম</label>
-            <input type="text" name="name" class="form-control" required placeholder="আপনার নাম">
-        </div>
-        <div class="form-group">
-            <label>ইমেইল অ্যাড্রেস</label>
-            <input type="email" name="email" class="form-control" required placeholder="example@mail.com">
-        </div>
-        <div class="form-group">
-            <label>পাসওয়ার্ড</label>
-            <input type="password" name="password" class="form-control" required placeholder="••••••••">
-        </div>
-        <div class="form-group">
-            <label>রেফার কোড (ঐচ্ছিক - ৳১০০ বোনাস)</label>
-            <input type="text" name="ref_by" class="form-control" placeholder="রেফার কোড থাকলে দিন">
-        </div>
-        <button type="submit" class="btn btn-success" style="width: 100%;">রেজিস্টার করুন</button>
-    </form>
 </div>
 
 <script>
-function toggleAuth(type) {
-    document.getElementById('loginForm').style.display = type === 'login' ? 'block' : 'none';
-    document.getElementById('registerForm').style.display = type === 'register' ? 'block' : 'none';
+function switchAuth(type) {
+    const isLogin = type === 'login';
+    document.getElementById('loginForm').classList.toggle('hidden', !isLogin);
+    document.getElementById('registerForm').classList.toggle('hidden', isLogin);
+    
+    document.getElementById('tabLogin').className = isLogin 
+        ? 'py-2.5 text-xs font-bold rounded-xl transition-all bg-white text-[#E11D48] shadow-sm' 
+        : 'py-2.5 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800';
+        
+    document.getElementById('tabRegister').className = !isLogin 
+        ? 'py-2.5 text-xs font-bold rounded-xl transition-all bg-white text-[#E11D48] shadow-sm' 
+        : 'py-2.5 text-xs font-bold rounded-xl transition-all text-slate-500 hover:text-slate-800';
 }
+
+// Auto-fill referral code if in URL parameter (?ref=CODE)
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+        switchAuth('register');
+        const refInput = document.querySelector('input[name="ref_by"]');
+        if (refInput) refInput.value = refCode;
+    }
+});
 </script>
 {% endblock %}
