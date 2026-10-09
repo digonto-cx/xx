@@ -1,23 +1,76 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2 style="margin-bottom: 20px;">উপলব্ধ কাজের তালিকা</h2>
+<div class="max-w-4xl mx-auto space-y-5 pb-8">
 
-<div class="grid">
-    {% for task in tasks %}
-    <div class="card">
-        <div class="card-title">{{ task.title }}</div>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 10px 0;">
-            {{ task.description[:100] }}...
-        </p>
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-            <span style="font-weight: 800; color: var(--secondary); font-size: 1.1rem;">৳ {{ "%.2f"|format(task.amount) }}</span>
-            <a href="/task/{{ task.id }}" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.85rem;">কাজ শুরু করুন</a>
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">মাইক্রো জব সেন্টার</span>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-list-check text-[#E11D48]"></i> উপলব্ধ টাস্কসমূহ
+            </h2>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="bg-rose-50 text-[#E11D48] text-xs font-extrabold px-3 py-1.5 rounded-full border border-rose-100 shadow-sm">
+                মোট কাজ: {{ tasks|length }} টি
+            </span>
         </div>
     </div>
-    {% else %}
-    <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
-        <p style="color: var(--text-muted);">বর্তমানে কোনো নতুন টাস্ক উপলব্ধ নেই। কিছুক্ষণ পর পুনরায় চেক করুন।</p>
+
+    <!-- Rule Hint Box -->
+    <div class="bg-white border border-rose-100 rounded-2xl p-3.5 flex items-center gap-3 shadow-sm text-xs text-slate-600">
+        <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-lightbulb"></i>
+        </div>
+        <p class="leading-relaxed">
+            নির্দেশনা অনুযায়ী কাজ সম্পন্ন করে স্ক্রিনশট জমা দিন। ভেরিফিকেশন শেষে ব্যালেন্সে সরাসরি টাকা যোগ হবে।
+        </p>
     </div>
-    {% endfor %}
+
+    <!-- Tasks Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for task in tasks %}
+        <div class="bg-white border border-rose-50/80 rounded-[28px] p-5 shadow-xl shadow-rose-100/30 hover:shadow-rose-100/60 transition duration-300 flex flex-col justify-between group">
+            
+            <div>
+                <!-- Top Row: Icon + Reward Pill -->
+                <div class="flex items-start justify-between gap-2 mb-3">
+                    <div class="w-10 h-10 rounded-2xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-sm group-hover:scale-105 transition">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <span class="bg-emerald-50 text-emerald-700 text-xs font-black px-2.5 py-1 rounded-xl border border-emerald-100 shrink-0">
+                        ৳ {{ "%.2f"|format(task.amount) }}
+                    </span>
+                </div>
+
+                <!-- Title & Description -->
+                <h3 class="font-extrabold text-slate-900 text-sm leading-snug mb-1.5 line-clamp-1">
+                    {{ task.title }}
+                </h3>
+                <p class="text-[11px] text-slate-400 leading-relaxed line-clamp-2 mb-4">
+                    {{ task.description }}
+                </p>
+            </div>
+
+            <!-- Action Button -->
+            <a href="/task/{{ task.id }}" 
+               class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-extrabold text-xs py-3 rounded-2xl transition shadow-md shadow-rose-500/20 flex items-center justify-center gap-2">
+                <span>কাজটি শুরু করুন</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+
+        </div>
+        {% else %}
+        <!-- Empty State -->
+        <div class="col-span-full bg-white border border-rose-50/80 rounded-[32px] p-12 text-center text-slate-400 shadow-sm">
+            <div class="w-16 h-16 mx-auto rounded-3xl bg-slate-50 text-slate-300 flex items-center justify-center text-2xl mb-3">
+                <i class="fa-solid fa-inbox"></i>
+            </div>
+            <h4 class="text-sm font-bold text-slate-700 mb-1">বর্তমানে কোনো নতুন কাজ নেই</h4>
+            <p class="text-xs">নতুন টাস্ক খুব শীঘ্রই যুক্ত করা হবে। কিছুক্ষণ পর আবার চেক করুন।</p>
+        </div>
+        {% endfor %}
+    </div>
+
 </div>
 {% endblock %}
