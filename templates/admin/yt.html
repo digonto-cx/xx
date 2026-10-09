@@ -1,0 +1,84 @@
+{% extends 'admin/base_admin.html' %}
+{% block admin_content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <!-- Add Video Form -->
+    <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm h-fit">
+        <h3 class="text-base font-extrabold text-slate-900 mb-1 flex items-center gap-2">
+            <i class="fa-brands fa-youtube text-red-600 text-lg"></i> নতুন YouTube ভিডিও যুক্ত করুন
+        </h3>
+        <p class="text-xs text-slate-400 mb-4">ভিডিও লিংক এবং রিওয়ার্ড প্রাইজ দিন</p>
+
+        <form action="/admin/yt" method="POST" class="space-y-3.5">
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">ভিডিও টাইটেল</label>
+                <input type="text" name="title" required placeholder="ভিডিওর শিরোনাম দিন" 
+                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none">
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">YouTube লিংক</label>
+                <input type="url" name="video_url" required placeholder="https://youtu.be/... বা watch?v=..." 
+                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none">
+            </div>
+
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1">পুরস্কারের পরিমাণ (৳)</label>
+                <input type="number" step="0.01" name="amount" required placeholder="যেমন: 1.50" 
+                    class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none">
+            </div>
+
+            <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-xs py-3 rounded-xl transition shadow-md shadow-rose-500/20">
+                + ভিডিও প্রকাশ করুন
+            </button>
+        </form>
+    </div>
+
+    <!-- Existing Videos List -->
+    <div class="md:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <h3 class="text-base font-extrabold text-slate-900 mb-1">সক্রিয় YouTube ভিডিও তালিকা</h3>
+        <p class="text-xs text-slate-400 mb-4">মোট ভিডিও: {{ videos|length }} টি</p>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-100 text-[11px] text-slate-400 font-bold uppercase">
+                        <th class="py-2.5 px-3">থাম্বনেইল</th>
+                        <th class="py-2.5 px-3">টাইটেল</th>
+                        <th class="py-2.5 px-3">পুরস্কার</th>
+                        <th class="py-2.5 px-3 text-right">অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-xs">
+                    {% for v in videos %}
+                    <tr>
+                        <td class="py-3 px-3">
+                            <img src="https://img.youtube.com/vi/{{ v.video_id }}/default.jpg" 
+                                 class="w-16 h-10 object-cover rounded-lg shadow-sm">
+                        </td>
+                        <td class="py-3 px-3 font-semibold text-slate-800 max-w-[200px] truncate">
+                            {{ v.title }}
+                        </td>
+                        <td class="py-3 px-3 font-extrabold text-emerald-600">
+                            ৳ {{ "%.2f"|format(v.amount) }}
+                        </td>
+                        <td class="py-3 px-3 text-right">
+                            <form action="/admin/yt/delete/{{ v.id }}" method="POST" onsubmit="return confirm('ভিডিওটি ডিলিট করতে চান?');">
+                                <button type="submit" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                    <i class="fa-solid fa-trash-can mr-1"></i> ডিলিট
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-slate-400">কোনো ভিডিও যুক্ত করা হয়নি।</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
