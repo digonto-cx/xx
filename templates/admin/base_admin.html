@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MicroEarnX Super Admin</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gradient-to-b from-rose-50/40 via-white to-amber-50/20 min-h-screen text-slate-800 flex flex-col font-sans antialiased">
+
+    <!-- Top Admin Bar -->
+    <header class="bg-slate-900 text-white sticky top-0 z-50 border-b border-slate-800 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+            
+            <a href="/admin" class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-full bg-[#E11D48] text-white flex items-center justify-center text-sm shadow">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <span class="font-extrabold text-white text-base tracking-wider">
+                    MICRO<span class="text-[#E11D48]">ADMIN</span> ⚡
+                </span>
+            </a>
+
+            <!-- Quick Navigation (Scrollable on Mobile) -->
+            <nav class="hidden md:flex items-center gap-1.5 text-xs font-bold">
+                <a href="/admin" class="px-3 py-2 rounded-xl hover:bg-slate-800 transition">ড্যাশবোর্ড</a>
+                <a href="/admin/users" class="px-3 py-2 rounded-xl hover:bg-slate-800 transition">ইউজার্স</a>
+                <a href="/admin/withdraw" class="px-3 py-2 rounded-xl hover:bg-slate-800 transition">উইথড্রয়াল</a>
+                <a href="/admin/task" class="px-3 py-2 rounded-xl hover:bg-slate-800 transition">টাস্ক</a>
+                <a href="/admin/submit" class="px-3 py-2 rounded-xl hover:bg-slate-800 transition">বাল্ক রিভিউ</a>
+                <a href="/admin/yt" class="px-3 py-2 rounded-xl hover:bg-slate-800 transition text-red-400">YouTube</a>
+                <a href="/admin/imgbb" class="px-3 py-2 rounded-xl hover:bg-slate-800 transition">ImgBB Keys</a>
+            </nav>
+
+            <a href="/logout" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-3 py-2 rounded-xl transition">
+                <i class="fa-solid fa-power-off mr-1"></i> লগআউট
+            </a>
+
+        </div>
+
+        <!-- Mobile Horizontal Nav -->
+        <div class="md:hidden flex items-center gap-2 overflow-x-auto px-4 py-2 bg-slate-800/80 text-[11px] font-bold border-t border-slate-700/60 no-scrollbar">
+            <a href="/admin" class="px-2.5 py-1 rounded-lg bg-slate-700 whitespace-nowrap">স্ট্যাটস</a>
+            <a href="/admin/users" class="px-2.5 py-1 rounded-lg hover:bg-slate-700 whitespace-nowrap">ইউজার</a>
+            <a href="/admin/withdraw" class="px-2.5 py-1 rounded-lg hover:bg-slate-700 whitespace-nowrap">উইথড্র</a>
+            <a href="/admin/task" class="px-2.5 py-1 rounded-lg hover:bg-slate-700 whitespace-nowrap">টাস্ক</a>
+            <a href="/admin/submit" class="px-2.5 py-1 rounded-lg hover:bg-slate-700 whitespace-nowrap">বাল্ক</a>
+            <a href="/admin/yt" class="px-2.5 py-1 rounded-lg hover:bg-slate-700 text-red-400 whitespace-nowrap">YouTube</a>
+            <a href="/admin/imgbb" class="px-2.5 py-1 rounded-lg hover:bg-slate-700 whitespace-nowrap">ImgBB</a>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-6xl w-full mx-auto p-4 md:py-6">
+        <!-- Flash Message -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-2xl text-xs font-bold flex items-center gap-3 border shadow-sm {% if category == 'success' %}bg-emerald-50 text-emerald-800 border-emerald-200{% else %}bg-rose-50 text-rose-800 border-rose-200{% endif %}">
+                        <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block admin_content %}{% endblock %}
+    </main>
+
+</body>
+</html>
