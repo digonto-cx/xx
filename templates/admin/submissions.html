@@ -1,0 +1,52 @@
+{% extends 'admin/base_admin.html' %}
+{% block admin_content %}
+<div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-5">
+    
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+            <h3 class="text-base font-black text-slate-900">টাস্ক সাবমিশন ও বাল্ক রিভিউ</h3>
+            <p class="text-xs text-slate-400">এক ক্লিকে সর্বোচ্চ ৩০টি রিভিউ (স্বয়ংক্রিয় ৩টি র‍্যান্ডম রিজেক্ট)</p>
+        </div>
+
+        <form action="/admin/submit/bulk" method="POST" onsubmit="return confirm('সর্বোচ্চ ৩০টি টাস্কের মধ্যে ৩টি র‍্যান্ডম রিজেক্ট করে বাকিগুলো অ্যাপ্রুভ করতে চান?');">
+            <button type="submit" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition flex items-center gap-2">
+                <i class="fa-solid fa-bolt"></i>
+                <span>বাল্ক রিভিউ চালান (Max 30, Auto 3 Reject)</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs">
+            <thead>
+                <tr class="border-b border-slate-100 text-[10px] text-slate-400 uppercase font-bold">
+                    <th class="py-2.5 px-3">ইউজার ইমেইল</th>
+                    <th class="py-2.5 px-3">টাস্ক টাইটেল</th>
+                    <th class="py-2.5 px-3">পুরস্কার</th>
+                    <th class="py-2.5 px-3 text-right">স্ক্রিনশট প্রুফ</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for s in submissions %}
+                <tr>
+                    <td class="py-3 px-3 font-semibold text-slate-800">{{ s.users.email }}</td>
+                    <td class="py-3 px-3 text-slate-600">{{ s.tasks.title }}</td>
+                    <td class="py-3 px-3 font-extrabold text-emerald-600">৳ {{ "%.2f"|format(s.tasks.amount) }}</td>
+                    <td class="py-3 px-3 text-right">
+                        <a href="{{ s.proof_url }}" target="_blank" class="bg-slate-100 hover:bg-slate-200 text-indigo-600 font-bold px-3 py-1.5 rounded-lg text-xs transition inline-flex items-center gap-1">
+                            <i class="fa-solid fa-image"></i> ছবি দেখুন
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" class="py-8 text-center text-slate-400">কোনো পেন্ডিং টাস্ক নেই।</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+{% endblock %}
