@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto space-y-4 pb-8">
+
+    <!-- Back Button -->
+    <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition px-1">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>ড্যাশবোর্ডে ফিরুন</span>
+    </a>
+
+    <!-- Main Spin Card -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 flex flex-col items-center text-center relative overflow-hidden">
+        
+        <!-- Header -->
+        <div class="flex items-center gap-2 mb-1">
+            <div class="w-8 h-8 rounded-full bg-amber-50 text-amber-500 flex items-center justify-center text-sm shadow-sm">
+                <i class="fa-solid fa-dharmachakra"></i>
+            </div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight">লাকি স্পিন হুইল</h2>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">স্পিন করে জিতে নিন ৳০.৫০ থেকে ৳৫.০০ পর্যন্ত ক্যাশ</p>
+
+        <!-- Status Pills -->
+        <div class="w-full bg-rose-50/50 border border-rose-100 rounded-2xl py-2.5 px-3 flex items-center justify-between mb-6 text-xs">
+            <span class="text-slate-600 font-bold">আজকে বাকি:</span>
+            <span class="bg-white text-[#E11D48] font-black px-3 py-1 rounded-xl shadow-sm border border-rose-100" id="remainingBadge">
+                {{ remaining }} / ৩ বার
+            </span>
+        </div>
+
+        <!-- Wheel Container -->
+        <div class="relative w-64 h-64 my-2 flex items-center justify-center">
+            
+            <!-- Top Pointer Arrow -->
+            <div class="absolute -top-3 z-20 text-rose-600 text-2xl drop-shadow-md">
+                <i class="fa-solid fa-location-pin"></i>
+            </div>
+
+            <!-- CSS Conic-Gradient Spin Wheel -->
+            <div id="wheelCircle" class="w-60 h-60 rounded-full border-4 border-white shadow-xl relative overflow-hidden transition-transform duration-[3500ms] ease-out"
+                 style="background: conic-gradient(
+                    #f87171 0deg 60deg, 
+                    #fbbf24 60deg 120deg, 
+                    #34d399 120deg 180deg, 
+                    #60a5fa 180deg 240deg, 
+                    #a78bfa 240deg 300deg, 
+                    #f472b6 300deg 360deg
+                 );">
+                
+                <!-- Center Core Badge -->
+                <div class="absolute inset-0 m-auto w-14 h-14 bg-white rounded-full border-4 border-slate-100 shadow-md flex items-center justify-center text-xs font-black text-slate-800 z-10">
+                    ৳
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Current Balance Live Card -->
+        <div class="my-4 text-xs font-bold text-slate-500">
+            বর্তমান ব্যালেন্স: <span class="text-emerald-600 font-black text-sm" id="liveUserBal">৳ {{ "%.2f"|format(user.balance) }}</span>
+        </div>
+
+        <!-- Spin Action Button -->
+        <button id="spinBtn" onclick="runSpinWheel()" 
+                class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-4 px-4 rounded-2xl transition shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-play text-xs"></i>
+            <span id="spinBtnLabel">স্পিন শুরু করুন</span>
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= INLINE JS CONTROLLER ================= -->
+<script>
+let spinning = false;
+let currentRotation = 0;
+
+function runSpinWheel() {
+    if (spinning) return;
+    
+    const spinBtn = document.getElementById('spinBtn');
+    const spinBtnLabel = document.getElementById('spinBtnLabel');
+    const wheel = document.getElementById('wheelCircle');
+
+    spinning = true;
+    spinBtn.disabled = true;
+    spinBtnLabel.innerText = "স্পিন হচ্ছে...";
+
+    // POST Request to /spin
+    fetch('/spin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.message);
+            spinning = false;
+            spinBtn.disabled = false;
+            spinBtnLabel.innerText = "স্পিন শুরু করুন";
+            return;
+        }
+
+        // Random rotation: Minimum 5 full turns (1800 deg) + random angle
+        const randomDegree = 1800 + Math.floor(Math.random() * 360);
+        currentRotation += randomDegree;
+        wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+        // Wait for rotation animation to complete (3.5 seconds)
+        setTimeout(() => {
+            alert(`🎉 অভিনন্দন! আপনি লাকি স্পিন থেকে ৳${parseFloat(data.reward).toFixed(2)} জিতেছেন!`);
+            document.getElementById('liveUserBal').innerText = `৳ ${parseFloat(data.new_balance).toFixed(2)}`;
+            document.getElementById('remainingBadge').innerText = `${data.remaining} / ৩ বার`;
+            
+            spinning = false;
+            spinBtn.disabled = false;
+            spinBtnLabel.innerText = "আবার স্পিন করুন";
+        }, 3600);
+    })
+    .catch(() => {
+        alert("সার্ভার সমস্যা! অনুগ্রহ করে কিছুক্ষণ পর চেষ্টা করুন।");
+        spinning = false;
+        spinBtn.disabled = false;
+        spinBtnLabel.innerText = "স্পিন শুরু করুন";
+    });
+}
+</script>
+{% endblock %}
