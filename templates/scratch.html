@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto space-y-4 pb-8">
+
+    <!-- Back Button -->
+    <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition px-1">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>ড্যাশবোর্ডে ফিরুন</span>
+    </a>
+
+    <!-- Main Scratch Card Container -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 flex flex-col items-center text-center relative overflow-hidden">
+        
+        <!-- Header -->
+        <div class="flex items-center gap-2 mb-1">
+            <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm shadow-sm">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight">লাকি স্ক্র্যাচ কার্ড</h2>
+        </div>
+        <p class="text-xs text-slate-400 mb-4">কার্ডটি ঘষে জিতে নিন ৳১.০০ থেকে ৳৬.০০ পর্যন্ত ক্যাশ</p>
+
+        <!-- Status Pills -->
+        <div class="w-full bg-emerald-50/50 border border-emerald-100 rounded-2xl py-2.5 px-3 flex items-center justify-between mb-6 text-xs">
+            <span class="text-slate-600 font-bold">আজকে বাকি:</span>
+            <span class="bg-white text-emerald-600 font-black px-3 py-1 rounded-xl shadow-sm border border-emerald-100" id="scratchRemainingBadge">
+                {{ remaining }} / ৩ বার
+            </span>
+        </div>
+
+        <!-- Scratch Canvas Box (Width: 280, Height: 150) -->
+        <div class="relative w-[280px] h-[150px] rounded-2xl overflow-hidden shadow-inner border border-slate-200 select-none">
+            
+            <!-- Hidden Underlying Reward Layer -->
+            <div class="absolute inset-0 bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex flex-col items-center justify-center">
+                <span class="text-[11px] font-bold uppercase tracking-wider opacity-90">আপনি পেয়েছেন</span>
+                <span id="revealedAmountText" class="text-3xl font-black tracking-tight mt-1">৳ ০.০০</span>
+                <span class="text-[9px] font-bold bg-white/20 px-2 py-0.5 rounded-full mt-1.5">সরাসরি ব্যালেন্সে যোগ হয়েছে</span>
+            </div>
+
+            <!-- Foreground Silver Scratch Overlay Canvas -->
+            <canvas id="scratchCanvas" width="280" height="150" class="absolute inset-0 cursor-crosshair z-10"></canvas>
+
+        </div>
+
+        <p class="text-[11px] text-slate-400 mt-3 font-medium">
+            <i class="fa-solid fa-hand-pointer text-amber-500 mr-1"></i> আঙ্গুল বা মাউস দিয়ে সিলভার অংশটি ঘষুন
+        </p>
+
+        <!-- Current Balance Display -->
+        <div class="my-4 text-xs font-bold text-slate-500">
+            বর্তমান ব্যালেন্স: <span class="text-emerald-600 font-black text-sm" id="liveScratchBal">৳ {{ "%.2f"|format(user.balance) }}</span>
+        </div>
+
+        <!-- Reset Button -->
+        <button id="resetCardBtn" onclick="resetScratchBoard()" 
+                class="w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs py-3.5 px-4 rounded-2xl transition shadow flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-right text-xs"></i>
+            <span>পরবর্তী কার্ড নিন</span>
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= INLINE TOUCH & SCRATCH ENGINE ================= -->
+<script>
+let isScratching = false;
+let alreadyClaimed = false;
+const canvas = document.getElementById('scratchCanvas');
+const ctx = canvas.getContext('2d');
+
+function drawScratchOverlay() {
+    ctx.globalCompositeOperation = 'source-over';
+    
+    // Silver gradient overlay
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#94a3b8');
+    gradient.addColorStop(0.5, '#cbd5e1');
+    gradient.addColorStop(1, '#94a3b8');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Overlay text
+    ctx.font = "bold 14px Arial";
+    ctx.fillStyle = "#475569";
+    ctx.textAlign = "center";
+    ctx.fillText("ঘষে পুরস্কার দেখুন 🎁", canvas.width / 2, canvas.height / 2 + 5);
+}
+
+// Scratch handler
+function scratch(e) {
+    if (!isScratching || alreadyClaimed) return;
+
+    // Prevent default scroll on touch
+    if (e.cancelable && e.type.startsWith('touch')) e.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Trigger Reward Claim immediately on initial scratch
+    if (!alreadyClaimed) {
+        alreadyClaimed = true;
+        claimScratchReward();
+    }
+}
+
+function claimScratchReward() {
+    fetch('/scratch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('revealedAmountText').innerText = `৳ ${parseFloat(data.reward).toFixed(2)}`;
+            document.getElementById('liveScratchBal').innerText = `৳ ${parseFloat(data.new_balance).toFixed(2)}`;
+            document.getElementById('scratchRemainingBadge').innerText = `${data.remaining} / ৩ বার`;
+            
+            // Fade out remainder of canvas
+            setTimeout(() => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }, 800);
+        } else {
+            alert(data.message);
+            drawScratchOverlay();
+            alreadyClaimed = false;
+        }
+    })
+    .catch(() => {
+        alert("সার্ভার ব্যস্ত, কিছুক্ষণ পর চেষ্টা করুন।");
+        drawScratchOverlay();
+        alreadyClaimed = false;
+    });
+}
+
+function resetScratchBoard() {
+    alreadyClaimed = false;
+    document.getElementById('revealedAmountText').innerText = "৳ ০.০০";
+    drawScratchOverlay();
+}
+
+// Attach Touch & Mouse Events
+canvas.addEventListener('mousedown', () => isScratching = true);
+window.addEventListener('mouseup', () => isScratching = false);
+canvas.addEventListener('mousemove', scratch);
+
+canvas.addEventListener('touchstart', (e) => { isScratching = true; scratch(e); }, { passive: false });
+window.addEventListener('touchend', () => isScratching = false);
+canvas.addEventListener('touchmove', scratch, { passive: false });
+
+// Initial Draw on Load
+window.addEventListener('DOMContentLoaded', drawScratchOverlay);
+</script>
+{% endblock %}
