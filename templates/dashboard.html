@@ -1,86 +1,260 @@
 {% extends 'base.html' %}
 {% block content %}
-<!-- Site Notice -->
-{% if notice %}
-<div class="site-notice">
-    📢 <strong>নোটিশ:</strong> {{ notice }}
-</div>
-{% endif %}
+<div class="max-w-lg mx-auto space-y-4 pb-8">
 
-<!-- Balance & Stats Grid -->
-<div class="grid">
-    <div class="card balance-card">
-        <div class="card-title" style="color: #e0e7ff;">বর্তমান ব্যালেন্স</div>
-        <h2 id="userBalance">৳ {{ "%.2f"|format(user.balance) }}</h2>
-        <p style="font-size: 0.85rem; opacity: 0.9;">সর্বনিম্ন উইথড্র: ৳৫০০</p>
-    </div>
-
-    <div class="card">
-        <div class="card-title">আপনার রেফারেল</div>
-        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 10px;">
-            প্রতি সফল রেফারেলে পাবেন <strong>৳১৫</strong>। মোট রেফার: <strong>{{ referral_count }}</strong> টি।
-        </p>
-        <div class="form-group">
-            <input type="text" id="refLink" class="form-control" readonly value="{{ request.host_url }}?ref={{ user.referral_code }}">
+    <!-- 1. USER GREETING & NOTICE -->
+    <div class="flex items-center justify-between px-1">
+        <div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">স্বাগতম ফিরে আসার জন্য</span>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+                {{ user.name }} <span class="text-sm">👋</span>
+            </h2>
         </div>
-        <button class="btn btn-primary" onclick="copyReferralLink('refLink')" style="width: 100%;">রেফার লিংক কপি করুন</button>
+        <div class="flex items-center gap-1.5 bg-white border border-rose-100 px-3 py-1.5 rounded-full shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-[11px] font-bold text-slate-600">আইডি: #{{ user.id }}</span>
+        </div>
     </div>
-</div>
 
-<!-- Quick Actions -->
-<div class="grid">
-    <a href="/tasks" class="card" style="text-decoration: none; color: inherit; text-align: center;">
-        <h3 style="color: var(--primary);">📝 টাস্ক কমপ্লিট করুন</h3>
-        <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">কাজ সম্পন্ন করে প্রমাণ জমা দিন</p>
+    <!-- Site Notice Banner -->
+    {% if notice %}
+    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-3.5 flex items-start gap-3 shadow-sm">
+        <div class="w-7 h-7 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-xs shadow-sm mt-0.5">
+            <i class="fa-solid fa-bullhorn"></i>
+        </div>
+        <p class="text-xs text-amber-900 font-medium leading-relaxed">
+            {{ notice }}
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- 2. HERO BALANCE CARD -->
+    <div class="bg-gradient-to-tr from-[#E11D48] to-rose-500 rounded-[32px] p-6 text-white shadow-xl shadow-rose-500/25 relative overflow-hidden">
+        <div class="relative z-10">
+            <div class="flex items-center justify-between opacity-90 mb-1">
+                <span class="text-xs font-bold uppercase tracking-wider">বর্তমান ওয়ালেট ব্যালেন্স</span>
+                <i class="fa-solid fa-shield-halved text-sm opacity-80"></i>
+            </div>
+            
+            <div class="flex items-baseline gap-1 my-2">
+                <span class="text-4xl sm:text-5xl font-black tracking-tight" id="userBalanceDisplay">
+                    ৳ {{ "%.2f"|format(user.balance) }}
+                </span>
+            </div>
+
+            <!-- Quick Action Buttons in Card -->
+            <div class="flex items-center gap-2 mt-4 pt-4 border-t border-white/20">
+                <a href="#withdrawSection" class="flex-1 bg-white hover:bg-rose-50 text-[#E11D48] text-xs font-extrabold py-2.5 px-4 rounded-xl text-center shadow-md active:scale-95 transition">
+                    <i class="fa-solid fa-money-bill-transfer mr-1"></i> টাকা তুলুন
+                </a>
+                <a href="/tasks" class="flex-1 bg-black/20 hover:bg-black/30 border border-white/30 text-white text-xs font-extrabold py-2.5 px-4 rounded-xl text-center active:scale-95 transition">
+                    <i class="fa-solid fa-list-check mr-1"></i> টাস্ক শুরু করুন
+                </a>
+            </div>
+        </div>
+
+        <!-- Background Watermark Icon -->
+        <i class="fa-solid fa-wallet absolute -right-6 -bottom-6 text-9xl text-white/10"></i>
+    </div>
+
+    <!-- 3. METRICS STATUS BOX (Same 500 Theme Style) -->
+    <div class="w-full bg-white border border-rose-100 rounded-2xl py-3 px-2 grid grid-cols-3 divide-x divide-slate-100 shadow-sm text-center">
+        <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">মোট রেফারেল</span>
+            <span class="text-xs font-black text-slate-800">{{ referral_count }} জন</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">প্রতি রেফারে</span>
+            <span class="text-xs font-black text-amber-600">+৳১৫.০০</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">মিনিমাম পেআউট</span>
+            <span class="text-xs font-black text-emerald-600">৳৫০০.০০</span>
+        </div>
+    </div>
+
+    <!-- 4. EARNING APPS & MINI GAMES -->
+    <div id="games" class="grid grid-cols-2 gap-3">
+        
+        <!-- Lucky Spin Card -->
+        <div class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm flex flex-col justify-between text-center relative overflow-hidden group">
+            <div class="w-11 h-11 mx-auto rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg mb-2 group-hover:rotate-45 transition duration-300">
+                <i class="fa-solid fa-dharmachakra"></i>
+            </div>
+            <h4 class="text-xs font-black text-slate-900">লাকি স্পিন</h4>
+            <p class="text-[10px] text-slate-400 my-1">দৈনিক স্পিন করে বোনাস জিতুন</p>
+            <button onclick="triggerLuckySpin()" id="spinActionBtn" class="mt-2 w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-[11px] font-extrabold py-2 rounded-xl transition shadow-sm">
+                স্পিন করুন
+            </button>
+        </div>
+
+        <!-- Scratch Card -->
+        <div class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm flex flex-col justify-between text-center relative overflow-hidden group">
+            <div class="w-11 h-11 mx-auto rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition duration-300">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h4 class="text-xs font-black text-slate-900">স্ক্র্যাচ কার্ড</h4>
+            <p class="text-[10px] text-slate-400 my-1">কার্ড ঘষে সরাসরি টাকা পান</p>
+            <button onclick="triggerScratchCard()" id="scratchActionBtn" class="mt-2 w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-[11px] font-extrabold py-2 rounded-xl transition shadow-sm">
+                কার্ড ঘষুন
+            </button>
+        </div>
+
+    </div>
+
+    <!-- 5. REFERRAL SHARE CARD -->
+    <div class="bg-white border border-rose-50/80 rounded-[28px] p-5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-full bg-rose-50 text-[#E11D48] flex items-center justify-center text-xs">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <h4 class="text-xs font-black text-slate-900">রেফারেল লিংক শেয়ার করুন</h4>
+            </div>
+            <span class="text-[10px] bg-rose-50 text-[#E11D48] font-black px-2 py-0.5 rounded-full">
+                রেফার কোড: {{ user.referral_code }}
+            </span>
+        </div>
+        
+        <p class="text-[11px] text-slate-500 mb-3 leading-relaxed">
+            বন্ধুদের ইনভাইট করুন। বন্ধু পাবে <strong>৳১০০</strong> এবং আপনি পাবেন <strong>৳১৫</strong> ক্যাশ!
+        </p>
+
+        <div class="flex items-center gap-1.5">
+            <input type="text" id="shareRefLink" readonly 
+                   value="{{ request.host_url }}?ref={{ user.referral_code }}" 
+                   class="flex-1 bg-slate-50 border border-slate-200 text-slate-600 text-xs font-mono px-3.5 py-2.5 rounded-xl focus:outline-none">
+            
+            <button onclick="copyRefLink()" class="bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white text-xs font-extrabold px-4 py-2.5 rounded-xl transition shadow-md shadow-rose-500/20 flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i>
+                <span>কপি</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 6. WITHDRAWAL SECTION -->
+    <div id="withdrawSection" class="bg-white border border-rose-50/80 rounded-[32px] p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+            <div class="w-8 h-8 rounded-full bg-rose-50 text-[#E11D48] flex items-center justify-center text-sm">
+                <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-black text-slate-900">উইথড্রয়াল রিকোয়েস্ট</h3>
+                <p class="text-[10px] text-slate-400">বিকাশ / নগদ / রকেট পার্সোনাল</p>
+            </div>
+        </div>
+
+        <div class="p-3 bg-amber-50/60 border border-amber-100 rounded-2xl my-3 text-[11px] text-amber-900">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 mr-1"></i>
+            শর্ত: সর্বনিম্ন <strong>৪টি রেফারেল</strong> (আপনার বর্তমান: {{ referral_count }} টি) এবং <strong>৫০০ টাকা</strong> ব্যালেন্স থাকতে হবে।
+        </div>
+
+        <form action="/withdraw" method="POST" class="space-y-3 mt-4">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">উইথড্র অ্যামাউন্ট (৳)</label>
+                <input type="number" name="amount" min="500" required placeholder="সর্বনিম্ন 500" 
+                    class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পেমেন্ট মেথড</label>
+                    <select name="method" required 
+                        class="w-full px-3 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+                        <option value="bKash">bKash (বিকাশ)</option>
+                        <option value="Nagad">Nagad (নগদ)</option>
+                        <option value="Rocket">Rocket (রকেট)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">অ্যাকাউন্ট নাম্বার</label>
+                    <input type="text" name="account" required placeholder="017xxxxxxxx" 
+                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-3">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>টাকা তোলার রিকোয়েস্ট পাঠান</span>
+            </button>
+        </form>
+    </div>
+
+    <!-- 7. TELEGRAM SUPPORT BUTTON -->
+    <a href="https://t.me/your_support_channel" target="_blank" 
+        class="w-full bg-white hover:bg-slate-50 border border-slate-200 active:scale-[0.98] transition-all text-slate-700 font-bold py-3 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 text-xs">
+        <i class="fa-brands fa-telegram text-sky-500 text-base"></i>
+        <span>টেলিগ্রাম হেল্পলাইন সাপোর্ট</span>
     </a>
 
-    <div class="card" style="text-align: center;">
-        <h3>🎡 লাকি স্পিন</h3>
-        <div class="wheel-box">
-            <div class="wheel" id="spinWheel"></div>
-            <button id="spinBtn" class="btn btn-warning" onclick="triggerSpin()" style="margin-top: 15px;">স্পিন করুন</button>
-        </div>
-    </div>
-
-    <div class="card" style="text-align: center;">
-        <h3>🎁 স্ক্র্যাচ কার্ড</h3>
-        <div class="scratch-box" style="margin-top: 15px;">
-            <div class="scratch-reward" id="scratchReward">ঘষুন!</div>
-            <canvas id="scratchCanvas" class="scratch-canvas" width="280" height="140"></canvas>
-        </div>
-    </div>
 </div>
 
-<!-- Withdraw Form -->
-<div class="card" style="margin-top: 25px;">
-    <h3>টাকা উইথড্র করুন</h3>
-    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 15px;">শর্ত: সর্বনিম্ন ৪টি রেফারেল ও ৫০০ টাকা ব্যালেন্স থাকতে হবে।</p>
-    <form action="/withdraw" method="POST">
-        <div class="grid" style="margin: 0 0 15px 0;">
-            <div class="form-group">
-                <label>উইথড্র অ্যামাউন্ট (৳)</label>
-                <input type="number" name="amount" min="500" class="form-control" required placeholder="500">
-            </div>
-            <div class="form-group">
-                <label>পেমেন্ট মাধ্যম</label>
-                <select name="method" class="form-control" required>
-                    <option value="bKash">bKash Personal</option>
-                    <option value="Nagad">Nagad Personal</option>
-                    <option value="Rocket">Rocket</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>অ্যাকাউন্ট নাম্বার</label>
-                <input type="text" name="account" class="form-control" required placeholder="017xxxxxxxx">
-            </div>
-        </div>
-        <button type="submit" class="btn btn-success">উইথড্র রিকোয়েস্ট পাঠান</button>
-    </form>
-</div>
-
+<!-- INTERACTIVE SCRIPTS -->
 <script>
-window.addEventListener('DOMContentLoaded', () => {
-    initScratchCard('scratchCanvas', 'scratchReward');
-});
+// Referral Link Copy
+function copyRefLink() {
+    const input = document.getElementById('shareRefLink');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(input.value).then(() => {
+        alert("রেফারেল লিংক কপি হয়েছে! বন্ধুদের ইনভাইট করুন।");
+    });
+}
+
+// Lucky Spin Action
+function triggerLuckySpin() {
+    const btn = document.getElementById('spinActionBtn');
+    btn.disabled = true;
+    btn.innerText = "স্পিন হচ্ছে...";
+
+    fetch('/spin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerText = "স্পিন করুন";
+        if (data.success) {
+            alert(`🎉 অভিনন্দন! আপনি ৳${data.reward} জিতেছেন!`);
+            document.getElementById('userBalanceDisplay').innerText = `৳ ${data.new_balance.toFixed(2)}`;
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerText = "স্পিন করুন";
+        alert("সার্ভার ব্যস্ত, কিছুক্ষণ পর চেষ্টা করুন।");
+    });
+}
+
+// Scratch Card Action
+function triggerScratchCard() {
+    const btn = document.getElementById('scratchActionBtn');
+    btn.disabled = true;
+    btn.innerText = "ঘষা হচ্ছে...";
+
+    fetch('/scratch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        btn.disabled = false;
+        btn.innerText = "কার্ড ঘষুন";
+        if (data.success) {
+            alert(`🎁 দারুণ! আপনি স্ক্র্যাচ করে ৳${data.reward} বোনাস পেয়েছেন!`);
+            document.getElementById('userBalanceDisplay').innerText = `৳ ${data.new_balance.toFixed(2)}`;
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(() => {
+        btn.disabled = false;
+        btn.innerText = "কার্ড ঘষুন";
+        alert("সার্ভার ব্যস্ত, কিছুক্ষণ পর চেষ্টা করুন।");
+    });
+}
 </script>
 {% endblock %}
