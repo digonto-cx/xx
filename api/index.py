@@ -605,6 +605,124 @@ def admin_bulk_submissions():
     flash(f"বাল্ক রিভিউ শেষ! {approved_count}টি অ্যাপ্রুভ এবং {reject_count}টি র‍্যান্ডমলি রিজেক্ট হয়েছে।", "success")
     return redirect(url_for('admin_submissions'))
 
+import re
+
+# --- YouTube Video ID Extractor Helper ---
+def extract_yt_id(url):
+    regex = r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+    match = re.search(regex, url)
+    return match.group(1) if match else None
+
+# ==========================================================
+# USER YOUTUBE EARN ROUTES
+# ==========================================================
+@app.route('/yt')
+@login_required
+def yt_videos():
+    sb = get_supabase()
+    user_id = session['user_id']
+    page = int(request.args.get('page', 1))
+    limit = 20
+    offset = (page - 1) * limit
+
+    # ইউজারের ইতোমধ্যে ক্লেইম করা ভিডিওগুলো বের করা
+    claimed_rows = sb.table('yt_claims').select('video_id').eq('user_id', user_id).execute().data or []
+    claimed_ids = [c['video_id'] for c in claimed_rows]
+
+    # ২০টি করে একটিভ ভিডিও আনা
+    query = sb.table('yt_videos').select('*').eq('is_active', True).order('id', desc=True)
+    all_videos = query.range(offset, offset + limit - 1).execute().data or []
+
+    # ভিডিওতে ক্লেইম স্ট্যাটাস ফ্ল্যাগ বসানো
+    for v in all_videos:
+        v['is_claimed'] = v['id'] in claimed_ids
+
+    total_count = len(sb.table('yt_videos').select('id').eq('is_active', True).execute().data or [])
+    has_next = (offset + limit) < total_count
+
+    return render_template('yt.html', videos=all_videos, page=page, has_next=has_next)
+
+@app.route('/yt/claim', methods=['POST'])
+@login_required
+def yt_claim():
+    sb = get_supabase()
+    user_id = session['user_id']
+    data = request.get_json() or {}
+    video_id = data.get('video_id')
+
+    if not video_id:
+        return jsonify({'success': False, 'message': 'অবৈধ ভিডিও আইডি!'})
+
+    # ১. ইউজার ইতিমধ্যে ক্লেইম করেছে কিনা চেক
+    already_claimed = sb.table('yt_claims').select('id').eq('user_id', user_id).eq('video_id', video_id).execute().data
+    if already_claimed:
+        return jsonify({'success': False, 'message': 'আপনি এই ভিডিওটি ইতিমধ্যে ক্লেইম করেছেন!'})
+
+    # ২. ভিডিও তথ্য যাচাই
+    video = sb.table('yt_videos').select('*').eq('id', video_id).single().execute().data
+    if not video or not video.get('is_active'):
+        return jsonify({'success': False, 'message': 'ভিডিওটি সক্রিয় নেই!'})
+
+    amount = float(video['amount'])
+
+    # ৩. ইউজারের ব্যালেন্সে টাকা যোগ এবং ক্লেইম হিস্ট্রি তৈরি
+    user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
+    new_balance = float(user['balance']) + amount
+
+    sb.table('users').update({'balance': new_balance}).eq('id', user_id).execute()
+    sb.table('yt_claims').insert({
+        'video_id': video_id,
+        'user_id': user_id,
+        'amount_earned': amount
+    }).execute()
+
+    return jsonify({
+        'success': True,
+        'message': f'🎉 অভিনন্দন! আপনি ৳{amount:.2f} সফলভাবে ক্লেইম করেছেন!',
+        'new_balance': new_balance
+    })
+
+# ==========================================================
+# ADMIN YOUTUBE CONTROLLER
+# ==========================================================
+@app.route('/admin/yt', methods=['GET', 'POST'])
+@admin_required
+def admin_yt():
+    sb = get_supabase()
+    if request.method == 'POST':
+        raw_url = request.form.get('video_url', '').strip()
+        title = request.form.get('title', '').strip() or 'YouTube Video'
+        try:
+            amount = float(request.form.get('amount', 1.00))
+        except ValueError:
+            amount = 1.00
+
+        vid = extract_yt_id(raw_url)
+        if not vid:
+            flash("ইউটিউব লিংক সঠিক নয়! (যেমন: https://youtu.be/... বা watch?v=... দিন)", "danger")
+            return redirect(url_for('admin_yt'))
+
+        sb.table('yt_videos').insert({
+            'video_url': raw_url,
+            'video_id': vid,
+            'title': title,
+            'amount': amount
+        }).execute()
+
+        flash("নতুন YouTube ভিডিও সফলভাবে যুক্ত হয়েছে!", "success")
+        return redirect(url_for('admin_yt'))
+
+    videos = sb.table('yt_videos').select('*').order('id', desc=True).execute().data or []
+    return render_template('admin/yt.html', videos=videos)
+
+@app.route('/admin/yt/delete/<int:video_id>', methods=['POST'])
+@admin_required
+def admin_yt_delete(video_id):
+    sb = get_supabase()
+    sb.table('yt_videos').delete().eq('id', video_id).execute()
+    flash("ভিডিওটি সফলভাবে ডিলিট করা হয়েছে!", "success")
+    return redirect(url_for('admin_yt'))
+    
 # ==========================================================
 # Local Development Execution
 # ==========================================================
