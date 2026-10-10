@@ -252,6 +252,7 @@ def register():
     try:
         inserted = sb.table('users').insert(new_user).execute()
         if inserted.data:
+            session.permanent = True
             session['user_id'] = inserted.data[0]['id']
             session['user_name'] = name
             flash(f"অভিনন্দন! আপনি ৳{initial_balance:.2f} জয়েনিং বোনাস পেয়েছেন।", "success")
@@ -278,6 +279,7 @@ def login():
         return redirect(url_for('index'))
 
     if check_password_hash(user['password_hash'], password):
+        session.permanent = True
         session['user_id'] = user['id']
         session['user_name'] = user['name']
         return redirect(url_for('dashboard'))
