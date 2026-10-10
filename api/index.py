@@ -484,31 +484,56 @@ def spin_page():
     user = sb.table('users').select('*').eq('id', user_id).single().execute().data
     remaining_spins = max(0, 3 - len(spins_today))
     return render_template('spin.html', user=user, remaining=remaining_spins)
-    
-@app.route('/scratch', methods=['POST'])
+
+# ==========================================================
+# SCRATCH CARD CONTROLLER (BUG-FREE WITH LIVE REMAINING)
+# ==========================================================
+@app.route('/scratch', methods=['GET', 'POST'])
 @login_required
-def scratch_card():
-    """Daily Scratch Card Feature"""
+def scratch_page():
     sb = get_supabase()
     user_id = session['user_id']
-    
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0).isoformat()
-    scratch_today = sb.table('daily_activities').select('id').eq('user_id', user_id).eq('activity_type', 'scratch').gte('created_at', today_start).execute().data
+    scratch_today = sb.table('daily_activities').select('id') \
+        .eq('user_id', user_id).eq('activity_type', 'scratch') \
+        .gte('created_at', today_start).execute().data or []
 
-    if len(scratch_today) >= 3:
-        return jsonify({"success": False, "message": "আজকের স্ক্র্যাচ কার্ড লিমিট শেষ!"})
+    # POST: স্ক্র্যাচ রিওয়ার্ড ক্লেম
+    if request.method == 'POST':
+        if len(scratch_today) >= 3:
+            return jsonify({
+                "success": False, 
+                "message": "আজকের ৩টি স্ক্র্যাচ ইতিমধ্যে শেষ হয়েছে! আগামীকাল আবার আসুন।",
+                "remaining": 0
+            })
 
-    reward = round(random.uniform(1.00, 6.00), 2)
-    user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
+        # রিওয়ার্ড অ্যামাউন্ট (৳১.০০ থেকে ৳৬.০০)
+        reward_pool = [1.00, 1.50, 2.00, 2.50, 3.00, 4.00, 5.00, 6.00]
+        reward = random.choice(reward_pool)
 
-    sb.table('users').update({'balance': float(user['balance']) + reward}).eq('id', user_id).execute()
-    sb.table('daily_activities').insert({
-        'user_id': user_id, 
-        'activity_type': 'scratch', 
-        'reward_earned': reward
-    }).execute()
+        user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
+        new_bal = float(user['balance']) + reward
 
-    return jsonify({"success": True, "reward": reward, "new_balance": float(user['balance']) + reward})
+        sb.table('users').update({'balance': new_bal}).eq('id', user_id).execute()
+        sb.table('daily_activities').insert({
+            'user_id': user_id, 
+            'activity_type': 'scratch', 
+            'reward_earned': reward
+        }).execute()
+
+        remaining = max(0, 3 - (len(scratch_today) + 1))
+        
+        return jsonify({
+            "success": True, 
+            "reward": reward, 
+            "new_balance": new_bal, 
+            "remaining": remaining
+        })
+
+    # GET: পেজ রেন্ডার
+    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
+    remaining_scratch = max(0, 3 - len(scratch_today))
+    return render_template('scratch.html', user=user, remaining=remaining_scratch)
     
 @app.route('/withdraw', methods=['GET', 'POST'])
 @login_required
