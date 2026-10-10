@@ -342,17 +342,19 @@ def scratch_card():
     }).execute()
 
     return jsonify({"success": True, "reward": reward, "new_balance": float(user['balance']) + reward})
-
-# ==========================================================
-# Withdrawal System
-# ==========================================================
-@app.route('/withdraw', methods=['POST'])
+    
+@app.route('/withdraw', methods=['GET', 'POST'])
 @login_required
 def withdraw():
     sb = get_supabase()
     user_id = session['user_id']
     user = sb.table('users').select('*').eq('id', user_id).single().execute().data
-    
+    ref_count = len(sb.table('users').select('id').eq('referred_by', user['referral_code']).execute().data or [])
+
+    # GET: ডেডিকেটেড পেজ রেন্ডার
+    if request.method == 'GET':
+        return render_template('withdraw.html', user=user, referral_count=ref_count)
+        
     try:
         amount = float(request.form.get('amount', 0))
     except ValueError:
@@ -361,22 +363,18 @@ def withdraw():
     method = request.form.get('method', '').strip()
     account = request.form.get('account', '').strip()
 
-    # শর্ত ১: সর্বনিম্ন ৫০০ টাকা
     if amount < 500:
         flash("সর্বনিম্ন উইথড্রয়াল অ্যামাউন্ট ৫০০ টাকা!", "danger")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('withdraw'))
 
     if float(user['balance']) < amount:
         flash("আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!", "danger")
-        return redirect(url_for('dashboard'))
+        return redirect(url_for('withdraw'))
 
-    # শর্ত ২: সর্বনিম্ন ৪টি রেফারেল আবশ্যক
-    ref_count = len(sb.table('users').select('id').eq('referred_by', user['referral_code']).execute().data or [])
     if ref_count < 4:
         flash(f"উইথড্র করতে সর্বনিম্ন ৪টি রেফারেল প্রয়োজন! আপনার বর্তমান রেফারেল: {ref_count} টি।", "danger")
-        return redirect(url_for('dashboard'))
-
-    # ব্যালেন্স ডিডাক্ট ও রিকোয়েস্ট তৈরি
+        return redirect(url_for('withdraw'))
+        
     sb.table('users').update({'balance': float(user['balance']) - amount}).eq('id', user_id).execute()
     sb.table('withdrawals').insert({
         'user_id': user_id,
@@ -388,7 +386,7 @@ def withdraw():
 
     flash("উইথড্রয়াল রিকোয়েস্ট সফলভাবে জমা হয়েছে!", "success")
     return redirect(url_for('dashboard'))
-
+    
 # ==========================================================
 # ADMIN CONTROLLER
 # ==========================================================
