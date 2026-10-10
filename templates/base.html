@@ -23,6 +23,23 @@
         }
     </script>
 
+    <!-- PWA Manifest & App Config -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#E11D48">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MicroEarnX">
+<link rel="apple-touch-icon" href="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg">
+
+<!-- Register Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js');
+        });
+    }
+</script>
+    
     <!-- Custom Liquid Glassmorphism & Neon Aura CSS -->
     <style>
         /* 1. Neon Circular Aura Rotating Behind X */
