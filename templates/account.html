@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto space-y-4 pb-8">
+
+    <!-- Back to Dashboard -->
+    <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition px-1">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>ড্যাশবোর্ডে ফিরুন</span>
+    </a>
+
+    <!-- Main Profile Card -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 space-y-6">
+        
+        <!-- Header & Avatar Section -->
+        <form method="POST" enctype="multipart/form-data" class="space-y-5">
+            
+            <div class="flex flex-col items-center text-center">
+                
+                <!-- Avatar with Camera Picker -->
+                <div class="relative group cursor-pointer">
+                    <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-rose-100 shadow-md bg-slate-100 flex items-center justify-center">
+                        {% if user.avatar_url %}
+                            <img id="avatarPreview" src="{{ user.avatar_url }}" alt="{{ user.name }}" class="w-full h-full object-cover">
+                        {% else %}
+                            <img id="avatarPreview" src="https://ui-avatars.com/api/?name={{ user.name }}&background=E11D48&color=fff&size=128" alt="{{ user.name }}" class="w-full h-full object-cover">
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Camera Button Overlay -->
+                    <label for="avatarInput" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white flex items-center justify-center text-xs shadow cursor-pointer transition active:scale-95">
+                        <i class="fa-solid fa-camera"></i>
+                    </label>
+                    <input type="file" name="avatar" id="avatarInput" accept="image/*" class="hidden" onchange="previewAvatar(this)">
+                </div>
+
+                <h3 class="text-base font-black text-slate-900 mt-3">{{ user.name }}</h3>
+                <p class="text-xs text-slate-400 font-medium">{{ user.email }}</p>
+
+                <!-- Status Pills -->
+                <div class="flex items-center gap-2 mt-2">
+                    <span class="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                        <i class="fa-solid fa-circle-check text-[9px] mr-0.5"></i> ভেরিফাইড ইউজার
+                    </span>
+                    <span class="text-[10px] font-bold bg-rose-50 text-[#E11D48] px-2.5 py-0.5 rounded-full border border-rose-100">
+                        রেফার কোড: {{ user.referral_code }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Stats Mini Bar -->
+            <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl py-2.5 px-2 grid grid-cols-3 divide-x divide-slate-200/60 text-center">
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase block">ব্যালেন্স</span>
+                    <span class="text-xs font-black text-slate-800">৳ {{ "%.2f"|format(user.balance) }}</span>
+                </div>
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase block">রেফারেল</span>
+                    <span class="text-xs font-black text-[#E11D48]">{{ ref_count }} জন</span>
+                </div>
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase block">সম্পন্ন কাজ</span>
+                    <span class="text-xs font-black text-emerald-600">{{ completed_tasks }} টি</span>
+                </div>
+            </div>
+
+            <!-- Personal Info Inputs -->
+            <div class="space-y-3 pt-2">
+                <span class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider block ml-1">ব্যক্তিগত তথ্য</span>
+                
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পূর্ণ নাম</label>
+                    <input type="text" name="name" value="{{ user.name }}" required 
+                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/40">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">ইমেইল (পরিবর্তনযোগ্য নয়)</label>
+                    <input type="email" value="{{ user.email }}" readonly 
+                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-400 bg-slate-100 cursor-not-allowed">
+                </div>
+            </div>
+
+            <!-- Social Accounts Connection -->
+            <div class="space-y-3 pt-3 border-t border-slate-100">
+                <span class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider block ml-1">সোশ্যাল একাউন্ট যুক্ত করুন</span>
+
+                <!-- Facebook Connect -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5 text-blue-600">
+                            <i class="fa-brands fa-facebook text-xs"></i> Facebook প্রোফাইল লিংক
+                        </span>
+                        {% if user.fb_link %}
+                            <a href="{{ user.fb_link }}" target="_blank" class="text-[10px] text-blue-600 hover:underline">কানেক্টেড প্রোফাইল দেখুন</a>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <input type="url" name="fb_link" value="{{ user.fb_link or '' }}" placeholder="https://facebook.com/your.username" 
+                            class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-slate-50/40">
+                        <i class="fa-brands fa-facebook absolute right-4 top-3 text-slate-300 text-xs"></i>
+                    </div>
+                </div>
+
+                <!-- Telegram Connect -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5 text-sky-500">
+                            <i class="fa-brands fa-telegram text-xs"></i> Telegram লিংক / ইউজারনেম
+                        </span>
+                        {% if user.tg_link %}
+                            <a href="{{ user.tg_link }}" target="_blank" class="text-[10px] text-sky-500 hover:underline">কানেক্টেড প্রোফাইল দেখুন</a>
+                        {% endif %}
+                    </label>
+                    <div class="relative">
+                        <input type="text" name="tg_link" value="{{ user.tg_link or '' }}" placeholder="https://t.me/your_username" 
+                            class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition bg-slate-50/40">
+                        <i class="fa-brands fa-telegram absolute right-4 top-3 text-slate-300 text-xs"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Badge Info -->
+            <div class="p-3 bg-rose-50/50 border border-rose-100 rounded-2xl text-[10px] text-slate-500 flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-[#E11D48] text-sm"></i>
+                <span>ডিভাইস বাইন্ডিং সক্রিয়। এই অ্যাকাউন্টে কেবল আপনার রেজিস্টার্ড ডিভাইস থেকে এক্সেস নিরাপদ।</span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" 
+                class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition">
+                <i class="fa-solid fa-floppy-disk text-xs"></i>
+                <span>পরিবর্তন সেভ করুন</span>
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- Realtime Image Preview Script -->
+<script>
+function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('avatarPreview').src = e.target.result;
+        }
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}
