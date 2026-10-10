@@ -433,32 +433,57 @@ def task_detail(task_id):
         return redirect(url_for('tasks'))
 
     return render_template('task_details.html', task=task)
-
-@app.route('/spin', methods=['POST'])
+# ==========================================================
+# LUCKY SPIN CONTROLLER (BUG-FREE WITH LIVE REMAINING)
+# ==========================================================
+@app.route('/spin', methods=['GET', 'POST'])
 @login_required
-def spin_wheel():
-    """Daily Spin Feature"""
+def spin_page():
     sb = get_supabase()
     user_id = session['user_id']
-    
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0).isoformat()
-    spins_today = sb.table('daily_activities').select('id').eq('user_id', user_id).eq('activity_type', 'spin').gte('created_at', today_start).execute().data
+    spins_today = sb.table('daily_activities').select('id') \
+        .eq('user_id', user_id).eq('activity_type', 'spin') \
+        .gte('created_at', today_start).execute().data or []
 
-    if len(spins_today) >= 3:
-        return jsonify({"success": False, "message": "আজকের স্পিন লিমিট শেষ!"})
+    # POST: স্পিন রিওয়ার্ড ক্যালকুলেশন
+    if request.method == 'POST':
+        if len(spins_today) >= 3:
+            return jsonify({
+                "success": False, 
+                "message": "আজকের ৩টি স্পিন সম্পন্ন হয়েছে! আগামীকাল আবার আসুন।", 
+                "remaining": 0
+            })
 
-    reward = round(random.uniform(0.50, 5.00), 2)
-    user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
+        # হুইলের স্লাইসের সাথে মিল রেখে রিওয়ার্ডস
+        slices = [0.50, 1.00, 1.50, 2.00, 3.00, 5.00]
+        reward = random.choice(slices)
+
+        user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
+        new_bal = float(user['balance']) + reward
+
+        sb.table('users').update({'balance': new_bal}).eq('id', user_id).execute()
+        sb.table('daily_activities').insert({
+            'user_id': user_id, 
+            'activity_type': 'spin', 
+            'reward_earned': reward
+        }).execute()
+
+        # নতুন বাকি সংখ্যা হিসাব
+        remaining = max(0, 3 - (len(spins_today) + 1))
+        
+        return jsonify({
+            "success": True, 
+            "reward": reward, 
+            "new_balance": new_bal, 
+            "remaining": remaining
+        })
+
+    # GET: পেজ রেন্ডার
+    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
+    remaining_spins = max(0, 3 - len(spins_today))
+    return render_template('spin.html', user=user, remaining=remaining_spins)
     
-    sb.table('users').update({'balance': float(user['balance']) + reward}).eq('id', user_id).execute()
-    sb.table('daily_activities').insert({
-        'user_id': user_id, 
-        'activity_type': 'spin', 
-        'reward_earned': reward
-    }).execute()
-
-    return jsonify({"success": True, "reward": reward, "new_balance": float(user['balance']) + reward})
-
 @app.route('/scratch', methods=['POST'])
 @login_required
 def scratch_card():
