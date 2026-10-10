@@ -1,0 +1,169 @@
+{% extends 'admin/base_admin.html' %}
+{% block admin_content %}
+<div class="space-y-5">
+
+    <!-- Header & Search Bar -->
+    <div class="bg-white border border-slate-200 rounded-[32px] p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-2">
+                <h3 class="text-base font-black text-slate-900">ইউজার ম্যানেজমেন্ট ও কন্ট্রোল</h3>
+                <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-2.5 py-0.5 rounded-full border border-rose-100">
+                    মোট: {{ total_count }} জন
+                </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">ইউজারদের ব্যালেন্স পরিবর্তন, ব্যান/আনব্যান ও সার্চ করুন</p>
+        </div>
+
+        <!-- Search Form -->
+        <form method="GET" action="/admin/users" class="flex items-center gap-2">
+            <div class="relative">
+                <input type="text" name="q" value="{{ search or '' }}" placeholder="নাম, ইমেইল বা রেফার কোড..." 
+                    class="w-56 sm:w-64 px-4 py-2.5 pl-9 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/50">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+            </div>
+            <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-4 py-2.5 rounded-2xl text-xs transition shadow-sm">
+                সার্চ
+            </button>
+            {% if search %}
+            <a href="/admin/users" class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-2.5 rounded-2xl text-xs font-bold transition">
+                রিসেট
+            </a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Users Table Card -->
+    <div class="bg-white border border-slate-200 rounded-[32px] p-5 sm:p-6 shadow-sm overflow-hidden">
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-slate-100 text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                        <th class="py-3 px-3">মেম্বার</th>
+                        <th class="py-3 px-3">রেফার ও ডিভাইস</th>
+                        <th class="py-3 px-3">ব্যালেন্স</th>
+                        <th class="py-3 px-3">স্ট্যাটাস</th>
+                        <th class="py-3 px-3">ব্যালেন্স যোগ / বিয়োগ</th>
+                        <th class="py-3 px-3 text-right">অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for u in users %}
+                    <tr class="hover:bg-slate-50/50 transition">
+                        
+                        <!-- Member Name & Email -->
+                        <td class="py-3.5 px-3">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-black text-xs flex items-center justify-center shrink-0 border border-slate-200">
+                                    {{ u.name[:1] }}
+                                </div>
+                                <div class="leading-tight">
+                                    <span class="font-extrabold text-slate-900 block">{{ u.name }}</span>
+                                    <span class="text-[11px] text-slate-400 font-mono">{{ u.email }}</span>
+                                </div>
+                            </div>
+                        </td>
+
+                        <!-- Referral & Device Info -->
+                        <td class="py-3.5 px-3">
+                            <span class="font-mono font-bold text-slate-700 block">কোড: {{ u.referral_code }}</span>
+                            <span class="text-[10px] text-slate-400 font-mono truncate max-w-[120px] block" title="{{ u.device_id }}">
+                                {{ u.device_id[:12] }}...
+                            </span>
+                        </td>
+
+                        <!-- Wallet Balance -->
+                        <td class="py-3.5 px-3">
+                            <span class="text-sm font-black text-emerald-600">
+                                ৳ {{ "%.2f"|format(u.balance) }}
+                            </span>
+                        </td>
+
+                        <!-- Ban Status Badge -->
+                        <td class="py-3.5 px-3">
+                            {% if u.is_banned %}
+                            <span class="text-[10px] font-black bg-rose-50 text-rose-600 px-2.5 py-1 rounded-full border border-rose-100 inline-flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Banned
+                            </span>
+                            {% else %}
+                            <span class="text-[10px] font-black bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full border border-emerald-100 inline-flex items-center gap-1">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                            </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Modify Balance Form -->
+                        <td class="py-3.5 px-3">
+                            <form action="/admin/user/{{ u.id }}/balance" method="POST" class="flex items-center gap-1.5">
+                                <input type="number" step="any" name="amount" placeholder="+৫০ বা -২০" required 
+                                    class="w-24 px-3 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#E11D48] bg-slate-50/50">
+                                <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-3 py-1.5 rounded-xl text-[11px] transition shadow-sm active:scale-95">
+                                    সেভ
+                                </button>
+                            </form>
+                        </td>
+
+                        <!-- Action Buttons (Ban/Unban & Delete) -->
+                        <td class="py-3.5 px-3 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <!-- Ban / Unban Toggle -->
+                                <form action="/admin/user/{{ u.id }}/ban" method="POST">
+                                    <button type="submit" 
+                                        class="px-3 py-1.5 rounded-xl text-[11px] font-extrabold transition active:scale-95 flex items-center gap-1 {% if u.is_banned %}bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-100{% else %}bg-amber-50 hover:bg-amber-100 text-amber-600 border border-amber-100{% endif %}">
+                                        <i class="fa-solid {% if u.is_banned %}fa-unlock{% else %}fa-ban{% endif %} text-[10px]"></i>
+                                        <span>{% if u.is_banned %}Unban{% else %}Ban{% endif %}</span>
+                                    </button>
+                                </form>
+
+                                <!-- Safe Delete -->
+                                <form action="/admin/user/{{ u.id }}/delete" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিতভাবে এই ইউজারকে চিরতরে মুছে ফেলতে চান?');">
+                                    <button type="submit" 
+                                        class="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100 px-2.5 py-1.5 rounded-xl text-[11px] font-extrabold transition active:scale-95" title="ডিলিট করুন">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-400">
+                            <i class="fa-solid fa-users-slash text-3xl text-slate-200 mb-2 block"></i>
+                            কোনো ইউজার পাওয়া যায়নি।
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 20-Per-Page Pagination Controller -->
+        <div class="flex items-center justify-between pt-5 mt-4 border-t border-slate-100">
+            <span class="text-xs font-bold text-slate-400">
+                বর্তমান পৃষ্ঠা: {{ page }}
+            </span>
+
+            <div class="flex items-center gap-2">
+                {% if page > 1 %}
+                <a href="?page={{ page - 1 }}&q={{ search or '' }}" 
+                   class="bg-white border border-slate-200 text-slate-700 font-extrabold px-4 py-2 rounded-xl text-xs hover:bg-slate-50 transition shadow-sm flex items-center gap-1">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                    <span>আগের পাতা</span>
+                </a>
+                {% endif %}
+
+                {% if has_next %}
+                <a href="?page={{ page + 1 }}&q={{ search or '' }}" 
+                   class="bg-white border border-slate-200 text-slate-700 font-extrabold px-4 py-2 rounded-xl text-xs hover:bg-slate-50 transition shadow-sm flex items-center gap-1">
+                    <span>পরের পাতা</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
