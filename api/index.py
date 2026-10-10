@@ -224,6 +224,47 @@ def logout():
     return redirect(url_for('index'))
 
 # ==========================================================
+# USER ACCOUNT & PROFILE CONTROLLER
+# ==========================================================
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account():
+    sb = get_supabase()
+    user_id = session['user_id']
+    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
+
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip() or user['name']
+        fb_link = request.form.get('fb_link', '').strip()
+        tg_link = request.form.get('tg_link', '').strip()
+        avatar_file = request.files.get('avatar')
+
+        update_payload = {
+            'name': name,
+            'fb_link': fb_link if fb_link else None,
+            'tg_link': tg_link if tg_link else None
+        }
+
+        # প্রোফাইল ছবি ImgBB Failover-এ আপলোড
+        if avatar_file and avatar_file.filename != '':
+            img_url = upload_to_imgbb(avatar_file.read())
+            if img_url:
+                update_payload['avatar_url'] = img_url
+            else:
+                flash("ইমেজ আপলোড ফেইল হয়েছে, সার্ভার ব্যস্ত!", "danger")
+                return redirect(url_for('account'))
+
+        sb.table('users').update(update_payload).eq('id', user_id).execute()
+        flash("প্রোফাইল তথ্য সফলভাবে আপডেট হয়েছে!", "success")
+        return redirect(url_for('account'))
+
+    # রেফারেল ও টাস্ক সম্পন্ন সংখ্যা
+    ref_count = len(sb.table('users').select('id').eq('referred_by', user['referral_code']).execute().data or [])
+    completed_tasks = len(sb.table('submissions').select('id').eq('user_id', user_id).eq('status', 'approved').execute().data or [])
+
+    return render_template('account.html', user=user, ref_count=ref_count, completed_tasks=completed_tasks)
+    
+# ==========================================================
 # User Portal & Earning Features
 # ==========================================================
 @app.route('/app')
