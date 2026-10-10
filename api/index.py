@@ -20,8 +20,26 @@ app = Flask(
     template_folder='../templates', 
     static_folder='../static'
 )
-app.secret_key = os.getenv("SECRET_KEY", "microearnx_prod_secret_key_8829910")
+# ==========================================================
+# PERMANENT SESSION CONFIGURATION (অটো লগআউট স্থায়ী সমাধান)
+# ==========================================================
+# ১. ফিক্সড সিক্রেট কি (সার্ভারলেস রিস্টার্টেও সেশন নষ্ট হবে না)
+app.secret_key = os.getenv("SECRET_KEY", "microearnx_permanent_super_secure_key_2026_xyz99")
 
+# ২. সেশনের মেয়াদ ৬০ দিন স্থায়ী করা হলো
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=60)
+
+# ৩. মোবাইল ও আধুনিক ব্রাউজার কুকি প্রোটেকশন
+app.config['SESSION_COOKIE_SECURE'] = True        # HTTPS সিকিউর কুকি
+app.config['SESSION_COOKIE_HTTPONLY'] = True      # জাভাস্ক্রিপ্ট কুকি হাইজ্যাক ব্লক
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'     # ব্রাউজার রিফ্রেশে সেশন থাকবে
+app.config['SESSION_REFRESH_EACH_REQUEST'] = True # প্রতিবার পেজ লোড দিলে মেয়াদ ৬০ দিনের জন্য রিনিউ হবে
+
+# ৪. গ্লোবাল ফিল্টার: প্রতি রিকোয়েস্টে সেশনকে পার্মানেন্ট রাখবে
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
+    
 # ==========================================================
 # Vercel Path Fixer Middleware (404 এরর স্থায়ী সমাধান)
 # ==========================================================
