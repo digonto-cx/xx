@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-lg mx-auto space-y-5 pb-12">
+
+    <!-- Header & Back Button -->
+    <div class="flex items-center justify-between px-1">
+        <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>ড্যাশবোর্ডে ফিরুন</span>
+        </a>
+        <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-3 py-1 rounded-full border border-rose-100 uppercase tracking-wider flex items-center gap-1">
+            <i class="fa-solid fa-headset text-xs"></i> ২৪/৭ হেল্প সেন্টার
+        </span>
+    </div>
+
+    <!-- 1. PERSONALIZED GREETING CARD -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-7 shadow-xl border border-rose-50/80 text-center space-y-2 relative overflow-hidden">
+        <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-xl shadow-sm mb-2">
+            <i class="fa-solid fa-hand-holding-heart"></i>
+        </div>
+        
+        <h2 class="text-xl font-black text-slate-900 tracking-tight">
+            Hlw, <span class="text-[#E11D48]">{{ user.name if user else 'বন্ধু' }}</span> 👋
+        </h2>
+        <p class="text-xs text-slate-500 font-medium leading-relaxed">
+            কেমন আছেন? MicroEarnX টিমের পক্ষ থেকে আপনাকে স্বাগতম। আমরা আপনাকে কীভাবে সাহায্য করতে পারি?
+        </p>
+    </div>
+
+    <!-- 2. INTERACTIVE TELEGRAM POLL WIDGET (DIRECT DATABASE VOTE) -->
+    <div class="bg-white rounded-[32px] p-6 shadow-xl border border-rose-50/80 space-y-4 text-center">
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">কুইক কমিউনিকেশন পোল</span>
+            <h3 class="text-sm font-black text-slate-900">আপনার কী টেলিগ্রাম (Telegram) আছে?</h3>
+        </div>
+
+        <!-- Yes / No Vote Buttons -->
+        <div id="voteButtonsBox" class="grid grid-cols-2 gap-3 pt-1">
+            <button onclick="submitTelegramVote(true)" 
+                    class="py-3 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-extrabold text-xs transition shadow-md shadow-sky-500/20 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-thumbs-up"></i>
+                <span>Yes, আছে</span>
+            </button>
+            <button onclick="submitTelegramVote(false)" 
+                    class="py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-extrabold text-xs transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-thumbs-down text-slate-400"></i>
+                <span>No, নেই</span>
+            </button>
+        </div>
+
+        <!-- Conditional Response: IF YES -->
+        <div id="yesResponseBox" class="hidden p-4 rounded-2xl bg-sky-50 border border-sky-100 space-y-2.5 text-center">
+            <p class="text-xs font-bold text-sky-900">
+                <i class="fa-brands fa-telegram text-sky-500 text-sm mr-1"></i> খুব ভালো! যেকোনো প্রয়োজনে টেলিগ্রামে মেসেজ দিন:
+            </p>
+            <a href="https://t.me/micro_earnx" target="_blank" 
+               class="inline-flex items-center gap-2 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs py-2.5 px-5 rounded-xl shadow-md transition">
+                <i class="fa-brands fa-telegram"></i>
+                <span>@micro_earnx এ মেসেজ পাঠান</span>
+            </a>
+        </div>
+
+        <!-- Conditional Response: IF NO -->
+        <div id="noResponseBox" class="hidden p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center space-y-2.5">
+            <p class="text-xs font-bold text-amber-900 leading-relaxed">
+                <i class="fa-solid fa-clock text-amber-500 mr-1"></i> আমাদের Live Support শিগগিরই আসছে, আপাতত টেলিগ্রামে মেসেজ দিন।
+            </p>
+            <a href="https://t.me/micro_earnx" target="_blank" 
+               class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-black text-xs py-2.5 px-5 rounded-xl shadow transition">
+                <i class="fa-brands fa-telegram text-sky-400"></i>
+                <span>টেলিগ্রাম সাপোর্ট খুলুন</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 3. OFFICIAL CHANNELS & SUPPORT CARDS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Direct Support -->
+        <a href="https://t.me/micro_earnx" target="_blank" 
+           class="bg-white border border-rose-50/80 rounded-[28px] p-5 shadow-sm hover:shadow-md transition flex items-center gap-3.5 group">
+            <div class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-500 flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition">
+                <i class="fa-brands fa-telegram"></i>
+            </div>
+            <div class="leading-tight">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">সরাসরি সাপোর্ট</span>
+                <h4 class="text-xs font-black text-slate-900 mt-0.5">@micro_earnx</h4>
+                <span class="text-[10px] font-bold text-sky-600 mt-1 inline-block">মেসেজ দিন &raquo;</span>
+            </div>
+        </a>
+
+        <!-- Official Updates Channel -->
+        <a href="https://t.me/micro_earn_x" target="_blank" 
+           class="bg-white border border-rose-50/80 rounded-[28px] p-5 shadow-sm hover:shadow-md transition flex items-center gap-3.5 group">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-2xl shrink-0 group-hover:scale-110 transition">
+                <i class="fa-solid fa-bullhorn"></i>
+            </div>
+            <div class="leading-tight">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">অফিসিয়াল আপডেট</span>
+                <h4 class="text-xs font-black text-slate-900 mt-0.5">MicroEarnX চ্যানেল</h4>
+                <span class="text-[10px] font-bold text-[#E11D48] mt-1 inline-block">জয়েন করুন &raquo;</span>
+            </div>
+        </a>
+    </div>
+
+    <!-- ================= 4. COMPREHENSIVE FAQ ACCORDION ================= -->
+    <div class="bg-white rounded-[32px] p-6 shadow-xl border border-rose-50/80 space-y-4">
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">সচরাচর জিজ্ঞাসিত প্রশ্নাবলী</span>
+            <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-circle-question text-[#E11D48]"></i> সাধারণ প্রশ্নোত্তর (FAQ)
+            </h3>
+        </div>
+
+        <div class="space-y-2.5 pt-1 text-xs">
+            
+            <!-- FAQ 1 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq1')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>১. টাস্ক সম্পন্ন করার পর টাকা কখন জমা হবে?</span>
+                    <i id="icon-faq1" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq1" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    টাস্ক জমা দেওয়ার পর অ্যাডমিন টিম স্ক্রিনশট ভেরিফাই করে। সাধারণত ১ থেকে সর্বোচ্চ ১২ ঘণ্টার মধ্যে অনুমোদিত হয়ে আপনার মূল ওয়ালেটে টাকা স্বয়ংক্রিয়ভাবে ক্রেডিট হয়ে যায়।
+                </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq2')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>২. উইথড্র করার শর্ত ও নিয়ম কী কী?</span>
+                    <i id="icon-faq2" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq2" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    টাকা তুলতে অ্যাকাউন্টে সর্বনিম্ন ৫০০ টাকা ব্যালেন্স থাকতে হবে এবং কমপক্ষে ৪টি সফল রেফারেল সম্পন্ন থাকতে হবে। এই শর্ত পূরণ হলে বিকাশ, নগদ বা রকেটে যেকোনো সময় টাকা তোলা যাবে।
+                </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq3')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>৩. টাকা পেতে কতক্ষণ সময় লাগে?</span>
+                    <i id="icon-faq3" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq3" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    উইথড্রয়াল রিকোয়েস্ট পাঠানোর পর সাধারণত ৫ মিনিট থেকে সর্বোচ্চ ৪ ঘণ্টার মধ্যে পেমেন্ট সম্পন্ন করা হয়। সম্পন্ন হলে হিস্ট্রি পেজে অফিসিয়াল রসিদ পাওয়া যাবে।
+                </div>
+            </div>
+
+            <!-- FAQ 4 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq4')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>৪. এক মোবাইলে একাধিক অ্যাকাউন্ট খোলা যাবে কি?</span>
+                    <i id="icon-faq4" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq4" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    না! কঠোর সুরক্ষার স্বার্থে ১টি মোবাইল বা ডিভাইসে কেবল ১টি অ্যাকাউন্ট অনুমোদিত। একই ডিভাইসে একাধিক অ্যাকাউন্ট বা নিজে নিজে রেফার করার চেষ্টা করলে অ্যাকাউন্ট চিরতরে ব্যান করা হবে।
+                </div>
+            </div>
+
+            <!-- FAQ 5 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq5')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>৫. রেফারেল বোনাস কীভাবে যোগ হয়?</span>
+                    <i id="icon-faq5" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq5" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    আপনার রেফারেল লিংক ব্যবহার করে কেউ সফলভাবে অ্যাকাউন্ট খুললে আপনি পাবেন ১৫ টাকা ক্যাশ বোনাস এবং জয়েন করা নতুন ইউজার পাবে ১০০ টাকা স্টার্টার বোনাস।
+                </div>
+            </div>
+
+            <!-- FAQ 6 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq6')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>৬. ইউটিউব ভিডিও ওয়াচে টাকা ক্লেইম হচ্ছে না কেন?</span>
+                    <i id="icon-faq6" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq6" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    ভিডিও দেখার সময় সম্পূর্ণ ৩০ সেকেন্ড অপেক্ষা করতে হবে। টাইমার শেষ হওয়ার আগে পেজ বা ট্যাব বন্ধ করলে রিওয়ার্ড আনলক হবে না। ৩০ সেকেন্ড শেষ হলেই ক্লেইম বাটন সবুজ হবে।
+                </div>
+            </div>
+
+            <!-- FAQ 7 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq7')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>৭. স্পিন ও স্ক্র্যাচ কার্ডের দৈনিক লিমিট কত?</span>
+                    <i id="icon-faq7" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq7" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    প্রতিটি ইউজার প্রতিদিন সর্বোচ্চ ৩ বার লাকি স্পিন এবং ৩ বার স্ক্র্যাচ কার্ড ঘষার ফ্রি সুযোগ পাবেন। প্রতিদিন রাত ১২টার পর এই লিমিট পুনরায় রিসেট হয়।
+                </div>
+            </div>
+
+            <!-- FAQ 8 -->
+            <div class="border border-slate-100 rounded-2xl overflow-hidden bg-slate-50/50">
+                <button onclick="toggleFaq('faq8')" class="w-full p-4 text-left font-extrabold text-slate-800 flex justify-between items-center">
+                    <span>৮. অ্যাকাউন্ট সংক্রান্ত কোনো জরুরি সমস্যা হলে কী করব?</span>
+                    <i id="icon-faq8" class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform"></i>
+                </button>
+                <div id="faq8" class="hidden px-4 pb-4 text-slate-600 leading-relaxed text-[11px] border-t border-slate-100 pt-2 bg-white">
+                    সরাসরি আমাদের টেলিগ্রাম সাপোর্ট @micro_earnx এ আপনার ইউজার আইডি ও সমস্যার স্ক্রিনশট পাঠিয়ে মেসেজ দিন। আমাদের টিম দ্রুত সমাধান করবে।
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPT: REALTIME DATABASE VOTE & ACCORDION -->
+<script>
+function submitTelegramVote(hasTelegram) {
+    // Hide buttons, show response
+    document.getElementById('voteButtonsBox').classList.add('hidden');
+    
+    if (hasTelegram) {
+        document.getElementById('yesResponseBox').classList.remove('hidden');
+    } else {
+        document.getElementById('noResponseBox').classList.remove('hidden');
+    }
+
+    // Direct database submission via POST /help/vote
+    fetch('/help/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ has_telegram: hasTelegram })
+    })
+    .then(res => res.json())
+    .catch(err => console.log('Vote logged'));
+}
+
+function toggleFaq(id) {
+    const el = document.getElementById(id);
+    const icon = document.getElementById('icon-' + id);
+    if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        icon.classList.add('rotate-180');
+    } else {
+        el.classList.add('hidden');
+        icon.classList.remove('rotate-180');
+    }
+}
+</script>
+{% endblock %}
