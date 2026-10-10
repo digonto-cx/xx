@@ -211,8 +211,8 @@ def register():
 
     # /register রাউটের ভেতর
     if not email.endswith('@gmail.com'):
-    flash("অনুগ্রহ করে একটি সঠিক ও বৈধ ইমেইল প্রদান করুন!", "danger")
-    return redirect(url_for('index'))
+        flash("অনুগ্রহ করে একটি সঠিক ও বৈধ ইমেইল প্রদান করুন!", "danger")
+        return redirect(url_for('index'))
     
     # শর্ত: ১ ডিভাইসে কেবল ১টি অ্যাকাউন্ট
     existing_device = sb.table('users').select('id').eq('device_id', device_id).execute().data
