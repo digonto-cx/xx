@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="max-w-md mx-auto space-y-4 pb-8">
+<!-- Include html2canvas CDN for instantaneous image generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<div class="max-w-lg mx-auto space-y-5 pb-12">
 
     <!-- Back to Dashboard -->
     <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition px-1">
@@ -8,14 +11,101 @@
         <span>ড্যাশবোর্ডে ফিরুন</span>
     </a>
 
-    <!-- Main Profile Card -->
-    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 space-y-6">
+    <!-- ================= 1. DOWNLOADABLE VIP DIGITAL PROFILE CARD ================= -->
+    <div class="bg-white rounded-[32px] p-5 sm:p-6 shadow-xl border border-rose-50/80 space-y-4">
         
-        <!-- Header & Avatar Section -->
+        <div class="flex items-center justify-between px-1">
+            <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">ডিজিটাল আর্নিং ব্যাজ</span>
+                <h3 class="text-sm font-black text-slate-900">অফিসিয়াল প্রোফাইল কার্ড</h3>
+            </div>
+            <span class="text-[10px] font-bold bg-slate-900 text-white px-2.5 py-1 rounded-xl">
+                VIP Card
+            </span>
+        </div>
+
+        <!-- The Target Card Element to Download (Screenshot Replica) -->
+        <div class="overflow-hidden rounded-[28px] shadow-2xl">
+            <div id="profileCardRender" class="relative w-full aspect-[16/10] bg-[#0b0f19] text-white p-5 sm:p-6 flex flex-col justify-between overflow-hidden select-none"
+                 style="background: radial-gradient(circle at 50% 0%, #1e293b 0%, #090d16 100%);">
+                
+                <!-- Metallic Glass Reflection Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.04] to-transparent pointer-events-none"></div>
+                <div class="absolute -right-8 -bottom-8 w-48 h-48 bg-[#E11D48]/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <!-- Watermark Background Logo -->
+                <i class="fa-solid fa-bolt absolute right-4 top-1/2 -translate-y-1/2 text-8xl text-white/[0.03] pointer-events-none"></i>
+
+                <!-- Card Top Row: Logo & Member ID -->
+                <div class="flex items-center justify-between relative z-10">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-rose-600 to-red-500 flex items-center justify-center text-white text-xs shadow-md">
+                            <i class="fa-solid fa-fire"></i>
+                        </div>
+                        <span class="font-black text-white text-sm tracking-wider">
+                            MICRO<span class="text-[#E11D48]">EARNX</span>
+                        </span>
+                    </div>
+                    <span class="text-[10px] font-mono tracking-widest text-slate-400 font-bold uppercase">
+                        MEMBER #{{ "%05d"|format(user.id) }}
+                    </span>
+                </div>
+
+                <!-- Card Center Row: Balance / Welcome Bonus -->
+                <div class="text-center relative z-10 my-auto py-2">
+                    <span class="text-[11px] font-medium text-slate-400 tracking-wide block mb-1">
+                        Wallet Balance
+                    </span>
+                    <h1 class="text-4xl sm:text-5xl font-black text-white tracking-tight drop-shadow-md">
+                        ৳ {{ "%.2f"|format(user.balance) }}
+                    </h1>
+                    <span class="text-[10px] font-medium text-slate-500 mt-1 block">
+                        Verified Earner
+                    </span>
+                </div>
+
+                <!-- Card Bottom Row: User Avatar & Handle -->
+                <div class="flex items-center justify-between relative z-10 pt-2 border-t border-white/[0.06]">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-full bg-slate-800 border-2 border-white/20 flex items-center justify-center text-xs font-black text-white overflow-hidden shadow-inner shrink-0">
+                            {{ user.name[:1] }}
+                        </div>
+                        <div class="text-left">
+                            <span class="text-xs font-black text-white block leading-tight truncate max-w-[150px]">
+                                {{ user.name }}
+                            </span>
+                            <span class="text-[10px] text-slate-400 font-mono">
+                                @{{ user.referral_code }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <span class="text-[9px] font-bold text-slate-500 block">STATUS</span>
+                        <span class="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Active
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Download Button -->
+        <button onclick="downloadProfileCard()" id="downloadBtn"
+            class="w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-extrabold text-xs py-3.5 px-4 rounded-2xl transition shadow-md flex items-center justify-center gap-2">
+            <i class="fa-solid fa-download text-xs text-rose-500"></i>
+            <span id="downloadBtnText">প্রোফাইল কার্ড ছবি ডাউনলোড করুন</span>
+        </button>
+
+    </div>
+
+    <!-- ================= 2. PROFILE EDIT & SOCIAL CONNECT ================= -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-rose-50/80 space-y-6">
+        
         <form method="POST" enctype="multipart/form-data" class="space-y-5">
             
             <div class="flex flex-col items-center text-center">
-                
                 <!-- Avatar with Camera Picker -->
                 <div class="relative group cursor-pointer">
                     <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-rose-100 shadow-md bg-slate-100 flex items-center justify-center">
@@ -26,7 +116,6 @@
                         {% endif %}
                     </div>
                     
-                    <!-- Camera Button Overlay -->
                     <label for="avatarInput" class="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[#E11D48] hover:bg-[#BE123C] text-white flex items-center justify-center text-xs shadow cursor-pointer transition active:scale-95">
                         <i class="fa-solid fa-camera"></i>
                     </label>
@@ -36,7 +125,6 @@
                 <h3 class="text-base font-black text-slate-900 mt-3">{{ user.name }}</h3>
                 <p class="text-xs text-slate-400 font-medium">{{ user.email }}</p>
 
-                <!-- Status Pills -->
                 <div class="flex items-center gap-2 mt-2">
                     <span class="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full border border-emerald-100">
                         <i class="fa-solid fa-circle-check text-[9px] mr-0.5"></i> ভেরিফাইড ইউজার
@@ -66,23 +154,16 @@
             <!-- Personal Info Inputs -->
             <div class="space-y-3 pt-2">
                 <span class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider block ml-1">ব্যক্তিগত তথ্য</span>
-                
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পূর্ণ নাম</label>
                     <input type="text" name="name" value="{{ user.name }}" required 
                         class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/40">
                 </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">ইমেইল (পরিবর্তনযোগ্য নয়)</label>
-                    <input type="email" value="{{ user.email }}" readonly 
-                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-400 bg-slate-100 cursor-not-allowed">
-                </div>
             </div>
 
             <!-- Social Accounts Connection -->
             <div class="space-y-3 pt-3 border-t border-slate-100">
-                <span class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider block ml-1">সোশ্যাল একাউন্ট যুক্ত করুন</span>
+                <span class="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider block ml-1">সোশ্যাল একাউন্ট লিংক</span>
 
                 <!-- Facebook Connect -->
                 <div>
@@ -91,45 +172,33 @@
                             <i class="fa-brands fa-facebook text-xs"></i> Facebook প্রোফাইল লিংক
                         </span>
                         {% if user.fb_link %}
-                            <a href="{{ user.fb_link }}" target="_blank" class="text-[10px] text-blue-600 hover:underline">কানেক্টেড প্রোফাইল দেখুন</a>
+                            <a href="{{ user.fb_link }}" target="_blank" class="text-[10px] text-blue-600 hover:underline">কানেক্টেড প্রোফাইল</a>
                         {% endif %}
                     </label>
-                    <div class="relative">
-                        <input type="url" name="fb_link" value="{{ user.fb_link or '' }}" placeholder="https://facebook.com/your.username" 
-                            class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-slate-50/40">
-                        <i class="fa-brands fa-facebook absolute right-4 top-3 text-slate-300 text-xs"></i>
-                    </div>
+                    <input type="url" name="fb_link" value="{{ user.fb_link or '' }}" placeholder="https://facebook.com/your.username" 
+                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition bg-slate-50/40">
                 </div>
 
                 <!-- Telegram Connect -->
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1 flex items-center justify-between">
                         <span class="flex items-center gap-1.5 text-sky-500">
-                            <i class="fa-brands fa-telegram text-xs"></i> Telegram লিংক / ইউজারনেম
+                            <i class="fa-brands fa-telegram text-xs"></i> Telegram ইউজারনেম / লিংক
                         </span>
                         {% if user.tg_link %}
-                            <a href="{{ user.tg_link }}" target="_blank" class="text-[10px] text-sky-500 hover:underline">কানেক্টেড প্রোফাইল দেখুন</a>
+                            <a href="{{ user.tg_link }}" target="_blank" class="text-[10px] text-sky-500 hover:underline">কানেক্টেড প্রোফাইল</a>
                         {% endif %}
                     </label>
-                    <div class="relative">
-                        <input type="text" name="tg_link" value="{{ user.tg_link or '' }}" placeholder="https://t.me/your_username" 
-                            class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition bg-slate-50/40">
-                        <i class="fa-brands fa-telegram absolute right-4 top-3 text-slate-300 text-xs"></i>
-                    </div>
+                    <input type="text" name="tg_link" value="{{ user.tg_link or '' }}" placeholder="https://t.me/your_username" 
+                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition bg-slate-50/40">
                 </div>
-            </div>
-
-            <!-- Security Badge Info -->
-            <div class="p-3 bg-rose-50/50 border border-rose-100 rounded-2xl text-[10px] text-slate-500 flex items-center gap-2">
-                <i class="fa-solid fa-shield-halved text-[#E11D48] text-sm"></i>
-                <span>ডিভাইস বাইন্ডিং সক্রিয়। এই অ্যাকাউন্টে কেবল আপনার রেজিস্টার্ড ডিভাইস থেকে এক্সেস নিরাপদ।</span>
             </div>
 
             <!-- Submit Button -->
             <button type="submit" 
                 class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition">
                 <i class="fa-solid fa-floppy-disk text-xs"></i>
-                <span>পরিবর্তন সেভ করুন</span>
+                <span>প্রোফাইল পরিবর্তন সেভ করুন</span>
             </button>
 
         </form>
@@ -138,8 +207,36 @@
 
 </div>
 
-<!-- Realtime Image Preview Script -->
+<!-- CLIENT-SIDE HIGH-RES CARD DOWNLOAD SCRIPT -->
 <script>
+function downloadProfileCard() {
+    const card = document.getElementById('profileCardRender');
+    const btn = document.getElementById('downloadBtn');
+    const btnText = document.getElementById('downloadBtnText');
+
+    btn.disabled = true;
+    btnText.innerText = "কার্ড তৈরি হচ্ছে...";
+
+    // Generate high resolution image (scale: 3 for crystal clear print)
+    html2canvas(card, {
+        scale: 3,
+        useCORS: true,
+        backgroundColor: null
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'MicroEarnX_Card_{{ user.name }}.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+
+        btn.disabled = false;
+        btnText.innerText = "প্রোফাইল কার্ড ছবি ডাউনলোড করুন";
+    }).catch(err => {
+        alert("কার্ড জেনারেট করতে সমস্যা হয়েছে, পুনরায় চেষ্টা করুন।");
+        btn.disabled = false;
+        btnText.innerText = "প্রোফাইল কার্ড ছবি ডাউনলোড করুন";
+    });
+}
+
 function previewAvatar(input) {
     if (input.files && input.files[0]) {
         const reader = new FileReader();
