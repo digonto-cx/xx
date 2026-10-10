@@ -1,76 +1,235 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="max-w-md mx-auto space-y-4 pb-8">
+<div class="max-w-lg mx-auto space-y-5 pb-12">
 
-    <!-- Back Button -->
-    <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition px-1">
-        <i class="fa-solid fa-arrow-left"></i>
-        <span>ড্যাশবোর্ডে ফিরুন</span>
-    </a>
+    <!-- Header & Back Button -->
+    <div class="flex items-center justify-between px-1">
+        <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>ড্যাশবোর্ডে ফিরুন</span>
+        </a>
+        <a href="/history" class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-3 py-1 rounded-full border border-rose-100 flex items-center gap-1.5 shadow-sm hover:bg-rose-100 transition">
+            <i class="fa-solid fa-clock-rotate-left text-[10px]"></i> উইথড্র হিস্ট্রি
+        </a>
+    </div>
 
-    <!-- Withdrawal Form Card -->
-    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 space-y-5">
+    <!-- Main Withdrawal Card -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 space-y-5 relative overflow-hidden">
         
-        <!-- Header -->
-        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
-            <div class="w-8 h-8 rounded-full bg-rose-50 text-[#E11D48] flex items-center justify-center text-sm">
-                <i class="fa-solid fa-building-columns"></i>
+        <!-- Header Title -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-2xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-base shadow-sm">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <div>
+                    <h2 class="text-base font-black text-slate-900 leading-tight">টাকা উত্তোলন (Payout)</h2>
+                    <p class="text-[10px] text-slate-400">পার্সোনাল বিকাশ, নগদ বা রকেটে টাকা তুলুন</p>
+                </div>
             </div>
-            <div>
-                <h3 class="text-sm font-black text-slate-900">টাকা উত্তোলন (Withdraw)</h3>
-                <p class="text-[10px] text-slate-400">বিকাশ / নগদ / রকেট পার্সোনাল</p>
+            <span class="text-[9px] font-black bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full border border-emerald-100 uppercase tracking-wider">
+                Instant Payout
+            </span>
+        </div>
+
+        <!-- 1. LIVE BALANCE & REFERRAL PROGRESS CARD -->
+        <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl p-4 text-white shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+                <div>
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block mb-0.5">উত্তোলনযোগ্য ব্যালেন্স</span>
+                    <span class="text-2xl sm:text-3xl font-black tracking-tight text-white">৳ {{ "%.2f"|format(user.balance) }}</span>
+                </div>
+                <div class="text-right">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 font-bold block mb-0.5">রেফারেল স্ট্যাটাস</span>
+                    <span class="text-xs font-black {% if referral_count >= 4 %}text-emerald-400{% else %}text-amber-400{% endif %}">
+                        {{ referral_count }} / ৪ টি সম্পন্ন
+                    </span>
+                </div>
+            </div>
+
+            <!-- Referral Progress Bar (Target: 4 Referrals) -->
+            <div class="space-y-1">
+                <div class="w-full bg-slate-700/60 rounded-full h-2 overflow-hidden border border-white/10">
+                    <div class="bg-gradient-to-r from-[#E11D48] to-emerald-500 h-full rounded-full transition-all duration-500" 
+                         style="width: {{ [100, (referral_count / 4) * 100]|min }}%;"></div>
+                </div>
+                {% if referral_count < 4 %}
+                <div class="flex items-center justify-between text-[10px] text-amber-300 font-medium pt-0.5">
+                    <span><i class="fa-solid fa-circle-exclamation mr-1"></i>উইথড্র করতে আরও {{ 4 - referral_count }}টি রেফারেল প্রয়োজন</span>
+                    <a href="/refer" class="text-white font-bold underline hover:text-rose-300">রেফার করুন &raquo;</a>
+                </div>
+                {% else %}
+                <span class="text-[10px] text-emerald-400 font-bold flex items-center gap-1 pt-0.5">
+                    <i class="fa-solid fa-circle-check"></i> আপনি টাকা তোলার জন্য সম্পূর্ণ উপযুক্ত!
+                </span>
+                {% endif %}
             </div>
         </div>
 
-        <!-- Balance Info -->
-        <div class="bg-gradient-to-r from-rose-50 to-amber-50 p-4 rounded-2xl border border-rose-100 flex items-center justify-between">
-            <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">বর্তমান ব্যালেন্স</span>
-                <span class="text-xl font-black text-slate-900">৳ {{ "%.2f"|format(user.balance) }}</span>
-            </div>
-            <div class="text-right">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">আপনার রেফারেল</span>
-                <span class="text-xs font-extrabold text-[#E11D48]">{{ referral_count }} / ৪ টি</span>
-            </div>
-        </div>
+        <!-- 2. WITHDRAWAL FORM -->
+        <form action="/withdraw" method="POST" class="space-y-5">
+            <input type="hidden" name="method" id="selectedMethod" value="bKash">
 
-        <!-- Rule Alert -->
-        <div class="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl text-[11px] text-amber-900 leading-relaxed">
-            <i class="fa-solid fa-circle-exclamation text-amber-500 mr-1"></i>
-            <strong>উইথড্রয়াল শর্ত:</strong> সর্বনিম্ন <strong>৪টি সফল রেফারেল</strong> এবং অ্যাকাউন্টে কমপক্ষে <strong>৫০০ টাকা</strong> ব্যালেন্স থাকতে হবে।
-        </div>
+            <!-- SELECT PAYMENT GATEWAY (LOGO TILES) -->
+            <div class="space-y-2">
+                <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider ml-1 flex items-center justify-between">
+                    <span>পেমেন্ট মেথড সিলেক্ট করুন</span>
+                    <span class="text-[10px] text-slate-400 font-normal">যেকোনো একটি বেছে নিন</span>
+                </label>
 
-        <!-- Withdrawal Form -->
-        <form action="/withdraw" method="POST" class="space-y-3.5">
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">উইথড্র অ্যামাউন্ট (৳)</label>
-                <input type="number" name="amount" min="500" required placeholder="সর্বনিম্ন 500" 
-                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+                <div class="grid grid-cols-3 gap-2.5">
+                    
+                    <!-- 1. bKash Card -->
+                    <div id="card-bKash" onclick="selectMethod('bKash', 'card-bKash')" 
+                         class="method-card cursor-pointer border-2 border-[#E11D48] bg-rose-50/50 rounded-2xl p-3 text-center transition-all duration-200 relative group flex flex-col items-center justify-center shadow-sm">
+                        
+                        <div class="w-12 h-12 rounded-xl bg-white p-1 border border-slate-100 flex items-center justify-center mb-1.5 shadow-sm overflow-hidden">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy5t5aXjDFFCW4OoNdCAEJ_5dOXsEi_Em4Z9p9h3nmpA4KrVzdLbGcBtyd&s=10" 
+                                 alt="bKash" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-xs font-black text-slate-900 block leading-tight">bKash</span>
+                        <span class="text-[9px] text-slate-400 font-bold">পার্সোনাল</span>
+
+                        <!-- Active Check Badge -->
+                        <span class="check-badge absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E11D48] text-white rounded-full flex items-center justify-center text-[10px] shadow">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                    </div>
+
+                    <!-- 2. Nagad Card -->
+                    <div id="card-Nagad" onclick="selectMethod('Nagad', 'card-Nagad')" 
+                         class="method-card cursor-pointer border-2 border-slate-200 bg-white hover:border-slate-300 rounded-2xl p-3 text-center transition-all duration-200 relative group flex flex-col items-center justify-center shadow-sm">
+                        
+                        <div class="w-12 h-12 rounded-xl bg-white p-1 border border-slate-100 flex items-center justify-center mb-1.5 shadow-sm overflow-hidden">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSANGhZUJa8bsglUsBFp75gieI6sy5IF81dUhje-ewRGORhne2Ic2l2p60&s=10" 
+                                 alt="Nagad" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-xs font-black text-slate-900 block leading-tight">Nagad</span>
+                        <span class="text-[9px] text-slate-400 font-bold">পার্সোনাল</span>
+
+                        <span class="check-badge hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E11D48] text-white rounded-full flex items-center justify-center text-[10px] shadow">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                    </div>
+
+                    <!-- 3. Rocket Card -->
+                    <div id="card-Rocket" onclick="selectMethod('Rocket', 'card-Rocket')" 
+                         class="method-card cursor-pointer border-2 border-slate-200 bg-white hover:border-slate-300 rounded-2xl p-3 text-center transition-all duration-200 relative group flex flex-col items-center justify-center shadow-sm">
+                        
+                        <div class="w-12 h-12 rounded-xl bg-white p-1 border border-slate-100 flex items-center justify-center mb-1.5 shadow-sm overflow-hidden">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCJU_NQ8Kgp5Tm2Xpve2pE0ultIonRKDyHpYEuqwnKHQ&s=10" 
+                                 alt="Rocket" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-xs font-black text-slate-900 block leading-tight">Rocket</span>
+                        <span class="text-[9px] text-slate-400 font-bold">পার্সোনাল</span>
+
+                        <span class="check-badge hidden absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#E11D48] text-white rounded-full flex items-center justify-center text-[10px] shadow">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                    </div>
+
+                </div>
             </div>
 
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পেমেন্ট মেথড</label>
-                <select name="method" required 
-                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                    <option value="bKash">bKash Personal (বিকাশ)</option>
-                    <option value="Nagad">Nagad Personal (নগদ)</option>
-                    <option value="Rocket">Rocket Personal (রকেট)</option>
-                </select>
+            <!-- AMOUNT INPUT & QUICK CHIPS -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between ml-1">
+                    <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider">
+                        উইথড্র অ্যামাউন্ট (৳)
+                    </label>
+                    <span class="text-[10px] font-bold text-slate-400">মিনিমাম ৳৫০০</span>
+                </div>
+
+                <div class="relative">
+                    <input type="number" id="withdrawAmountInput" name="amount" min="500" required placeholder="500" 
+                        class="w-full px-4 py-3 pl-9 rounded-2xl border border-slate-200 text-sm font-black text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/50">
+                    <span class="absolute left-3.5 top-3.5 text-slate-400 font-black text-sm">৳</span>
+                </div>
+
+                <!-- Quick Amount Autofill Chips -->
+                <div class="flex items-center gap-1.5 pt-1">
+                    <button type="button" onclick="setAmount(500)" 
+                            class="flex-1 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-[11px] font-bold text-slate-700 transition active:scale-95 shadow-2xs">
+                        ৳ ৫০০
+                    </button>
+                    <button type="button" onclick="setAmount(1000)" 
+                            class="flex-1 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-[11px] font-bold text-slate-700 transition active:scale-95 shadow-2xs">
+                        ৳ ১,০০০
+                    </button>
+                    <button type="button" onclick="setAmount(2000)" 
+                            class="flex-1 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-[11px] font-bold text-slate-700 transition active:scale-95 shadow-2xs">
+                        ৳ ২,০০০
+                    </button>
+                    <button type="button" onclick="setAmount({{ user.balance|int }})" 
+                            class="flex-1 py-1.5 rounded-xl border border-rose-200 bg-rose-50 hover:bg-rose-100 text-[11px] font-bold text-[#E11D48] transition active:scale-95 shadow-2xs">
+                        সব ব্যালেন্স
+                    </button>
+                </div>
             </div>
 
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">অ্যাকাউন্ট নাম্বার</label>
-                <input type="text" name="account" required placeholder="017xxxxxxxx" 
-                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            <!-- ACCOUNT NUMBER INPUT -->
+            <div class="space-y-1">
+                <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider ml-1">
+                    অ্যাকাউন্ট নাম্বার
+                </label>
+                <div class="relative">
+                    <input type="text" name="account" required placeholder="01XXXXXXXXX (১১ ডিজিট)" 
+                        class="w-full px-4 py-3 pl-10 rounded-2xl border border-slate-200 text-xs font-mono font-bold text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/50">
+                    <i class="fa-solid fa-mobile-screen-button absolute left-4 top-3.5 text-slate-400 text-sm"></i>
+                </div>
             </div>
 
-            <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-4 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition mt-4">
+            <!-- SUBMIT BUTTON -->
+            <button type="submit" 
+                class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs sm:text-sm py-4 px-4 rounded-2xl shadow-xl shadow-rose-500/25 flex items-center justify-center gap-2 transition duration-200">
                 <i class="fa-solid fa-paper-plane text-xs"></i>
-                <span>রিকোয়েস্ট সাবমিট করুন</span>
+                <span>উইথড্রয়াল রিকোয়েস্ট পাঠান</span>
             </button>
         </form>
+
+        <!-- Trust Badges Footer -->
+        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
+            <div class="p-2 bg-slate-50 rounded-xl">
+                <i class="fa-solid fa-bolt text-amber-500 text-xs mb-1 block"></i>
+                <span class="text-[9px] font-bold text-slate-600 block">সুপারফাস্ট পেআউট</span>
+            </div>
+            <div class="p-2 bg-slate-50 rounded-xl">
+                <i class="fa-solid fa-shield-halved text-emerald-500 text-xs mb-1 block"></i>
+                <span class="text-[9px] font-bold text-slate-600 block">০% অতিরিক্ত ফি</span>
+            </div>
+            <div class="p-2 bg-slate-50 rounded-xl">
+                <i class="fa-solid fa-headset text-indigo-500 text-xs mb-1 block"></i>
+                <span class="text-[9px] font-bold text-slate-600 block">২৪/৭ সাপোর্ট</span>
+            </div>
+        </div>
 
     </div>
 
 </div>
+
+<!-- SCRIPT: INTERACTIVE PAYMENT METHOD & QUICK AMOUNT SELECTOR -->
+<script>
+// Select Payment Gateway Tile
+function selectMethod(methodName, elementId) {
+    document.getElementById('selectedMethod').value = methodName;
+
+    // Reset all tiles
+    document.querySelectorAll('.method-card').forEach(card => {
+        card.className = "method-card cursor-pointer border-2 border-slate-200 bg-white hover:border-slate-300 rounded-2xl p-3 text-center transition-all duration-200 relative group flex flex-col items-center justify-center shadow-sm";
+        const badge = card.querySelector('.check-badge');
+        if (badge) badge.classList.add('hidden');
+    });
+
+    // Highlight selected tile
+    const active = document.getElementById(elementId);
+    active.className = "method-card cursor-pointer border-2 border-[#E11D48] bg-rose-50/50 rounded-2xl p-3 text-center transition-all duration-200 relative group flex flex-col items-center justify-center shadow-sm";
+    const activeBadge = active.querySelector('.check-badge');
+    if (activeBadge) activeBadge.classList.remove('hidden');
+}
+
+// Quick Fill Amount
+function setAmount(amount) {
+    document.getElementById('withdrawAmountInput').value = amount;
+}
+</script>
 {% endblock %}
