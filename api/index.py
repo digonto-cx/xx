@@ -959,39 +959,6 @@ def admin_yt_delete(video_id):
     flash("ভিডিওটি সফলভাবে ডিলিট করা হয়েছে!", "success")
     return redirect(url_for('admin_yt'))
 
-@app.route('/scratch', methods=['GET', 'POST'])
-@login_required
-def scratch_page():
-    sb = get_supabase()
-    user_id = session['user_id']
-    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0).isoformat()
-    scratch_today = sb.table('daily_activities').select('id').eq('user_id', user_id).eq('activity_type', 'scratch').gte('created_at', today_start).execute().data or []
-
-    # POST: স্ক্র্যাচ রিওয়ার্ড ক্যালকুলেশন
-    if request.method == 'POST':
-        if len(scratch_today) >= 3:
-            return jsonify({"success": False, "message": "আজকের ৩টি স্ক্র্যাচ লিমিট শেষ! আগামীকাল আবার আসুন।"})
-
-        reward = round(random.uniform(1.00, 6.00), 2)
-        user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
-        new_bal = float(user['balance']) + reward
-
-        sb.table('users').update({'balance': new_bal}).eq('id', user_id).execute()
-        sb.table('daily_activities').insert({
-            'user_id': user_id, 
-            'activity_type': 'scratch', 
-            'reward_earned': reward
-        }).execute()
-
-        remaining = max(0, 3 - (len(scratch_today) + 1))
-        return jsonify({"success": True, "reward": reward, "new_balance": new_bal, "remaining": remaining})
-
-    # GET: স্ক্র্যাচ পেজ রেন্ডার
-    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
-    remaining_scratch = max(0, 3 - len(scratch_today))
-    return render_template('scratch.html', user=user, remaining=remaining_scratch)
-
-
 # ==========================================================
 # ADVERTISER & PROMOTION LANDING CONTROLLER
 # ==========================================================
