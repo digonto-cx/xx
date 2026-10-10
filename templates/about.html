@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-8 pb-16">
+
+    <!-- Header & Back Button -->
+    <div class="flex items-center justify-between px-1">
+        <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>ড্যাশবোর্ডে ফিরুন</span>
+        </a>
+        <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-3 py-1 rounded-full border border-rose-100 uppercase tracking-wider flex items-center gap-1">
+            <i class="fa-solid fa-gem text-xs"></i> শতভাগ স্বচ্ছতা
+        </span>
+    </div>
+
+    <!-- ================= 1. HERO HEADER ================= -->
+    <div class="text-center space-y-3 pt-2">
+        <div class="w-14 h-14 mx-auto rounded-3xl bg-rose-50 border-2 border-rose-200 text-[#E11D48] flex items-center justify-center text-2xl shadow-sm">
+            <i class="fa-solid fa-hand-holding-dollar"></i>
+        </div>
+        
+        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+            MicroEarnX কীভাবে কাজ করে এবং <br>
+            <span class="text-[#E11D48]">আমরা কীভাবে টাকা প্রদান করি?</span>
+        </h1>
+        
+        <p class="text-xs sm:text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">
+            কোনো গোপনীয়তা নয়—আমাদের আয়ের উৎস, ক্লায়েন্ট নেটওয়ার্ক এবং কীভাবে টাকা ইউজারদের মাঝে পৌঁছায় তার সম্পূর্ণ সত্য ও বাস্তব রূপরেখা।
+        </p>
+    </div>
+
+    <!-- ================= 2. THE BIG TRUTH: আমাদের বিজনেস মডেল ও আয়ের উৎস ================= -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-rose-50/80 space-y-6">
+        
+        <div class="flex items-center gap-3 border-b border-slate-100 pb-4">
+            <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-black text-slate-900">টাকা কি আকাশ থেকে আসে?</h3>
+                <p class="text-[11px] text-slate-400">টাকার আসল উৎস এবং কীভাবে আমরা সবাইকে পেমেন্ট করি</p>
+            </div>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed">
+            অনেকের মনে প্রশ্ন জাগে—<strong>"অনলাইনে কাজ করে টাকা পাওয়া কি আসলেই সম্ভব? কোম্পানি কেন টাকা দেয়?"</strong> উত্তরটি খুবই সহজ এবং সম্পূর্ণ ব্যবসায়িক। এটি কোনো ম্যাজিক বা জুয়া নয়, এটি একটি <strong class="text-slate-900">ডিজিটাল অ্যাডভার্টাইজিং ও ক্রাউডসোর্সিং ইকোসিস্টেম</strong>।
+        </p>
+
+        <!-- 4 Steps of Real Money Flow -->
+        <div class="space-y-3 text-xs">
+            
+            <!-- Step 1 -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
+                <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
+                    ১
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-black text-slate-900 text-sm">বিদেশী ও দেশি ক্লায়েন্টদের ক্যাম্পেইন</h4>
+                    <p class="text-slate-500 leading-relaxed text-[11px]">
+                        ইউরোপ, আমেরিকা ও এশিয়ার বিভিন্ন ডিজিটাল এজেন্সি, অ্যাপ ডেভেলপার এবং ইউটিউবাররা তাদের কনটেন্ট প্রমোট করার জন্য বড় অঙ্কের ডলারে আমাদের মতো প্ল্যাটফর্মকে চুক্তিভিত্তিক হায়ার করে।
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
+                <div class="w-7 h-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
+                    ২
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-black text-slate-900 text-sm">প্রমোশন পেজের সরাসরি লোকাল অর্ডার</h4>
+                    <p class="text-slate-500 leading-relaxed text-[11px]">
+                        আমাদের নিজস্ব <a href="/promote" class="text-purple-600 font-bold underline">প্রমোশন পেজ</a> থেকে প্রতিদিন শত শত ফেসবুক পেজ ওনার (মনিটাইজেশন বুস্টের জন্য), টেলিগ্রাম চ্যানেল ওনার এবং ওয়েবসাইট মালিকরা রিয়েল ট্রাফিকের জন্য বাজেট পে করে কাজ জমা দেন।
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
+                <div class="w-7 h-7 rounded-full bg-rose-100 text-[#E11D48] flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
+                    ৩
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-black text-slate-900 text-sm">টাস্ক আকারে আপনার হাতে পৌঁছায়</h4>
+                    <p class="text-slate-500 leading-relaxed text-[11px]">
+                        ক্লায়েন্টদের এই বড় বড় কাজগুলোকে আমরা ছোট ছোট মাইক্রো-টাস্কে রূপান্তর করি (যেমন: একটি ভিডিও ৩০ সেকেন্ড দেখা, পেজ লাইক দেওয়া, বা অ্যাপ রিভিউ দেওয়া) এবং আপনাদের ড্যাশবোর্ডে তুলে ধরি।
+                    </p>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="p-4 rounded-2xl bg-emerald-50/60 border border-emerald-100 flex items-start gap-3">
+                <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-black shrink-0 mt-0.5">
+                    ৪
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-black text-emerald-950 text-sm">ন্যায্য লভ্যাংশ বণ্টন (Win-Win)</h4>
+                    <p class="text-emerald-800 leading-relaxed text-[11px]">
+                        ক্লায়েন্ট যে টাকা আমাদের দেয়, তার থেকে কেবল সার্ভার ও মেইনটেন্যান্স খরচ বাবদ সামান্য কিছু রেখে (১০-১৫%), <strong>বাকি পুরো বড় অংশটি সরাসরি আপনাদের বিকাশ, নগদ বা রকেটে পেমেন্ট হিসেবে পাঠিয়ে দিই</strong>।
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ================= 3. WHY NOT A SCAM (আমরা কেন শতভাগ নিরাপদ?) ================= -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-rose-50/80 space-y-4">
+        <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-emerald-500"></i> MicroEarnX কেন ১০০% নিরাপদ?
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                <span class="font-extrabold text-slate-800 flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-ban text-[#E11D48]"></i> জিরো ইনভেস্টমেন্ট পলিসি
+                </span>
+                <p class="text-slate-500 text-[11px]">এখানে কাজ করতে ১ টাকাও ডিপোজিট করতে হয় না। জয়েনিং ও কাজ করা সম্পূর্ণ ফ্রি।</p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                <span class="font-extrabold text-slate-800 flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-user-check text-blue-500"></i> কোনো রোবট বা বট নয়
+                </span>
+                <p class="text-slate-500 text-[11px]">আমাদের ইউজাররা আসল মানুষ, তাই ক্লায়েন্ট সন্তুষ্ট হয়ে আমাদের নিয়মিত বড় বড় কাজের অর্ডার দেয়।</p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                <span class="font-extrabold text-slate-800 flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-receipt text-amber-500"></i> লাইভ ডিজিটাল রসিদ
+                </span>
+                <p class="text-slate-500 text-[11px]">প্রতিটি পেমেন্ট সম্পন্ন হলে হিস্ট্রি পেজে অফিশিয়াল ট্রানজেকশন রসিদ পাওয়া যায়।</p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-1">
+                <span class="font-extrabold text-slate-800 flex items-center gap-1.5 text-xs">
+                    <i class="fa-solid fa-lock text-emerald-500"></i> ডিভাইস প্রোটেকশন
+                </span>
+                <p class="text-slate-500 text-[11px]">১ ডিভাইসে ১ অ্যাকাউন্ট কঠোরভাবে নিশ্চিত করে আমরা ফ্রড মুক্ত পরিবেশ বজায় রাখি।</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 4. PLATFORM STATISTICS ================= -->
+    <div class="bg-gradient-to-tr from-slate-900 to-slate-800 rounded-[32px] p-6 text-white shadow-xl space-y-4 text-center">
+        <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">প্ল্যাটফর্ম রিপোর্ট</span>
+            <h3 class="text-base font-black">আমাদের বর্তমান কমিউনিটি পরিসংখ্যান</h3>
+        </div>
+
+        <div class="grid grid-cols-3 divide-x divide-slate-700/80 pt-2">
+            <div>
+                <span class="text-xl sm:text-2xl font-black text-rose-400 block">১৫,০০০+</span>
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">অ্যাক্টিভ ইউজার</span>
+            </div>
+            <div>
+                <span class="text-xl sm:text-2xl font-black text-emerald-400 block">৳৩৫ লক্ষ+</span>
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">মোট পেআউট</span>
+            </div>
+            <div>
+                <span class="text-xl sm:text-2xl font-black text-sky-400 block">৫০০+</span>
+                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">ক্লায়েন্ট পার্টনার</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 5. OUR MISSION & QUICK CTAS ================= -->
+    <div class="bg-white rounded-[32px] p-6 shadow-xl border border-rose-50/80 text-center space-y-4">
+        <h3 class="text-sm font-black text-slate-900">আমাদের মূল লক্ষ্য</h3>
+        <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+            বাংলাদেশের শিক্ষার্থী, গৃহিণী এবং বেকার তরুণ-তরুণীদের স্মার্টফোনকে কাজে লাগিয়ে একটি স্বচ্ছ, স্থায়ী এবং নিরাপদ পার্ট-টাইম উপার্জনের সুযোগ তৈরি করাই MicroEarnX-এর প্রধান লক্ষ্য।
+        </p>
+
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="/allwork" class="w-full sm:w-auto bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-extrabold text-xs py-3.5 px-6 rounded-2xl shadow-lg shadow-rose-500/25 transition">
+                <i class="fa-solid fa-play mr-1"></i> কাজ শুরু করুন
+            </a>
+            <a href="/promote" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-800 font-extrabold text-xs py-3.5 px-6 rounded-2xl transition">
+                <i class="fa-solid fa-bullhorn mr-1"></i> বিজ্ঞাপন দিতে চান?
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
