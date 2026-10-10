@@ -1036,6 +1036,51 @@ def promote():
         return redirect(url_for('promote'))
 
     return render_template('promote.html', is_logged_in=is_logged_in, user=user)
+
+# ==========================================================
+# PWA MANIFEST, SERVICE WORKER & /install CONTROLLER
+# ==========================================================
+@app.route('/manifest.json')
+def pwa_manifest():
+    manifest_data = {
+        "name": "MicroEarnX - Micro Task & Earn",
+        "short_name": "MicroEarnX",
+        "start_url": "/app",
+        "display": "standalone",
+        "background_color": "#ffffff",
+        "theme_color": "#E11D48",
+        "orientation": "portrait-primary",
+        "icons": [
+            {
+                "src": "https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg",
+                "sizes": "192x192",
+                "type": "image/jpeg",
+                "purpose": "any maskable"
+            },
+            {
+                "src": "https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg",
+                "sizes": "512x512",
+                "type": "image/jpeg",
+                "purpose": "any maskable"
+            }
+        ]
+    }
+    return jsonify(manifest_data)
+
+@app.route('/sw.js')
+def pwa_sw():
+    sw_code = """
+    self.addEventListener('install', (e) => { self.skipWaiting(); });
+    self.addEventListener('activate', (e) => { e.waitUntil(clients.claim()); });
+    self.addEventListener('fetch', (e) => {
+        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+    });
+    """
+    return app.response_class(sw_code, mimetype='application/javascript')
+
+@app.route('/install')
+def install_app_page():
+    return render_template('install.html')
     
 # ==========================================================
 # Local Development Execution
