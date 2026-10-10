@@ -10,6 +10,14 @@
     <!-- FontAwesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- PWA Manifest & App Config -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#E11D48">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MicroEarnX">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg">
+
     <script>
         tailwind.config = {
             theme: {
@@ -23,26 +31,9 @@
         }
     </script>
 
-    <!-- PWA Manifest & App Config -->
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#E11D48">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="MicroEarnX">
-<link rel="apple-touch-icon" href="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg">
-
-<!-- Register Service Worker -->
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js');
-        });
-    }
-</script>
-    
-    <!-- Custom Liquid Glassmorphism & Neon Aura CSS -->
+    <!-- Custom CSS: Neon Aura X, Floating Widget & Liquid Dock -->
     <style>
-        /* 1. Neon Circular Aura Rotating Behind X */
+        /* 1. Neon Circular Aura Behind X */
         @keyframes neon-halo-spin {
             0% {
                 transform: rotate(0deg) scale(0.96);
@@ -60,7 +51,6 @@
                 filter: hue-rotate(0deg);
             }
         }
-
         .neon-x-wrapper {
             position: relative;
             display: inline-flex;
@@ -70,7 +60,6 @@
             height: 28px;
             margin-left: 2px;
         }
-
         .neon-aura-ring {
             position: absolute;
             inset: 0;
@@ -80,7 +69,6 @@
             animation: neon-halo-spin 3s linear infinite;
             pointer-events: none;
         }
-
         .x-letter-glow {
             position: relative;
             z-index: 10;
@@ -91,16 +79,25 @@
             user-select: none;
         }
 
-        /* 2. Liquid Glassmorphism Floating Dock */
+        /* 2. Floating Circular Support Widget Animation */
+        @keyframes float-widget {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+        .animate-float-widget {
+            animation: float-widget 3.5s ease-in-out infinite;
+        }
+
+        /* 3. Liquid Glassmorphism Dock */
         .liquid-glass-dock {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.78);
             backdrop-filter: blur(28px) saturate(190%);
             -webkit-backdrop-filter: blur(28px) saturate(190%);
-            border: 1px solid rgba(255, 255, 255, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.7);
             box-shadow: 0 15px 45px rgba(225, 29, 72, 0.12), 0 4px 15px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.95);
         }
 
-        /* 3. Center Work Button Liquid Ripple Glow */
+        /* 4. Center Work Pulse Glow */
         @keyframes liquid-pulse {
             0% { transform: scale(0.94); opacity: 0.9; }
             50% { transform: scale(1.18); opacity: 0.25; }
@@ -111,7 +108,7 @@
         }
     </style>
 
-    <!-- Client-Side Device Security Token -->
+    <!-- Client-Side Device Security Token & Service Worker -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             try {
@@ -132,6 +129,13 @@
                 document.querySelectorAll('input[name="device_id"]').forEach(input => input.value = stored);
             } catch(e) {}
         });
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js');
+            });
+        }
     </script>
 </head>
 <body class="bg-gradient-to-b from-rose-50/60 via-white to-amber-50/40 min-h-screen flex flex-col font-sans antialiased text-slate-800 pb-28 md:pb-12 selection:bg-rose-100 selection:text-[#E11D48]">
@@ -142,43 +146,44 @@
             
             <!-- Brand Logo with Circular Border & Animated Neon Aura X -->
             <a href="/" class="flex items-center gap-2 group">
-                <!-- Circular Logo Container -->
-                <div class="w-10 h-10 rounded-full border-2 border-rose-300/80 p-0.5 shadow-sm bg-white overflow-hidden flex items-center justify-center shrink-0 group-hover:scale-105 transition duration-300">
+                <div class="w-10 h-10 rounded-full border-2 border-rose-300/90 p-0.5 shadow-sm bg-white overflow-hidden flex items-center justify-center shrink-0 group-hover:scale-105 transition duration-300">
                     <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" 
                          alt="MicroEarnX Logo" 
                          class="w-full h-full object-cover rounded-full">
                 </div>
                 
-                <!-- Brand Text: MicroEarn + Neon Halo X -->
                 <div class="flex items-center select-none">
                     <span class="font-black text-slate-900 text-lg tracking-tight">MicroEarn</span>
-                    
-                    <!-- Animated Circular Neon Halo Container for X -->
                     <div class="neon-x-wrapper">
                         <span class="neon-aura-ring"></span>
                         <span class="x-letter-glow">X</span>
                     </div>
-
                     <span class="text-amber-500 text-sm ml-1">⚡</span>
                 </div>
             </a>
 
-            <!-- Right Controls: Profile Avatar & Menu Toggle -->
+            <!-- Right Controls: VIP Header Avatar & Menu Toggle -->
             <div class="flex items-center gap-2.5">
                 {% if current_user %}
-                    <!-- User Avatar Badge with Online Status Dot -->
-                    <a href="/account" class="relative flex items-center gap-2 bg-rose-50/80 hover:bg-rose-100 border border-rose-200/80 p-1 pr-3 rounded-full transition shadow-sm group" title="আমার প্রোফাইল">
-                        <div class="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white shadow-sm bg-slate-800 flex items-center justify-center text-white text-xs font-black">
-                            {% if current_user.avatar_url %}
-                                <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="w-full h-full object-cover">
-                            {% else %}
-                                {{ current_user.name[:1] }}
-                            {% endif %}
+                    <!-- Highly Aesthetic Golden/Crimson Ring Avatar -->
+                    <a href="/account" class="relative group flex items-center gap-2 bg-white/90 hover:bg-white border border-rose-200/90 p-1 pr-3 rounded-full shadow-sm hover:shadow-md transition-all duration-300 active:scale-95" title="আমার প্রোফাইল">
+                        <div class="relative w-8 h-8 rounded-full p-0.5 bg-gradient-to-tr from-[#E11D48] via-rose-500 to-amber-400 shadow-inner">
+                            <div class="w-full h-full rounded-full overflow-hidden bg-slate-900 flex items-center justify-center text-white text-xs font-black">
+                                {% if current_user.avatar_url %}
+                                    <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="w-full h-full object-cover">
+                                {% else %}
+                                    {{ current_user.name[:1] }}
+                                {% endif %}
+                            </div>
                         </div>
-                        <!-- Active Green Dot -->
-                        <span class="absolute bottom-1 left-7 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full"></span>
                         
-                        <span class="text-xs font-black text-slate-800 group-hover:text-[#E11D48] transition hidden sm:inline-block">
+                        <!-- Pulsing Emerald Online Indicator Dot -->
+                        <span class="absolute bottom-0.5 left-7 flex h-2.5 w-2.5">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border border-white"></span>
+                        </span>
+                        
+                        <span class="text-xs font-black text-slate-900 group-hover:text-[#E11D48] transition hidden sm:inline-block tabular-nums">
                             ৳ {{ "%.2f"|format(current_user.balance) }}
                         </span>
                     </a>
@@ -197,31 +202,31 @@
         </div>
     </header>
 
-    <!-- ================= USER DRAWER SIDEBAR WITH PROFILE CARD ================= -->
+    <!-- ================= FULL DRAWER SIDEBAR WITH ALL NAVS ================= -->
     <div id="drawerOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
     <aside id="drawerPanel" class="fixed top-0 right-0 h-full w-72 sm:w-80 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-5 sm:p-6 rounded-l-[32px] border-l border-rose-50 overflow-hidden">
         
-        <!-- Drawer Close Button -->
+        <!-- Drawer Top Bar -->
         <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-            <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">মেনু নেভিগেশন</span>
-            <button onclick="toggleSidebar(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                <i class="fa-solid fa-compass text-[#E11D48]"></i> অল নেভিগেশন হাব
+            </span>
+            <button onclick="toggleSidebar(false)" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <!-- 1. VIP PROFILE CARD INSIDE TOGGLE DRAWER -->
-        <div class="pt-4 pb-2">
+        <!-- 1. VIP Profile Card inside Drawer -->
+        <div class="pt-3 pb-2">
             {% if current_user %}
             <div class="relative w-full rounded-2xl p-4 text-white overflow-hidden shadow-lg select-none"
                  style="background: radial-gradient(circle at 50% 0%, #1e293b 0%, #090d16 100%); border: 1px solid rgba(255,255,255,0.12);">
-                
-                <!-- Metallic Sheen -->
                 <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none"></div>
 
                 <div class="flex items-center justify-between relative z-10 mb-2">
                     <div class="flex items-center gap-2">
-                        <div class="w-9 h-9 rounded-full overflow-hidden border-2 border-white/20 shadow bg-slate-800 flex items-center justify-center text-white text-xs font-black">
+                        <div class="w-9 h-9 rounded-full overflow-hidden border-2 border-white/20 bg-slate-800 flex items-center justify-center text-white text-xs font-black shrink-0">
                             {% if current_user.avatar_url %}
                                 <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="w-full h-full object-cover">
                             {% else %}
@@ -241,7 +246,7 @@
                 <div class="flex items-center justify-between relative z-10 pt-2 border-t border-white/[0.08]">
                     <div>
                         <span class="text-[9px] text-slate-400 block">ব্যালেন্স</span>
-                        <span class="text-sm font-black text-white">৳ {{ "%.2f"|format(current_user.balance) }}</span>
+                        <span class="text-sm font-black text-white tabular-nums">৳ {{ "%.2f"|format(current_user.balance) }}</span>
                     </div>
                     <a href="/account" class="text-[10px] font-bold text-rose-400 hover:text-rose-300 flex items-center gap-1">
                         <span>প্রোফাইল</span>
@@ -250,69 +255,106 @@
                 </div>
             </div>
             {% else %}
-            <!-- Guest Welcome Card in Drawer -->
             <div class="rounded-2xl p-4 bg-rose-50 border border-rose-100 text-center space-y-2">
-                <div class="w-8 h-8 mx-auto rounded-full bg-white p-0.5 border border-rose-200">
+                <div class="w-9 h-9 mx-auto rounded-full bg-white p-0.5 border border-rose-200">
                     <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" class="w-full h-full object-cover rounded-full">
                 </div>
-                <p class="text-xs font-bold text-slate-800">স্বাগতম MicroEarnX এ</p>
+                <p class="text-xs font-black text-slate-900">স্বাগতম MicroEarnX এ</p>
                 <a href="/" class="block w-full bg-[#E11D48] text-white text-xs font-bold py-2 rounded-xl shadow-sm">লগইন বা একাউন্ট খুলুন</a>
             </div>
             {% endif %}
         </div>
 
-        <!-- 2. Clean Navigation Links -->
-        <nav class="flex-1 py-2 space-y-1 overflow-y-auto">
-            {% if current_user %}
-                <a href="/app" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+        <!-- 2. ALL NAVIGATION LINKS (Categorized) -->
+        <nav class="flex-1 py-1 space-y-3 overflow-y-auto pr-1">
+            
+            <!-- Category 1: Main Portals -->
+            <div class="space-y-1">
+                <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 px-3 block">প্রধান মেনু</span>
+                
+                <a href="/app" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
                     <i class="fa-solid fa-house text-slate-400 w-4 text-center"></i>
                     <span>ড্যাশবোর্ড (Home)</span>
                 </a>
-                <a href="/allwork" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                <a href="/allwork" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
                     <i class="fa-solid fa-briefcase text-slate-400 w-4 text-center"></i>
-                    <span>সকল কাজের তালিকা (Work)</span>
+                    <span>সকল কাজ (All Work)</span>
                 </a>
-                <a href="/history" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                <a href="/history" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
                     <i class="fa-solid fa-clock-rotate-left text-slate-400 w-4 text-center"></i>
                     <span>হিস্ট্রি ও রসিদ (History)</span>
                 </a>
-                <a href="/withdraw" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                <a href="/withdraw" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
                     <i class="fa-solid fa-wallet text-slate-400 w-4 text-center"></i>
-                    <span>টাকা উত্তোলন (Withdraw)</span>
+                    <span>উইথড্রয়াল (Withdraw)</span>
                 </a>
-                <a href="/account" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                <a href="/account" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
                     <i class="fa-solid fa-user-gear text-slate-400 w-4 text-center"></i>
-                    <span>আমার অ্যাকাউন্ট (Account)</span>
+                    <span>অ্যাকাউন্ট ও ভিআইপি কার্ড</span>
                 </a>
-                <a href="/refer" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
-                    <i class="fa-solid fa-user-plus text-slate-400 w-4 text-center"></i>
-                    <span>রেফারেল ও আয়</span>
+            </div>
+
+            <!-- Category 2: Earning Features -->
+            <div class="space-y-1 pt-1 border-t border-slate-100">
+                <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 px-3 block">আর্নিং ফিচারসমূহ</span>
+
+                <a href="/tasks" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-list-check text-indigo-500 w-4 text-center"></i>
+                    <span>মাইক্রো টাস্ক সেন্টার</span>
                 </a>
-            {% endif %}
+                <a href="/yt" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-brands fa-youtube text-red-500 w-4 text-center"></i>
+                    <span>YouTube ভিডিও ওয়াচ</span>
+                </a>
+                <a href="/spin" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-dharmachakra text-amber-500 w-4 text-center"></i>
+                    <span>লাকি স্পিন হুইল</span>
+                </a>
+                <a href="/scratch" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-gift text-emerald-500 w-4 text-center"></i>
+                    <span>লাকি স্ক্র্যাচ কার্ড</span>
+                </a>
+                <a href="/refer" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-user-plus text-[#E11D48] w-4 text-center"></i>
+                    <span>রেফারেল ও ইনভাইট</span>
+                </a>
+            </div>
 
-            <div class="pt-2 my-1 border-t border-slate-100"></div>
+            <!-- Category 3: Services & Information -->
+            <div class="space-y-1 pt-1 border-t border-slate-100">
+                <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 px-3 block">সেবা ও সাপোর্ট</span>
 
-            <a href="/tutorial" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
-                <i class="fa-solid fa-circle-play text-blue-500 w-4 text-center"></i>
-                <span>ভিডিও টিউটোরিয়াল</span>
-            </a>
-            <a href="/promote" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
-                <i class="fa-solid fa-bullhorn text-amber-500 w-4 text-center"></i>
-                <span>বিজ্ঞাপন ও প্রমোশন</span>
-            </a>
-            <a href="/sponsor" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
-                <i class="fa-solid fa-handshake text-rose-500 w-4 text-center"></i>
-                <span>স্পনসরশিপ প্রোগ্রাম</span>
-            </a>
-            <a href="https://t.me/your_support_channel" target="_blank" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-sky-600 hover:bg-sky-50 transition">
-                <i class="fa-brands fa-telegram text-sky-500 w-4 text-center"></i>
-                <span>টেলিগ্রাম সাপোর্ট</span>
-            </a>
+                <a href="/install" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-mobile-screen-button text-emerald-600 w-4 text-center"></i>
+                    <span>অ্যাপ ইনস্টল করুন (PWA)</span>
+                </a>
+                <a href="/tutorial" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-circle-play text-blue-500 w-4 text-center"></i>
+                    <span>কাজের ভিডিও গাইড</span>
+                </a>
+                <a href="/promote" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-bullhorn text-amber-500 w-4 text-center"></i>
+                    <span>বিজ্ঞাপন ও প্রমোশন</span>
+                </a>
+                <a href="/sponsor" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-handshake text-pink-500 w-4 text-center"></i>
+                    <span>স্পনসরশিপ প্রোগ্রাম</span>
+                </a>
+                <a href="/help" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-headset text-indigo-500 w-4 text-center"></i>
+                    <span>হেল্প সেন্টার ও FAQ</span>
+                </a>
+                <a href="/about" class="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
+                    <i class="fa-solid fa-circle-info text-rose-500 w-4 text-center"></i>
+                    <span>আমাদের আয়ের উৎস (About)</span>
+                </a>
+            </div>
+
         </nav>
 
-        <!-- Drawer Logout -->
+        <!-- Drawer Logout Footer -->
         {% if current_user %}
-        <div class="pt-3 border-t border-slate-100">
+        <div class="pt-2 border-t border-slate-100">
             <a href="/logout" class="w-full flex items-center justify-center gap-2 bg-rose-50 hover:bg-rose-100 text-[#E11D48] text-xs font-bold py-2.5 rounded-2xl transition">
                 <i class="fa-solid fa-arrow-right-from-bracket"></i>
                 <span>লগআউট করুন</span>
@@ -339,17 +381,22 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- ================= FLOATING LIVE SUPPORT WIDGET ================= -->
-    <div class="fixed bottom-24 right-4 z-40">
-        <a href="https://t.me/your_support_channel" target="_blank"
-           class="relative group flex items-center gap-2 bg-gradient-to-tr from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white p-3 sm:px-4 sm:py-2.5 rounded-full shadow-xl shadow-sky-500/35 transition-all duration-300 hover:scale-110 active:scale-95"
+    <!-- ================= FULLY ROUNDED 3D FLOATING SUPPORT WIDGET ================= -->
+    <div class="fixed bottom-24 right-4 z-40 animate-float-widget">
+        <a href="https://t.me/micro_earnx" target="_blank"
+           class="relative group w-14 h-14 rounded-full bg-gradient-to-tr from-[#0088cc] via-[#00a8e8] to-[#00b4d8] text-white flex items-center justify-center text-2xl shadow-2xl shadow-sky-500/40 border-2 border-white/80 transition-all duration-300 hover:scale-110 active:scale-95"
            title="সরাসরি টেলিগ্রাম সাপোর্ট">
-            <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-300 opacity-80"></span>
-                <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-sky-400 border-2 border-white"></span>
+            
+            <!-- Live Radar Pulse Wave -->
+            <span class="absolute inset-0 rounded-full bg-sky-400 opacity-60 animate-ping pointer-events-none"></span>
+            
+            <!-- Telegram Icon -->
+            <i class="fa-brands fa-telegram drop-shadow relative z-10"></i>
+
+            <!-- Live Help Tag Pill -->
+            <span class="absolute -top-1.5 -right-1.5 bg-[#E11D48] text-white text-[9px] font-black px-1.5 py-0.2 rounded-full border border-white shadow">
+                Help
             </span>
-            <i class="fa-brands fa-telegram text-xl"></i>
-            <span class="text-xs font-extrabold hidden sm:inline-block">হেল্পলাইন</span>
         </a>
     </div>
 
@@ -369,12 +416,10 @@
                 <span class="text-[9px] font-extrabold">History</span>
             </a>
 
-            <!-- 3. Work (/allwork) Liquid Glow Center Action Button -->
+            <!-- 3. Work (/allwork) Center Liquid Pulse Glow Button -->
             <a href="/allwork" class="nav-item -mt-6 flex flex-col items-center group active:scale-95 transition" data-path="/allwork">
                 <div class="relative flex items-center justify-center">
-                    <!-- Liquid Glow Ring -->
                     <span class="absolute w-14 h-14 rounded-full bg-[#E11D48]/30 liquid-glow-ring pointer-events-none"></span>
-                    <!-- Core Button -->
                     <div class="relative w-12 h-12 rounded-full bg-gradient-to-tr from-[#E11D48] via-rose-500 to-red-500 text-white flex items-center justify-center text-lg shadow-xl shadow-rose-500/40 border-2 border-white group-hover:scale-105 transition duration-200">
                         <i class="fa-solid fa-bolt"></i>
                     </div>
