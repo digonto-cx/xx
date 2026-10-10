@@ -4,6 +4,7 @@ import string
 import requests
 from datetime import datetime, timezone, timedelta
 from functools import wraps
+from flask import send_from_directory
 from flask import (
     Flask, render_template, request, redirect, 
     url_for, session, flash, jsonify
@@ -1081,6 +1082,13 @@ def pwa_sw():
 @app.route('/install')
 def install_app_page():
     return render_template('install.html')
+
+
+
+@app.route('/sw.js')
+def serve_sw():
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return send_from_directory(root_dir, 'sw.js', mimetype='application/javascript')
     
 # ==========================================================
 # Local Development Execution
