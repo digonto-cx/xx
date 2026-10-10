@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto space-y-5 pb-14">
+
+    <!-- Header & Back Button -->
+    <div class="flex items-center justify-between px-1">
+        <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>ড্যাশবোর্ডে ফিরুন</span>
+        </a>
+        <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-2.5 py-1 rounded-full border border-rose-100 uppercase">
+            ভিডিও গাইড
+        </span>
+    </div>
+
+    <!-- Main Reel Player Card -->
+    <div class="bg-white rounded-[32px] p-5 sm:p-6 shadow-2xl shadow-rose-200/40 border border-rose-50/80 space-y-4 text-center">
+        
+        <div>
+            <div class="w-10 h-10 mx-auto rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-2 shadow-sm">
+                <i class="fa-brands fa-facebook"></i>
+            </div>
+            <h2 class="text-base font-black text-slate-900 tracking-tight">কীভাবে কাজ করবেন?</h2>
+            <p class="text-xs text-slate-400 mt-0.5">নিচের ফেসবুক রিলস ভিডিওটি সম্পূর্ণ দেখে নিয়ম বুঝে নিন</p>
+        </div>
+
+        <!-- Facebook Reel Embed Frame (Vertical 9:16 Aspect) -->
+        <div class="relative w-full max-w-[320px] mx-auto aspect-[9/16] rounded-2xl overflow-hidden bg-slate-900 shadow-xl border-2 border-slate-100 flex items-center justify-center">
+            
+            <iframe 
+                src="https://www.facebook.com/plugins/video.php?height=560&href={{ fb_reel_url|urlencode }}&show_text=false&width=320&autoplay=true" 
+                class="w-full h-full border-0 overflow-hidden" 
+                scrolling="no" 
+                frameborder="0" 
+                allowfullscreen="true" 
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+            </iframe>
+
+        </div>
+
+        <!-- 3 Quick Steps Guidance -->
+        <div class="text-left bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-2.5 text-xs text-slate-600">
+            <span class="font-extrabold text-slate-800 text-[11px] uppercase tracking-wider block">
+                <i class="fa-solid fa-list-ol text-[#E11D48] mr-1"></i> কাজের ৩টি সহজ ধাপ:
+            </span>
+
+            <div class="flex items-start gap-2">
+                <span class="w-4 h-4 rounded-full bg-rose-100 text-[#E11D48] text-[9px] font-black flex items-center justify-center shrink-0 mt-0.5">১</span>
+                <p><strong>টাস্ক সিলেক্ট করুন:</strong> টাস্ক পেজে গিয়ে কাজের নিয়ম ও শর্তাবলী ভালো করে পড়ুন।</p>
+            </div>
+
+            <div class="flex items-start gap-2">
+                <span class="w-4 h-4 rounded-full bg-rose-100 text-[#E11D48] text-[9px] font-black flex items-center justify-center shrink-0 mt-0.5">২</span>
+                <p><strong>স্ক্রিনশট নিন:</strong> কাজ শেষ করে স্পষ্ট প্রুফ স্ক্রিনশট তুলে সাবমিট করুন।</p>
+            </div>
+
+            <div class="flex items-start gap-2">
+                <span class="w-4 h-4 rounded-full bg-rose-100 text-[#E11D48] text-[9px] font-black flex items-center justify-center shrink-0 mt-0.5">৩</span>
+                <p><strong>টাকা তুলুন:</strong> ব্যালেন্স ৫০০ টাকা ও ৪টি রেফারেল পূর্ণ হলে বিকাশ বা নগদে উইথড্র দিন।</p>
+            </div>
+        </div>
+
+        <!-- Action Button: Start Working -->
+        <a href="/tasks" 
+           class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition">
+            <i class="fa-solid fa-play text-xs"></i>
+            <span>কাজ শুরু করতে এখানে চাপুন</span>
+        </a>
+
+        <!-- Help Support -->
+        <a href="https://t.me/your_support_channel" target="_blank" 
+           class="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs py-3 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 transition">
+            <i class="fa-brands fa-telegram text-sky-500 text-base"></i>
+            <span>ভিডিও বুঝতে না পারলে টেলিগ্রামে হেল্প নিন</span>
+        </a>
+
+    </div>
+
+</div>
+{% endblock %}
