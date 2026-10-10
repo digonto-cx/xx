@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto space-y-4 pb-8">
+
+    <!-- Back Button -->
+    <a href="/app" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition px-1">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>ড্যাশবোর্ডে ফিরুন</span>
+    </a>
+
+    <!-- Withdrawal Form Card -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 space-y-5">
+        
+        <!-- Header -->
+        <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+            <div class="w-8 h-8 rounded-full bg-rose-50 text-[#E11D48] flex items-center justify-center text-sm">
+                <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-black text-slate-900">টাকা উত্তোলন (Withdraw)</h3>
+                <p class="text-[10px] text-slate-400">বিকাশ / নগদ / রকেট পার্সোনাল</p>
+            </div>
+        </div>
+
+        <!-- Balance Info -->
+        <div class="bg-gradient-to-r from-rose-50 to-amber-50 p-4 rounded-2xl border border-rose-100 flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">বর্তমান ব্যালেন্স</span>
+                <span class="text-xl font-black text-slate-900">৳ {{ "%.2f"|format(user.balance) }}</span>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">আপনার রেফারেল</span>
+                <span class="text-xs font-extrabold text-[#E11D48]">{{ referral_count }} / ৪ টি</span>
+            </div>
+        </div>
+
+        <!-- Rule Alert -->
+        <div class="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl text-[11px] text-amber-900 leading-relaxed">
+            <i class="fa-solid fa-circle-exclamation text-amber-500 mr-1"></i>
+            <strong>উইথড্রয়াল শর্ত:</strong> সর্বনিম্ন <strong>৪টি সফল রেফারেল</strong> এবং অ্যাকাউন্টে কমপক্ষে <strong>৫০০ টাকা</strong> ব্যালেন্স থাকতে হবে।
+        </div>
+
+        <!-- Withdrawal Form -->
+        <form action="/withdraw" method="POST" class="space-y-3.5">
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">উইথড্র অ্যামাউন্ট (৳)</label>
+                <input type="number" name="amount" min="500" required placeholder="সর্বনিম্ন 500" 
+                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পেমেন্ট মেথড</label>
+                <select name="method" required 
+                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+                    <option value="bKash">bKash Personal (বিকাশ)</option>
+                    <option value="Nagad">Nagad Personal (নগদ)</option>
+                    <option value="Rocket">Rocket Personal (রকেট)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">অ্যাকাউন্ট নাম্বার</label>
+                <input type="text" name="account" required placeholder="017xxxxxxxx" 
+                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
+            </div>
+
+            <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-4 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition mt-4">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>রিকোয়েস্ট সাবমিট করুন</span>
+            </button>
+        </form>
+
+    </div>
+
+</div>
+{% endblock %}
