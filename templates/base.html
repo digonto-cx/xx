@@ -23,41 +23,74 @@
         }
     </script>
 
-    <!-- Custom CSS Animations (Micro-Interactions) -->
+    <!-- Custom Liquid Glassmorphism & Neon Aura CSS -->
     <style>
-        /* Highlighted Animated X */
-        @keyframes glow-x {
-            0%, 100% {
-                transform: scale(1) rotate(0deg);
-                filter: drop-shadow(0 0 3px rgba(225, 29, 72, 0.5));
+        /* 1. Neon Circular Aura Rotating Behind X */
+        @keyframes neon-halo-spin {
+            0% {
+                transform: rotate(0deg) scale(0.96);
+                box-shadow: 0 0 10px #ff0055, 0 0 18px #ff0055 inset;
+                filter: hue-rotate(0deg);
             }
             50% {
-                transform: scale(1.18) rotate(6deg);
-                filter: drop-shadow(0 0 10px rgba(225, 29, 72, 0.9));
+                transform: rotate(180deg) scale(1.12);
+                box-shadow: 0 0 16px #ff0077, 0 0 26px #ff0055 inset;
+                filter: hue-rotate(25deg);
+            }
+            100% {
+                transform: rotate(360deg) scale(0.96);
+                box-shadow: 0 0 10px #ff0055, 0 0 18px #ff0055 inset;
+                filter: hue-rotate(0deg);
             }
         }
-        .animated-x {
-            display: inline-block;
-            color: #E11D48;
-            animation: glow-x 2.2s infinite ease-in-out;
-            transform-origin: center;
+
+        .neon-x-wrapper {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            margin-left: 2px;
         }
 
-        /* Center Work Button Pulsing Glow */
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            50% { transform: scale(1.15); opacity: 0.3; }
-            100% { transform: scale(0.95); opacity: 0.8; }
-        }
-        .pulse-glow-ring {
-            animation: pulse-ring 2s infinite ease-in-out;
+        .neon-aura-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 9999px;
+            background: radial-gradient(circle, rgba(225, 29, 72, 0.45) 0%, rgba(255, 0, 100, 0.18) 70%, transparent 100%);
+            border: 1.5px solid rgba(255, 0, 85, 0.7);
+            animation: neon-halo-spin 3s linear infinite;
+            pointer-events: none;
         }
 
-        /* Smooth Bottom Navigation Glass Blur */
-        .glass-dock {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+        .x-letter-glow {
+            position: relative;
+            z-index: 10;
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: #ffffff;
+            text-shadow: 0 0 8px #ff0055, 0 0 15px #ff0055;
+            user-select: none;
+        }
+
+        /* 2. Liquid Glassmorphism Floating Dock */
+        .liquid-glass-dock {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(28px) saturate(190%);
+            -webkit-backdrop-filter: blur(28px) saturate(190%);
+            border: 1px solid rgba(255, 255, 255, 0.65);
+            box-shadow: 0 15px 45px rgba(225, 29, 72, 0.12), 0 4px 15px rgba(0, 0, 0, 0.04), inset 0 1px 1px rgba(255, 255, 255, 0.95);
+        }
+
+        /* 3. Center Work Button Liquid Ripple Glow */
+        @keyframes liquid-pulse {
+            0% { transform: scale(0.94); opacity: 0.9; }
+            50% { transform: scale(1.18); opacity: 0.25; }
+            100% { transform: scale(0.94); opacity: 0.9; }
+        }
+        .liquid-glow-ring {
+            animation: liquid-pulse 2.2s infinite ease-in-out;
         }
     </style>
 
@@ -84,26 +117,33 @@
         });
     </script>
 </head>
-<body class="bg-gradient-to-b from-rose-50/60 via-white to-amber-50/40 min-h-screen flex flex-col font-sans antialiased text-slate-800 pb-28 md:pb-10 selection:bg-rose-100 selection:text-[#E11D48]">
+<body class="bg-gradient-to-b from-rose-50/60 via-white to-amber-50/40 min-h-screen flex flex-col font-sans antialiased text-slate-800 pb-28 md:pb-12 selection:bg-rose-100 selection:text-[#E11D48]">
 
     <!-- ================= TOP HEADER NAVBAR ================= -->
     <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-rose-100/70 shadow-[0_4px_25px_rgb(0,0,0,0.03)]">
         <div class="max-w-xl mx-auto px-4 h-16 flex items-center justify-between">
             
-            <!-- Brand Logo with Round Border & Animated X -->
-            <a href="/" class="flex items-center gap-2.5 group">
+            <!-- Brand Logo with Circular Border & Animated Neon Aura X -->
+            <a href="/" class="flex items-center gap-2 group">
                 <!-- Circular Logo Container -->
-                <div class="w-10 h-10 rounded-full border-2 border-rose-200/90 p-0.5 shadow-sm bg-white overflow-hidden flex items-center justify-center shrink-0 group-hover:scale-105 transition duration-300">
-                    <img src="https://i.ibb.co.com/nqLnsdd0/Add-Text-10-09-09-21-33.png" 
+                <div class="w-10 h-10 rounded-full border-2 border-rose-300/80 p-0.5 shadow-sm bg-white overflow-hidden flex items-center justify-center shrink-0 group-hover:scale-105 transition duration-300">
+                    <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" 
                          alt="MicroEarnX Logo" 
-                         class="w-full h-full object-contain">
+                         class="w-full h-full object-cover rounded-full">
                 </div>
                 
-                <!-- Brand Text: MicroEarn + Animated X -->
-                <span class="font-black text-slate-900 text-lg tracking-tight select-none">
-                    MicroEarn<span class="animated-x font-black text-xl">X</span>
-                    <span class="text-amber-500 text-sm ml-0.5">⚡</span>
-                </span>
+                <!-- Brand Text: MicroEarn + Neon Halo X -->
+                <div class="flex items-center select-none">
+                    <span class="font-black text-slate-900 text-lg tracking-tight">MicroEarn</span>
+                    
+                    <!-- Animated Circular Neon Halo Container for X -->
+                    <div class="neon-x-wrapper">
+                        <span class="neon-aura-ring"></span>
+                        <span class="x-letter-glow">X</span>
+                    </div>
+
+                    <span class="text-amber-500 text-sm ml-1">⚡</span>
+                </div>
             </a>
 
             <!-- Right Controls: Profile Avatar & Menu Toggle -->
@@ -140,43 +180,72 @@
         </div>
     </header>
 
-    <!-- ================= USER DRAWER SIDEBAR ================= -->
+    <!-- ================= USER DRAWER SIDEBAR WITH PROFILE CARD ================= -->
     <div id="drawerOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"></div>
 
-    <aside id="drawerPanel" class="fixed top-0 right-0 h-full w-72 sm:w-80 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-6 rounded-l-[32px] border-l border-rose-50">
+    <aside id="drawerPanel" class="fixed top-0 right-0 h-full w-72 sm:w-80 bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col p-5 sm:p-6 rounded-l-[32px] border-l border-rose-50 overflow-hidden">
         
-        <!-- Drawer Header -->
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-            {% if current_user %}
-            <div class="flex items-center gap-2.5">
-                <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-rose-200 bg-slate-800 flex items-center justify-center text-white text-xs font-black">
-                    {% if current_user.avatar_url %}
-                        <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="w-full h-full object-cover">
-                    {% else %}
-                        {{ current_user.name[:1] }}
-                    {% endif %}
-                </div>
-                <div class="leading-tight">
-                    <span class="text-xs font-black text-slate-900 block truncate max-w-[130px]">{{ current_user.name }}</span>
-                    <span class="text-[10px] text-[#E11D48] font-bold">ব্যালেন্স: ৳ {{ "%.2f"|format(current_user.balance) }}</span>
-                </div>
-            </div>
-            {% else %}
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-full border border-rose-200 p-0.5 bg-white">
-                    <img src="https://i.ibb.co.com/nqLnsdd0/Add-Text-10-09-09-21-33.png" class="w-full h-full object-contain">
-                </div>
-                <span class="font-black text-slate-900 text-sm">MicroEarnX মেনু</span>
-            </div>
-            {% endif %}
-
+        <!-- Drawer Close Button -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">মেনু নেভিগেশন</span>
             <button onclick="toggleSidebar(false)" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <!-- Navigation Links -->
-        <nav class="flex-1 py-4 space-y-1 overflow-y-auto">
+        <!-- 1. VIP PROFILE CARD INSIDE TOGGLE DRAWER -->
+        <div class="pt-4 pb-2">
+            {% if current_user %}
+            <div class="relative w-full rounded-2xl p-4 text-white overflow-hidden shadow-lg select-none"
+                 style="background: radial-gradient(circle at 50% 0%, #1e293b 0%, #090d16 100%); border: 1px solid rgba(255,255,255,0.12);">
+                
+                <!-- Metallic Sheen -->
+                <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/[0.05] to-transparent pointer-events-none"></div>
+
+                <div class="flex items-center justify-between relative z-10 mb-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-full overflow-hidden border-2 border-white/20 shadow bg-slate-800 flex items-center justify-center text-white text-xs font-black">
+                            {% if current_user.avatar_url %}
+                                <img src="{{ current_user.avatar_url }}" alt="{{ current_user.name }}" class="w-full h-full object-cover">
+                            {% else %}
+                                {{ current_user.name[:1] }}
+                            {% endif %}
+                        </div>
+                        <div class="leading-tight">
+                            <span class="text-xs font-black text-white block truncate max-w-[110px]">{{ current_user.name }}</span>
+                            <span class="text-[9px] text-slate-400 font-mono">@{{ current_user.referral_code }}</span>
+                        </div>
+                    </div>
+                    <span class="text-[9px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase">
+                        Active
+                    </span>
+                </div>
+
+                <div class="flex items-center justify-between relative z-10 pt-2 border-t border-white/[0.08]">
+                    <div>
+                        <span class="text-[9px] text-slate-400 block">ব্যালেন্স</span>
+                        <span class="text-sm font-black text-white">৳ {{ "%.2f"|format(current_user.balance) }}</span>
+                    </div>
+                    <a href="/account" class="text-[10px] font-bold text-rose-400 hover:text-rose-300 flex items-center gap-1">
+                        <span>প্রোফাইল</span>
+                        <i class="fa-solid fa-arrow-right text-[8px]"></i>
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <!-- Guest Welcome Card in Drawer -->
+            <div class="rounded-2xl p-4 bg-rose-50 border border-rose-100 text-center space-y-2">
+                <div class="w-8 h-8 mx-auto rounded-full bg-white p-0.5 border border-rose-200">
+                    <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" class="w-full h-full object-cover rounded-full">
+                </div>
+                <p class="text-xs font-bold text-slate-800">স্বাগতম MicroEarnX এ</p>
+                <a href="/" class="block w-full bg-[#E11D48] text-white text-xs font-bold py-2 rounded-xl shadow-sm">লগইন বা একাউন্ট খুলুন</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- 2. Clean Navigation Links -->
+        <nav class="flex-1 py-2 space-y-1 overflow-y-auto">
             {% if current_user %}
                 <a href="/app" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
                     <i class="fa-solid fa-house text-slate-400 w-4 text-center"></i>
@@ -202,14 +271,9 @@
                     <i class="fa-solid fa-user-plus text-slate-400 w-4 text-center"></i>
                     <span>রেফারেল ও আয়</span>
                 </a>
-            {% else %}
-                <a href="/" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
-                    <i class="fa-solid fa-arrow-right-to-bracket text-slate-400 w-4 text-center"></i>
-                    <span>লগইন / রেজিস্ট্রেশন</span>
-                </a>
             {% endif %}
 
-            <div class="pt-3 my-2 border-t border-slate-100"></div>
+            <div class="pt-2 my-1 border-t border-slate-100"></div>
 
             <a href="/tutorial" class="flex items-center gap-3.5 px-3.5 py-2.5 rounded-2xl text-xs font-bold text-slate-700 hover:bg-rose-50 hover:text-[#E11D48] transition">
                 <i class="fa-solid fa-circle-play text-blue-500 w-4 text-center"></i>
@@ -263,7 +327,6 @@
         <a href="https://t.me/your_support_channel" target="_blank"
            class="relative group flex items-center gap-2 bg-gradient-to-tr from-sky-500 to-blue-600 hover:from-sky-600 hover:to-blue-700 text-white p-3 sm:px-4 sm:py-2.5 rounded-full shadow-xl shadow-sky-500/35 transition-all duration-300 hover:scale-110 active:scale-95"
            title="সরাসরি টেলিগ্রাম সাপোর্ট">
-            <!-- Pulsing Notification Dot -->
             <span class="absolute -top-1 -right-1 flex h-3.5 w-3.5">
                 <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-300 opacity-80"></span>
                 <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-sky-400 border-2 border-white"></span>
@@ -273,49 +336,51 @@
         </a>
     </div>
 
-    <!-- ================= 5-BUTTON ANIMATED BOTTOM NAVIGATION DOCK ================= -->
-    <nav class="fixed bottom-0 left-0 right-0 z-40 glass-dock border-t border-rose-100/80 px-3 py-1.5 flex justify-around items-center shadow-[0_-10px_30px_rgba(0,0,0,0.06)]">
-        
-        <!-- 1. Home -->
-        <a href="/app" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/app">
-            <i class="fa-solid fa-house text-base group-hover:-translate-y-0.5 transition duration-200"></i>
-            <span class="text-[9px] font-extrabold">Home</span>
-        </a>
+    <!-- ================= LIQUID GLASSMORPHISM BOTTOM NAVIGATION DOCK ================= -->
+    <div class="fixed bottom-3 left-0 right-0 z-40 px-3 flex justify-center pointer-events-none">
+        <nav class="liquid-glass-dock w-full max-w-md rounded-[32px] px-3 py-1.5 flex justify-around items-center pointer-events-auto transition-all duration-300">
+            
+            <!-- 1. Home -->
+            <a href="/app" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/app">
+                <i class="fa-solid fa-house text-base group-hover:-translate-y-0.5 transition duration-200"></i>
+                <span class="text-[9px] font-extrabold">Home</span>
+            </a>
 
-        <!-- 2. History -->
-        <a href="/history" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/history">
-            <i class="fa-solid fa-clock-rotate-left text-base group-hover:-translate-y-0.5 transition duration-200"></i>
-            <span class="text-[9px] font-extrabold">History</span>
-        </a>
+            <!-- 2. History -->
+            <a href="/history" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/history">
+                <i class="fa-solid fa-clock-rotate-left text-base group-hover:-translate-y-0.5 transition duration-200"></i>
+                <span class="text-[9px] font-extrabold">History</span>
+            </a>
 
-        <!-- 3. Work (/allwork) Pulsing Glow Action Button -->
-        <a href="/allwork" class="nav-item -mt-6 flex flex-col items-center group active:scale-95 transition" data-path="/allwork">
-            <div class="relative flex items-center justify-center">
-                <!-- Outer Pulse Glow Ring -->
-                <span class="absolute w-14 h-14 rounded-full bg-rose-500/30 pulse-glow-ring pointer-events-none"></span>
-                <!-- Core Button -->
-                <div class="relative w-12 h-12 rounded-full bg-gradient-to-tr from-[#E11D48] via-rose-500 to-red-500 text-white flex items-center justify-center text-lg shadow-xl shadow-rose-500/40 border-2 border-white group-hover:scale-105 transition duration-200">
-                    <i class="fa-solid fa-bolt"></i>
+            <!-- 3. Work (/allwork) Liquid Glow Center Action Button -->
+            <a href="/allwork" class="nav-item -mt-6 flex flex-col items-center group active:scale-95 transition" data-path="/allwork">
+                <div class="relative flex items-center justify-center">
+                    <!-- Liquid Glow Ring -->
+                    <span class="absolute w-14 h-14 rounded-full bg-[#E11D48]/30 liquid-glow-ring pointer-events-none"></span>
+                    <!-- Core Button -->
+                    <div class="relative w-12 h-12 rounded-full bg-gradient-to-tr from-[#E11D48] via-rose-500 to-red-500 text-white flex items-center justify-center text-lg shadow-xl shadow-rose-500/40 border-2 border-white group-hover:scale-105 transition duration-200">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
                 </div>
-            </div>
-            <span class="text-[9px] font-black text-[#E11D48] mt-1 tracking-tight">Work</span>
-        </a>
+                <span class="text-[9px] font-black text-[#E11D48] mt-1 tracking-tight">Work</span>
+            </a>
 
-        <!-- 4. Withdraw -->
-        <a href="/withdraw" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/withdraw">
-            <i class="fa-solid fa-wallet text-base group-hover:-translate-y-0.5 transition duration-200"></i>
-            <span class="text-[9px] font-extrabold">Withdraw</span>
-        </a>
+            <!-- 4. Withdraw -->
+            <a href="/withdraw" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/withdraw">
+                <i class="fa-solid fa-wallet text-base group-hover:-translate-y-0.5 transition duration-200"></i>
+                <span class="text-[9px] font-extrabold">Withdraw</span>
+            </a>
 
-        <!-- 5. Account -->
-        <a href="/account" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/account">
-            <i class="fa-solid fa-user text-base group-hover:-translate-y-0.5 transition duration-200"></i>
-            <span class="text-[9px] font-extrabold">Account</span>
-        </a>
+            <!-- 5. Account -->
+            <a href="/account" class="nav-item flex flex-col items-center gap-0.5 py-1 px-3 rounded-2xl text-slate-400 hover:text-[#E11D48] transition-all duration-200 group active:scale-90" data-path="/account">
+                <i class="fa-solid fa-user text-base group-hover:-translate-y-0.5 transition duration-200"></i>
+                <span class="text-[9px] font-extrabold">Account</span>
+            </a>
 
-    </nav>
+        </nav>
+    </div>
 
-    <!-- Drawer Toggle & Active State Highlighter Script -->
+    <!-- Drawer Toggle & Active State Script -->
     <script>
         function toggleSidebar(open) {
             const overlay = document.getElementById('drawerOverlay');
