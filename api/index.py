@@ -138,6 +138,8 @@ def upload_to_imgbb(file_bytes):
             
     return None
 
+
+
 # ==========================================================
 # TUTORIAL & GUIDELINE VIDEO CONTROLLER
 # ==========================================================
@@ -195,7 +197,34 @@ def sponsor():
         return redirect(url_for('sponsor'))
 
     return render_template('sponsor.html', is_logged_in=is_logged_in, user=user)
+
+# ==========================================================
+# HELP & SUPPORT CENTER CONTROLLER
+# ==========================================================
+@app.route('/help')
+def help_page():
+    sb = get_supabase()
+    user = None
+    if 'user_id' in session:
+        user = sb.table('users').select('*').eq('id', session['user_id']).single().execute().data
+    return render_template('help.html', user=user)
+
+@app.route('/help/vote', methods=['POST'])
+def help_vote():
+    sb = get_supabase()
+    data = request.get_json() or {}
+    has_tg = bool(data.get('has_telegram', False))
+    user_id = session.get('user_id')
+
+    # সরাসরি ডেটাবেসে ভোট সেভ
+    sb.table('help_votes').insert({
+        'user_id': user_id,
+        'has_telegram': has_tg
+    }).execute()
+
+    return jsonify({"success": True, "message": "ভোট সফলভাবে জমা হয়েছে!"})
     
+
 @app.route('/register', methods=['POST'])
 def register():
     sb = get_supabase()
