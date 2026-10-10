@@ -567,6 +567,26 @@ def admin_dashboard():
         notice=current_notice
     )
 
+# ==========================================================
+# GLOBAL TEMPLATE CONTEXT (হেডারে প্রোফাইল ছবি পাওয়ার জন্য)
+# ==========================================================
+@app.context_processor
+def inject_global_user():
+    if 'user_id' in session:
+        sb = get_supabase()
+        u = sb.table('users').select('id, name, balance, avatar_url, referral_code') \
+            .eq('id', session['user_id']).single().execute().data
+        return dict(current_user=u)
+    return dict(current_user=None)
+
+# ==========================================================
+# ALL WORK HUB (/allwork)
+# ==========================================================
+@app.route('/allwork')
+@login_required
+def all_work():
+    return render_template('allwork.html')
+    
 @app.route('/admin/notice', methods=['POST'])
 @admin_required
 def admin_update_notice():
