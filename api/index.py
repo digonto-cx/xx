@@ -121,6 +121,15 @@ def upload_to_imgbb(file_bytes):
     return None
 
 # ==========================================================
+# TUTORIAL & GUIDELINE VIDEO CONTROLLER
+# ==========================================================
+@app.route('/tutorial')
+def tutorial():
+    # ফেসবুক রিলস ভিডিওর লিংক (প্রয়োজনে আপনি আপনার নিজস্ব রিলস লিংক দিয়ে রিপ্লেস করতে পারেন)
+    fb_reel_url = "https://www.facebook.com/reel/1015849843657384/"
+    return render_template('tutorial.html', fb_reel_url=fb_reel_url)
+    
+# ==========================================================
 # User Auth & Device Security
 # ==========================================================
 @app.route('/')
