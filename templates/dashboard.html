@@ -5,7 +5,7 @@
     <!-- 1. USER GREETING & NOTICE -->
     <div class="flex items-center justify-between px-1">
         <div>
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">স্বাগতম ফিরে আসার জন্য</span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">স্বাগতম ফিরে আসার জন্য</span>
             <h2 class="text-lg font-black text-slate-900 tracking-tight flex items-center gap-1.5">
                 {{ user.name }} <span class="text-sm">👋</span>
             </h2>
@@ -42,13 +42,15 @@
                 </span>
             </div>
 
-            <!-- Quick Action Buttons in Card -->
+            <!-- Quick Action Buttons -->
             <div class="flex items-center gap-2 mt-4 pt-4 border-t border-white/20">
-                <a href="#withdrawSection" class="flex-1 bg-white hover:bg-rose-50 text-[#E11D48] text-xs font-extrabold py-2.5 px-4 rounded-xl text-center shadow-md active:scale-95 transition">
-                    <i class="fa-solid fa-money-bill-transfer mr-1"></i> টাকা তুলুন
+                <a href="/withdraw" class="flex-1 bg-white hover:bg-rose-50 text-[#E11D48] text-xs font-extrabold py-2.5 px-4 rounded-xl text-center shadow-md active:scale-95 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>টাকা তুলুন</span>
                 </a>
-                <a href="/tasks" class="flex-1 bg-black/20 hover:bg-black/30 border border-white/30 text-white text-xs font-extrabold py-2.5 px-4 rounded-xl text-center active:scale-95 transition">
-                    <i class="fa-solid fa-list-check mr-1"></i> টাস্ক শুরু করুন
+                <a href="/tasks" class="flex-1 bg-black/20 hover:bg-black/30 border border-white/30 text-white text-xs font-extrabold py-2.5 px-4 rounded-xl text-center active:scale-95 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>টাস্ক শুরু করুন</span>
                 </a>
             </div>
         </div>
@@ -57,7 +59,7 @@
         <i class="fa-solid fa-wallet absolute -right-6 -bottom-6 text-9xl text-white/10"></i>
     </div>
 
-    <!-- 3. METRICS STATUS BOX (Same 500 Theme Style) -->
+    <!-- 3. METRICS STATUS BOX -->
     <div class="w-full bg-white border border-rose-100 rounded-2xl py-3 px-2 grid grid-cols-3 divide-x divide-slate-100 shadow-sm text-center">
         <div>
             <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">মোট রেফারেল</span>
@@ -73,32 +75,48 @@
         </div>
     </div>
 
-    <!-- 4. EARNING APPS & MINI GAMES -->
-    <div id="games" class="grid grid-cols-2 gap-3">
+    <!-- 4. ALL EARNING APPS & MINI-GAMES GRID -->
+    <div class="grid grid-cols-2 gap-3">
         
-        <!-- Lucky Spin Card -->
-        <div class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm flex flex-col justify-between text-center relative overflow-hidden group">
-            <div class="w-11 h-11 mx-auto rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg mb-2 group-hover:rotate-45 transition duration-300">
+        <!-- Task Center -->
+        <a href="/tasks" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md transition text-center flex flex-col items-center justify-between group">
+            <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-2 group-hover:scale-105 transition">
+                <i class="fa-solid fa-list-check"></i>
+            </div>
+            <h4 class="text-xs font-black text-slate-900">টাস্ক সেন্টার</h4>
+            <p class="text-[10px] text-slate-400 my-1">ছোট ছোট কাজ সম্পন্ন করুন</p>
+            <span class="mt-2 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">কাজ দেখুন &raquo;</span>
+        </a>
+
+        <!-- YouTube Video Watch -->
+        <a href="/yt" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md transition text-center flex flex-col items-center justify-between group">
+            <div class="w-11 h-11 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-lg mb-2 group-hover:scale-105 transition">
+                <i class="fa-brands fa-youtube"></i>
+            </div>
+            <h4 class="text-xs font-black text-slate-900">ভিডিও দেখুন</h4>
+            <p class="text-[10px] text-slate-400 my-1">৩০ সেকেন্ড ভিডিও = ক্যাশ</p>
+            <span class="mt-2 text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-xl">ভিডিও দেখুন &raquo;</span>
+        </a>
+
+        <!-- Lucky Spin Wheel -->
+        <a href="/spin" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md transition text-center flex flex-col items-center justify-between group">
+            <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg mb-2 group-hover:rotate-45 transition duration-300">
                 <i class="fa-solid fa-dharmachakra"></i>
             </div>
             <h4 class="text-xs font-black text-slate-900">লাকি স্পিন</h4>
-            <p class="text-[10px] text-slate-400 my-1">দৈনিক স্পিন করে বোনাস জিতুন</p>
-            <button onclick="triggerLuckySpin()" id="spinActionBtn" class="mt-2 w-full bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-[11px] font-extrabold py-2 rounded-xl transition shadow-sm">
-                স্পিন করুন
-            </button>
-        </div>
+            <p class="text-[10px] text-slate-400 my-1">দৈনিক ৩টি ফ্রি স্পিন</p>
+            <span class="mt-2 text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl">স্পিন করুন &raquo;</span>
+        </a>
 
         <!-- Scratch Card -->
-        <div class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm flex flex-col justify-between text-center relative overflow-hidden group">
-            <div class="w-11 h-11 mx-auto rounded-2xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition duration-300">
+        <a href="/scratch" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md transition text-center flex flex-col items-center justify-between group">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-2 group-hover:scale-105 transition">
                 <i class="fa-solid fa-gift"></i>
             </div>
             <h4 class="text-xs font-black text-slate-900">স্ক্র্যাচ কার্ড</h4>
             <p class="text-[10px] text-slate-400 my-1">কার্ড ঘষে সরাসরি টাকা পান</p>
-            <button onclick="triggerScratchCard()" id="scratchActionBtn" class="mt-2 w-full bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-[11px] font-extrabold py-2 rounded-xl transition shadow-sm">
-                কার্ড ঘষুন
-            </button>
-        </div>
+            <span class="mt-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-xl">কার্ড ঘষুন &raquo;</span>
+        </a>
 
     </div>
 
@@ -109,10 +127,10 @@
                 <div class="w-7 h-7 rounded-full bg-rose-50 text-[#E11D48] flex items-center justify-center text-xs">
                     <i class="fa-solid fa-user-plus"></i>
                 </div>
-                <h4 class="text-xs font-black text-slate-900">রেফারেল লিংক শেয়ার করুন</h4>
+                <h4 class="text-xs font-black text-slate-900">রেফারেল প্রোগ্রাম</h4>
             </div>
-            <span class="text-[10px] bg-rose-50 text-[#E11D48] font-black px-2 py-0.5 rounded-full">
-                রেফার কোড: {{ user.referral_code }}
+            <span class="text-[10px] bg-rose-50 text-[#E11D48] font-black px-2.5 py-0.5 rounded-full border border-rose-100">
+                কোড: {{ user.referral_code }}
             </span>
         </div>
         
@@ -132,55 +150,7 @@
         </div>
     </div>
 
-    <!-- 6. WITHDRAWAL SECTION -->
-    <div id="withdrawSection" class="bg-white border border-rose-50/80 rounded-[32px] p-6 shadow-sm">
-        <div class="flex items-center gap-2 mb-2">
-            <div class="w-8 h-8 rounded-full bg-rose-50 text-[#E11D48] flex items-center justify-center text-sm">
-                <i class="fa-solid fa-building-columns"></i>
-            </div>
-            <div>
-                <h3 class="text-sm font-black text-slate-900">উইথড্রয়াল রিকোয়েস্ট</h3>
-                <p class="text-[10px] text-slate-400">বিকাশ / নগদ / রকেট পার্সোনাল</p>
-            </div>
-        </div>
-
-        <div class="p-3 bg-amber-50/60 border border-amber-100 rounded-2xl my-3 text-[11px] text-amber-900">
-            <i class="fa-solid fa-circle-exclamation text-amber-500 mr-1"></i>
-            শর্ত: সর্বনিম্ন <strong>৪টি রেফারেল</strong> (আপনার বর্তমান: {{ referral_count }} টি) এবং <strong>৫০০ টাকা</strong> ব্যালেন্স থাকতে হবে।
-        </div>
-
-        <form action="/withdraw" method="POST" class="space-y-3 mt-4">
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">উইথড্র অ্যামাউন্ট (৳)</label>
-                <input type="number" name="amount" min="500" required placeholder="সর্বনিম্ন 500" 
-                    class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-            </div>
-
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পেমেন্ট মেথড</label>
-                    <select name="method" required 
-                        class="w-full px-3 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                        <option value="bKash">bKash (বিকাশ)</option>
-                        <option value="Nagad">Nagad (নগদ)</option>
-                        <option value="Rocket">Rocket (রকেট)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">অ্যাকাউন্ট নাম্বার</label>
-                    <input type="text" name="account" required placeholder="017xxxxxxxx" 
-                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                </div>
-            </div>
-
-            <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-3">
-                <i class="fa-solid fa-paper-plane text-xs"></i>
-                <span>টাকা তোলার রিকোয়েস্ট পাঠান</span>
-            </button>
-        </form>
-    </div>
-
-    <!-- 7. TELEGRAM SUPPORT BUTTON -->
+    <!-- 6. TELEGRAM HELPLINE SUPPORT -->
     <a href="https://t.me/your_support_channel" target="_blank" 
         class="w-full bg-white hover:bg-slate-50 border border-slate-200 active:scale-[0.98] transition-all text-slate-700 font-bold py-3 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 text-xs">
         <i class="fa-brands fa-telegram text-sky-500 text-base"></i>
@@ -189,71 +159,14 @@
 
 </div>
 
-<!-- INTERACTIVE SCRIPTS -->
+<!-- Simple Referral Copy Script -->
 <script>
-// Referral Link Copy
 function copyRefLink() {
     const input = document.getElementById('shareRefLink');
     input.select();
     input.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(input.value).then(() => {
-        alert("রেফারেল লিংক কপি হয়েছে! বন্ধুদের ইনভাইট করুন।");
-    });
-}
-
-// Lucky Spin Action
-function triggerLuckySpin() {
-    const btn = document.getElementById('spinActionBtn');
-    btn.disabled = true;
-    btn.innerText = "স্পিন হচ্ছে...";
-
-    fetch('/spin', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(res => res.json())
-    .then(data => {
-        btn.disabled = false;
-        btn.innerText = "স্পিন করুন";
-        if (data.success) {
-            alert(`🎉 অভিনন্দন! আপনি ৳${data.reward} জিতেছেন!`);
-            document.getElementById('userBalanceDisplay').innerText = `৳ ${data.new_balance.toFixed(2)}`;
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(() => {
-        btn.disabled = false;
-        btn.innerText = "স্পিন করুন";
-        alert("সার্ভার ব্যস্ত, কিছুক্ষণ পর চেষ্টা করুন।");
-    });
-}
-
-// Scratch Card Action
-function triggerScratchCard() {
-    const btn = document.getElementById('scratchActionBtn');
-    btn.disabled = true;
-    btn.innerText = "ঘষা হচ্ছে...";
-
-    fetch('/scratch', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-    })
-    .then(res => res.json())
-    .then(data => {
-        btn.disabled = false;
-        btn.innerText = "কার্ড ঘষুন";
-        if (data.success) {
-            alert(`🎁 দারুণ! আপনি স্ক্র্যাচ করে ৳${data.reward} বোনাস পেয়েছেন!`);
-            document.getElementById('userBalanceDisplay').innerText = `৳ ${data.new_balance.toFixed(2)}`;
-        } else {
-            alert(data.message);
-        }
-    })
-    .catch(() => {
-        btn.disabled = false;
-        btn.innerText = "কার্ড ঘষুন";
-        alert("সার্ভার ব্যস্ত, কিছুক্ষণ পর চেষ্টা করুন।");
+        alert("🎉 রেফারেল লিংক কপি হয়েছে! বন্ধুদের ইনভাইট করে ৳১৫ বোনাস নিন।");
     });
 }
 </script>
