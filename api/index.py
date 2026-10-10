@@ -360,48 +360,6 @@ def task_detail(task_id):
 
     return render_template('task_details.html', task=task)
 
-# ==========================================================
-# ADVERTISER & PROMOTION LANDING CONTROLLER
-# ==========================================================
-@app.route('/promote', methods=['GET', 'POST'])
-def promote():
-    sb = get_supabase()
-    user = None
-    is_logged_in = 'user_id' in session
-
-    if is_logged_in:
-        user = sb.table('users').select('*').eq('id', session['user_id']).single().execute().data
-
-    if request.method == 'POST':
-        # শর্ত: লগইন ছাড়া ফর্ম সাবমিট হবে না
-        if not is_logged_in:
-            flash("প্রমোশন ফর্ম জমা দিতে অনুগ্রহ করে প্রথমে লগইন করুন!", "danger")
-            return redirect(url_for('index'))
-
-        name = request.form.get('name', '').strip()
-        email = request.form.get('email', '').strip()
-        phone = request.form.get('phone', '').strip()
-        service_type = request.form.get('service_type', 'General').strip()
-        requirement = request.form.get('requirement', '').strip()
-
-        if not name or not email or not phone or not requirement:
-            flash("ফর্মের সবকটি তথ্য সঠিকভাবে পূরণ করুন!", "danger")
-            return redirect(url_for('promote'))
-
-        sb.table('promotions').insert({
-            'user_id': session['user_id'],
-            'name': name,
-            'email': email,
-            'phone': phone,
-            'service_type': service_type,
-            'requirement': requirement
-        }).execute()
-
-        flash("🎉 আপনার রিকোয়েস্ট সফলভাবে জমা হয়েছে! আমাদের টিম দ্রুতই আপনার সাথে যোগাযোগ করবে।", "success")
-        return redirect(url_for('promote'))
-
-    return render_template('promote.html', is_logged_in=is_logged_in, user=user)
-    
 @app.route('/spin', methods=['POST'])
 @login_required
 def spin_wheel():
@@ -922,6 +880,49 @@ def scratch_page():
     user = sb.table('users').select('*').eq('id', user_id).single().execute().data
     remaining_scratch = max(0, 3 - len(scratch_today))
     return render_template('scratch.html', user=user, remaining=remaining_scratch)
+
+
+# ==========================================================
+# ADVERTISER & PROMOTION LANDING CONTROLLER
+# ==========================================================
+@app.route('/promote', methods=['GET', 'POST'])
+def promote():
+    sb = get_supabase()
+    user = None
+    is_logged_in = 'user_id' in session
+
+    if is_logged_in:
+        user = sb.table('users').select('*').eq('id', session['user_id']).single().execute().data
+
+    if request.method == 'POST':
+        # শর্ত: লগইন ছাড়া ফর্ম সাবমিট হবে না
+        if not is_logged_in:
+            flash("প্রমোশন ফর্ম জমা দিতে অনুগ্রহ করে প্রথমে লগইন করুন!", "danger")
+            return redirect(url_for('index'))
+
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        phone = request.form.get('phone', '').strip()
+        service_type = request.form.get('service_type', 'General').strip()
+        requirement = request.form.get('requirement', '').strip()
+
+        if not name or not email or not phone or not requirement:
+            flash("ফর্মের সবকটি তথ্য সঠিকভাবে পূরণ করুন!", "danger")
+            return redirect(url_for('promote'))
+
+        sb.table('promotions').insert({
+            'user_id': session['user_id'],
+            'name': name,
+            'email': email,
+            'phone': phone,
+            'service_type': service_type,
+            'requirement': requirement
+        }).execute()
+
+        flash("🎉 আপনার রিকোয়েস্ট সফলভাবে জমা হয়েছে! আমাদের টিম দ্রুতই আপনার সাথে যোগাযোগ করবে।", "success")
+        return redirect(url_for('promote'))
+
+    return render_template('promote.html', is_logged_in=is_logged_in, user=user)
     
 # ==========================================================
 # Local Development Execution
