@@ -1,57 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* Subtle Entrance Animation */
-    @keyframes fadeInUp {
+    /* Smooth Entrance & Typography Enhancements */
+    @keyframes dashEntrance {
         from { opacity: 0; transform: translateY(14px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    .animate-fade-in {
-        animation: fadeInUp 0.5s ease-out forwards;
+    .animate-dash {
+        animation: dashEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    
-    /* Notification Ping Glow */
-    @keyframes notice-glow {
-        0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-        50% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+
+    /* Ambient Card Glow */
+    .premium-card {
+        background: #ffffff;
+        border: 1px solid rgba(254, 205, 211, 0.6);
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.03), 0 4px 12px -2px rgba(225, 29, 72, 0.02);
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .pulse-notice {
-        animation: notice-glow 2.5s infinite;
+    .premium-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 35px -8px rgba(225, 29, 72, 0.12), 0 6px 15px -3px rgba(0, 0, 0, 0.04);
+        border-color: rgba(254, 205, 211, 1);
     }
 </style>
 
-<div class="max-w-lg mx-auto space-y-4 pb-10 animate-fade-in">
+<div class="max-w-lg mx-auto space-y-4 pb-12 animate-dash">
 
-    <!-- ================= 1. VIP USER GREETING HEADER ================= -->
+    <!-- ================= 1. VIP USER PROFILE & TYPOGRAPHY HEADER ================= -->
     <div class="flex items-center justify-between px-1">
         <div class="leading-tight">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-0.5">স্বাগতম ফিরে আসার জন্য</span>
+            <span class="text-[9px] font-black uppercase tracking-widest text-slate-400 block mb-0.5">
+                অফিসিয়াল আর্নিং ড্যাশবোর্ড
+            </span>
             <div class="flex items-center gap-1.5">
-                <h2 class="text-xl font-black bg-gradient-to-r from-slate-900 via-rose-600 to-red-600 bg-clip-text text-transparent tracking-tight">
+                <h1 class="text-xl sm:text-2xl font-black bg-gradient-to-r from-slate-900 via-rose-600 to-red-600 bg-clip-text text-transparent tracking-tight">
                     {{ user.name }}
-                </h2>
-                <!-- Verified Checkmark Badge -->
-                <i class="fa-solid fa-circle-check text-sky-500 text-xs shadow-sm" title="ভেরিফাইড মেম্বার"></i>
+                </h1>
+                <!-- Verified Badge -->
+                <i class="fa-solid fa-circle-check text-sky-500 text-xs drop-shadow-sm" title="ভেরিফাইড মেম্বার"></i>
             </div>
         </div>
 
-        <!-- Member ID Tag -->
+        <!-- VIP Member ID Chip -->
         <div class="flex items-center gap-1.5 bg-white border border-rose-100/90 px-3 py-1.5 rounded-2xl shadow-sm">
             <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="text-[11px] font-mono font-extrabold text-slate-700 tracking-wider">
+            <span class="text-[11px] font-mono font-black text-slate-700 tracking-wider">
                 #{{ "%05d"|format(user.id) }}
             </span>
         </div>
     </div>
 
-    <!-- ================= 2. ANIMATED NOTICE BAR ================= -->
+    <!-- ================= 2. SITE ANNOUNCEMENT NOTICE ================= -->
     {% if notice %}
     <div class="relative overflow-hidden bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-amber-500/5 backdrop-blur-md border border-amber-200/90 rounded-2xl p-3.5 shadow-sm flex items-start gap-3">
-        <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-xs shadow-md shadow-amber-500/30 pulse-notice mt-0.5">
+        <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-xs shadow-md shadow-amber-500/30 mt-0.5">
             <i class="fa-solid fa-bullhorn"></i>
         </div>
         <div class="text-xs text-amber-950 font-medium leading-relaxed pr-1">
-            <span class="font-black text-amber-800 text-[11px] uppercase tracking-wider block mb-0.5">
+            <span class="font-black text-amber-800 text-[10px] uppercase tracking-widest block mb-0.5">
                 📢 জরুরি আপডেট নোটিশ:
             </span>
             {{ notice }}
@@ -59,16 +65,44 @@
     </div>
     {% endif %}
 
-    <!-- ================= 3. HERO WALLET BALANCE CARD ================= -->
-    <div class="bg-gradient-to-tr from-[#E11D48] via-rose-500 to-red-500 rounded-[32px] p-6 text-white shadow-2xl shadow-rose-500/25 relative overflow-hidden">
+    <!-- ================= 3. NEW: PWA APP INSTALL CTA BANNER ================= -->
+    <a href="/install" 
+       class="group relative overflow-hidden block bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white rounded-[28px] p-4 sm:p-4.5 border border-slate-800 shadow-xl shadow-slate-900/25 hover:scale-[1.01] active:scale-95 transition-all duration-300">
+        
+        <!-- Ambient Background Glow -->
+        <div class="absolute -right-8 -top-8 w-32 h-32 bg-[#E11D48]/20 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="relative w-11 h-11 rounded-2xl border-2 border-rose-300/80 p-0.5 bg-white shadow-md overflow-hidden shrink-0 group-hover:rotate-6 transition duration-300">
+                    <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" alt="App Logo" class="w-full h-full object-cover rounded-xl">
+                </div>
+                <div class="leading-tight">
+                    <div class="flex items-center gap-1.5 mb-0.5">
+                        <span class="text-xs font-black tracking-tight text-white">অফিসিয়াল অ্যাপ ইনস্টল করুন</span>
+                        <span class="text-[8px] font-black bg-[#E11D48] text-white px-1.5 py-0.2 rounded-full uppercase">PWA</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-medium">প্লে-স্টোর ছাড়াই সরাসরি ফোনে ১ MB অ্যাপ চালান</p>
+                </div>
+            </div>
+
+            <div class="bg-[#E11D48] hover:bg-[#BE123C] text-white font-extrabold text-[11px] px-3.5 py-2 rounded-xl shadow-md shadow-rose-500/30 flex items-center gap-1.5 shrink-0 group-hover:scale-105 transition">
+                <i class="fa-solid fa-download text-[10px]"></i>
+                <span>ইনস্টল</span>
+            </div>
+        </div>
+    </a>
+
+    <!-- ================= 4. HERO WALLET BALANCE CARD ================= -->
+    <div class="bg-gradient-to-tr from-[#E11D48] via-rose-500 to-red-500 rounded-[32px] p-6 text-white shadow-2xl shadow-rose-500/30 relative overflow-hidden">
         <div class="relative z-10">
             <div class="flex items-center justify-between opacity-90 mb-1">
-                <span class="text-xs font-bold uppercase tracking-wider">বর্তমান ওয়ালেট ব্যালেন্স</span>
+                <span class="text-[10px] font-black uppercase tracking-widest">বর্তমান ওয়ালেট ব্যালেন্স</span>
                 <i class="fa-solid fa-shield-halved text-sm opacity-80"></i>
             </div>
             
             <div class="flex items-baseline gap-1 my-2">
-                <span class="text-4xl sm:text-5xl font-black tracking-tight" id="userBalanceDisplay">
+                <span class="text-4xl sm:text-5xl font-black tracking-tight tabular-nums" id="userBalanceDisplay">
                     ৳ {{ "%.2f"|format(user.balance) }}
                 </span>
             </div>
@@ -86,13 +120,12 @@
             </div>
         </div>
 
-        <!-- Background Watermark Icon -->
         <i class="fa-solid fa-wallet absolute -right-6 -bottom-6 text-9xl text-white/10 pointer-events-none"></i>
     </div>
 
-    <!-- ================= 4. VIDEO GUIDE CTA BANNER ================= -->
+    <!-- ================= 5. VIDEO GUIDE TUTORIAL BANNER ================= -->
     <a href="/tutorial" 
-       class="group relative overflow-hidden flex items-center justify-between p-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-600 text-white rounded-2xl shadow-lg shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-300">
+       class="group relative overflow-hidden flex items-center justify-between p-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-600 text-white rounded-2xl shadow-lg shadow-indigo-500/20 hover:scale-[1.01] active:scale-95 transition-all duration-300">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-white text-sm shadow group-hover:rotate-12 transition">
                 <i class="fa-solid fa-play"></i>
@@ -102,58 +135,74 @@
                 <span class="text-[10px] text-blue-100 opacity-90">কীভাবে কাজ করবেন তা ১ মিনিটে বুঝে নিন</span>
             </div>
         </div>
-        <div class="flex items-center gap-1 text-xs font-bold bg-white/20 px-3 py-1.5 rounded-xl group-hover:bg-white group-hover:text-indigo-600 transition">
+        <div class="flex items-center gap-1 text-[11px] font-bold bg-white/20 px-3 py-1.5 rounded-xl group-hover:bg-white group-hover:text-indigo-600 transition">
             <span>দেখুন</span>
-            <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            <i class="fa-solid fa-chevron-right text-[9px]"></i>
         </div>
     </a>
 
-    <!-- ================= 6. ALL EARNING APPS & MINI-GAMES GRID ================= -->
+    <!-- ================= 6. METRICS STATUS BOX (3-BOX) ================= -->
+    <div class="w-full bg-white border border-rose-100 rounded-2xl py-3 px-2 grid grid-cols-3 divide-x divide-slate-100 shadow-sm text-center">
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400 block mb-0.5">মোট রেফারেল</span>
+            <span class="text-xs font-black text-slate-900 tabular-nums">{{ referral_count }} জন</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400 block mb-0.5">প্রতি রেফারে</span>
+            <span class="text-xs font-black text-amber-600 tabular-nums">+৳১৫.০০</span>
+        </div>
+        <div>
+            <span class="text-[9px] font-bold uppercase tracking-widest text-slate-400 block mb-0.5">মিনিমাম পেআউট</span>
+            <span class="text-xs font-black text-emerald-600 tabular-nums">৳৫০০.০০</span>
+        </div>
+    </div>
+
+    <!-- ================= 7. EARNING APPS & MINI-GAMES GRID ================= -->
     <div class="grid grid-cols-2 gap-3">
         
         <!-- Task Center -->
-        <a href="/tasks" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition text-center flex flex-col items-center justify-between group">
-            <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">
+        <a href="/tasks" class="premium-card rounded-[28px] p-4 text-center flex flex-col items-center justify-between group active:scale-95">
+            <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition duration-300">
                 <i class="fa-solid fa-list-check"></i>
             </div>
             <h4 class="text-xs font-black text-slate-900">টাস্ক সেন্টার</h4>
-            <p class="text-[10px] text-slate-400 my-1">ছোট ছোট কাজ সম্পন্ন করুন</p>
+            <p class="text-[10px] text-slate-400 my-1 leading-tight">সহজ কাজ করে টাকা নিন</p>
             <span class="mt-2 text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-xl">কাজ দেখুন &raquo;</span>
         </a>
 
         <!-- YouTube Video Watch -->
-        <a href="/yt" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition text-center flex flex-col items-center justify-between group">
-            <div class="w-11 h-11 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">
+        <a href="/yt" class="premium-card rounded-[28px] p-4 text-center flex flex-col items-center justify-between group active:scale-95">
+            <div class="w-11 h-11 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition duration-300">
                 <i class="fa-brands fa-youtube"></i>
             </div>
             <h4 class="text-xs font-black text-slate-900">ভিডিও দেখুন</h4>
-            <p class="text-[10px] text-slate-400 my-1">৩০ সেকেন্ড ভিডিও = ক্যাশ</p>
+            <p class="text-[10px] text-slate-400 my-1 leading-tight">৩০ সেকেন্ড ভিডিও = ক্যাশ</p>
             <span class="mt-2 text-[10px] font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-xl">ভিডিও দেখুন &raquo;</span>
         </a>
 
         <!-- Lucky Spin Wheel -->
-        <a href="/spin" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition text-center flex flex-col items-center justify-between group">
+        <a href="/spin" class="premium-card rounded-[28px] p-4 text-center flex flex-col items-center justify-between group active:scale-95">
             <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-500 flex items-center justify-center text-lg mb-2 group-hover:rotate-45 transition duration-300">
                 <i class="fa-solid fa-dharmachakra"></i>
             </div>
             <h4 class="text-xs font-black text-slate-900">লাকি স্পিন</h4>
-            <p class="text-[10px] text-slate-400 my-1">দৈনিক ৩টি ফ্রি স্পিন</p>
+            <p class="text-[10px] text-slate-400 my-1 leading-tight">দৈনিক ৩টি ফ্রি স্পিন</p>
             <span class="mt-2 text-[10px] font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-xl">স্পিন করুন &raquo;</span>
         </a>
 
         <!-- Scratch Card -->
-        <a href="/scratch" class="bg-white border border-rose-50/80 rounded-[28px] p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition text-center flex flex-col items-center justify-between group">
-            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition">
+        <a href="/scratch" class="premium-card rounded-[28px] p-4 text-center flex flex-col items-center justify-between group active:scale-95">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg mb-2 group-hover:scale-110 transition duration-300">
                 <i class="fa-solid fa-gift"></i>
             </div>
             <h4 class="text-xs font-black text-slate-900">স্ক্র্যাচ কার্ড</h4>
-            <p class="text-[10px] text-slate-400 my-1">কার্ড ঘষে সরাসরি টাকা পান</p>
+            <p class="text-[10px] text-slate-400 my-1 leading-tight">কার্ড ঘষে সরাসরি টাকা নিন</p>
             <span class="mt-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-xl">কার্ড ঘষুন &raquo;</span>
         </a>
 
     </div>
 
-    <!-- ================= 7. TELEGRAM OFFICIAL CHANNEL JOIN CTA ================= -->
+    <!-- ================= 8. TELEGRAM OFFICIAL CHANNEL JOIN CTA ================= -->
     <div class="bg-gradient-to-r from-sky-500 to-blue-600 rounded-[28px] p-4 text-white shadow-xl shadow-sky-500/20 flex items-center justify-between gap-3">
         <div class="flex items-center gap-3">
             <div class="w-11 h-11 rounded-2xl bg-white/20 flex items-center justify-center text-xl shrink-0">
@@ -161,19 +210,19 @@
             </div>
             <div class="leading-tight">
                 <h4 class="text-xs font-black">টেলিগ্রাম অফিসিয়াল চ্যানেল</h4>
-                <p class="text-[10px] text-sky-100 opacity-90 mt-0.5">সব পেমেন্ট প্রুফ ও নতুন আপডেট দেখতে যুক্ত হোন</p>
+                <p class="text-[10px] text-sky-100 opacity-90 mt-0.5">সব পেমেন্ট প্রুফ ও নতুন আপডেট দেখতে যোগ দিন</p>
             </div>
         </div>
-        <a href="https://t.me/your_support_channel" target="_blank"
+        <a href="https://t.me/micro_earn_x" target="_blank"
            class="bg-white text-sky-600 hover:bg-sky-50 active:scale-95 font-extrabold text-[11px] px-3.5 py-2 rounded-xl transition shadow-sm shrink-0">
             জয়েন করুন
         </a>
     </div>
 
-    <!-- ================= 8. PROMOTE & SPONSOR 2-COLUMN SPLIT CTAS ================= -->
+    <!-- ================= 9. PROMOTE & SPONSOR SPLIT CTAS ================= -->
     <div class="grid grid-cols-2 gap-3">
         <!-- Promote CTA -->
-        <a href="/promote" class="bg-white border border-rose-100 rounded-[28px] p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition flex flex-col justify-between group">
+        <a href="/promote" class="premium-card rounded-[28px] p-4 flex flex-col justify-between group active:scale-95">
             <div>
                 <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-500 flex items-center justify-center text-sm mb-2 group-hover:scale-110 transition">
                     <i class="fa-solid fa-bullhorn"></i>
@@ -185,7 +234,7 @@
         </a>
 
         <!-- Sponsor CTA -->
-        <a href="/sponsor" class="bg-white border border-rose-100 rounded-[28px] p-4 shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-95 transition flex flex-col justify-between group">
+        <a href="/sponsor" class="premium-card rounded-[28px] p-4 flex flex-col justify-between group active:scale-95">
             <div>
                 <div class="w-9 h-9 rounded-xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-sm mb-2 group-hover:scale-110 transition">
                     <i class="fa-solid fa-handshake"></i>
@@ -197,7 +246,7 @@
         </a>
     </div>
 
-    <!-- ================= 9. REFERRAL SHARE CARD ================= -->
+    <!-- ================= 10. REFERRAL SHARE CARD ================= -->
     <div class="bg-white border border-rose-50/80 rounded-[28px] p-5 shadow-sm">
         <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
