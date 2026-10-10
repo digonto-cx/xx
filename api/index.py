@@ -453,6 +453,32 @@ def withdraw():
 
     flash("উইথড্রয়াল রিকোয়েস্ট সফলভাবে জমা হয়েছে!", "success")
     return redirect(url_for('dashboard'))
+
+
+# ==========================================================
+# USER HISTORY (TASKS & WITHDRAWALS)
+# ==========================================================
+@app.route('/history')
+@login_required
+def history():
+    sb = get_supabase()
+    user_id = session['user_id']
+    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
+
+    # ১. টাস্ক সাবমিশন হিস্ট্রি
+    task_subs = sb.table('submissions').select('*, tasks(title, amount)') \
+        .eq('user_id', user_id).order('id', desc=True).execute().data or []
+
+    # ২. উইথড্রয়াল হিস্ট্রি
+    withdrawals = sb.table('withdrawals').select('*') \
+        .eq('user_id', user_id).order('id', desc=True).execute().data or []
+
+    return render_template(
+        'history.html', 
+        user=user, 
+        task_subs=task_subs, 
+        withdrawals=withdrawals
+    )
     
 # ==========================================================
 # ADMIN CONTROLLER
