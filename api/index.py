@@ -263,6 +263,32 @@ def account():
     completed_tasks = len(sb.table('submissions').select('id').eq('user_id', user_id).eq('status', 'approved').execute().data or [])
 
     return render_template('account.html', user=user, ref_count=ref_count, completed_tasks=completed_tasks)
+
+
+# ==========================================================
+# REFERRAL PAGE CONTROLLER
+# ==========================================================
+@app.route('/refer')
+@login_required
+def refer_page():
+    sb = get_supabase()
+    user_id = session['user_id']
+    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
+
+    # ইউজারের রেফারেল কোড ব্যবহার করে যারা জয়েন করেছে তাদের তালিকা
+    referred_users = sb.table('users').select('name, email, created_at') \
+        .eq('referred_by', user['referral_code']) \
+        .order('id', desc=True).execute().data or []
+
+    # মোট রেফারেল আয়
+    total_earned = len(referred_users) * 15.00
+
+    return render_template(
+        'refer.html',
+        user=user,
+        referred_users=referred_users,
+        total_earned=total_earned
+   ) 
     
 # ==========================================================
 # User Portal & Earning Features
