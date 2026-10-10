@@ -129,6 +129,46 @@ def index():
         return redirect(url_for('dashboard'))
     return render_template('index.html')
 
+# ==========================================================
+# SPONSORSHIP & PARTNER PROGRAM CONTROLLER
+# ==========================================================
+@app.route('/sponsor', methods=['GET', 'POST'])
+def sponsor():
+    sb = get_supabase()
+    user = None
+    is_logged_in = 'user_id' in session
+
+    if is_logged_in:
+        user = sb.table('users').select('*').eq('id', session['user_id']).single().execute().data
+
+    if request.method == 'POST':
+        # শর্ত: লগইন ছাড়া স্পনসর ফর্ম সাবমিট হবে না
+        if not is_logged_in:
+            flash("স্পনসরশিপের জন্য আবেদন করতে অনুগ্রহ করে প্রথমে লগইন করুন!", "danger")
+            return redirect(url_for('index'))
+
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        link = request.form.get('link', '').strip()
+        description = request.form.get('description', '').strip()
+
+        if not name or not email or not link or not description:
+            flash("সবগুলো তথ্য সঠিকভাবে পূরণ করুন!", "danger")
+            return redirect(url_for('sponsor'))
+
+        sb.table('sponsors').insert({
+            'user_id': session['user_id'],
+            'name': name,
+            'email': email,
+            'link': link,
+            'description': description
+        }).execute()
+
+        flash("🎉 অভিনন্দন! আপনার স্পনসরশিপ আবেদন সফলভাবে জমা হয়েছে। আমাদের পার্টনারশিপ টিম দ্রুতই আপনার সাথে যোগাযোগ করবে।", "success")
+        return redirect(url_for('sponsor'))
+
+    return render_template('sponsor.html', is_logged_in=is_logged_in, user=user)
+    
 @app.route('/register', methods=['POST'])
 def register():
     sb = get_supabase()
