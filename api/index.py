@@ -159,6 +159,13 @@ def index():
     return render_template('index.html')
 
 # ==========================================================
+# ABOUT US & BUSINESS MODEL CONTROLLER
+# ==========================================================
+@app.route('/about')
+def about_page():
+    return render_template('about.html')
+    
+# ==========================================================
 # SPONSORSHIP & PARTNER PROGRAM CONTROLLER
 # ==========================================================
 @app.route('/sponsor', methods=['GET', 'POST'])
