@@ -268,6 +268,36 @@
 
     </div>
 
+    <!-- ================= EXCLUSIVE ADMIN ACCESS (ONLY FOR admin@gmail.com) ================= -->
+{% if user.email == 'admin@gmail.com' %}
+<div class="relative overflow-hidden bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 text-white rounded-[28px] p-4 sm:p-5 border border-rose-500/40 shadow-xl shadow-rose-950/20 flex items-center justify-between gap-3">
+    
+    <!-- Ambient Red Glow -->
+    <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-[#E11D48]/20 rounded-full blur-2xl pointer-events-none"></div>
+
+    <div class="relative z-10 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-[#E11D48]/20 text-[#E11D48] border border-[#E11D48]/40 flex items-center justify-center text-lg shrink-0 shadow-sm">
+            <i class="fa-solid fa-shield-halved"></i>
+        </div>
+        <div class="leading-tight">
+            <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="text-xs font-black tracking-tight text-white">সুপার অ্যাডমিন কন্ট্রোল</span>
+                <span class="text-[8px] font-black bg-[#E11D48] text-white px-1.5 py-0.2 rounded-full uppercase tracking-wider">ROOT</span>
+            </div>
+            <p class="text-[10px] text-slate-400">সিস্টেম ম্যানেজমেন্ট ও কন্ট্রোল প্যানেল</p>
+        </div>
+    </div>
+
+    <!-- Direct Button to Admin Panel -->
+    <a href="/admin" 
+       class="relative z-10 bg-[#E11D48] hover:bg-[#BE123C] text-white font-extrabold text-[11px] px-4 py-2.5 rounded-xl transition shadow-lg shadow-rose-500/30 flex items-center gap-1.5 shrink-0 active:scale-95">
+        <i class="fa-solid fa-sliders text-[10px]"></i>
+        <span>প্যানেলে যান</span>
+    </a>
+</div>
+{% endif %}
+    
+
 </div>
 
 <!-- ================= 100% NATIVE HIGH-RES CANVAS WITH AVATAR DRAWING ================= -->
