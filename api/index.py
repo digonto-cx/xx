@@ -887,7 +887,7 @@ def extract_yt_id(url):
     return match.group(1) if match else None
 
 # ==========================================================
-# USER YOUTUBE EARN ROUTES
+# YOUTUBE EARN CONTROLLER (SEEN VIDEOS 100% AUTO-HIDDEN)
 # ==========================================================
 @app.route('/yt')
 @login_required
@@ -898,22 +898,28 @@ def yt_videos():
     limit = 20
     offset = (page - 1) * limit
 
-    # ইউজারের ইতোমধ্যে ক্লেইম করা ভিডিওগুলো বের করা
+    # ১. এই ইউজার যেসব ভিডিও ইতিমধ্যে দেখে ফেলেছে সেগুলোর আইডি নেওয়া
     claimed_rows = sb.table('yt_claims').select('video_id').eq('user_id', user_id).execute().data or []
-    claimed_ids = [c['video_id'] for c in claimed_rows]
+    claimed_ids = set(c['video_id'] for c in claimed_rows)
 
-    # ২০টি করে একটিভ ভিডিও আনা
-    query = sb.table('yt_videos').select('*').eq('is_active', True).order('id', desc=True)
-    all_videos = query.range(offset, offset + limit - 1).execute().data or []
+    # ২. সিস্টেমের সকল সক্রিয় ভিডিও আনা
+    all_videos = sb.table('yt_videos').select('*').eq('is_active', True).order('id', desc=True).execute().data or []
 
-    # ভিডিওতে ক্লেইম স্ট্যাটাস ফ্ল্যাগ বসানো
-    for v in all_videos:
-        v['is_claimed'] = v['id'] in claimed_ids
+    # ৩. অলরেডি দেখা ভিডিওগুলো তালিকা থেকে ১০০% হাইড করা
+    available_videos = [v for v in all_videos if v['id'] not in claimed_ids]
 
-    total_count = len(sb.table('yt_videos').select('id').eq('is_active', True).execute().data or [])
-    has_next = (offset + limit) < total_count
+    # ৪. শুধুমাত্র না-দেখা ভিডিওগুলোর ওপর ২০টি করে পেজিনেশন করা
+    total_available = len(available_videos)
+    paginated_videos = available_videos[offset : offset + limit]
+    has_next = (offset + limit) < total_available
 
-    return render_template('yt.html', videos=all_videos, page=page, has_next=has_next)
+    return render_template(
+        'yt.html', 
+        videos=paginated_videos, 
+        page=page, 
+        has_next=has_next,
+        total_available=total_available
+    )
 
 @app.route('/yt/claim', methods=['POST'])
 @login_required
@@ -926,23 +932,28 @@ def yt_claim():
     if not video_id:
         return jsonify({'success': False, 'message': 'অবৈধ ভিডিও আইডি!'})
 
-    # ১. ইউজার ইতিমধ্যে ক্লেইম করেছে কিনা চেক
-    already_claimed = sb.table('yt_claims').select('id').eq('user_id', user_id).eq('video_id', video_id).execute().data
-    if already_claimed:
-        return jsonify({'success': False, 'message': 'আপনি এই ভিডিওটি ইতিমধ্যে ক্লেইম করেছেন!'})
+    # ১. কঠোর চেকিং: ১ বারের বেশি দ্বিতীয়বার দেখা সম্পূর্ণ ব্লক
+    already_seen = sb.table('yt_claims').select('id').eq('user_id', user_id).eq('video_id', video_id).execute().data
+    if already_seen:
+        return jsonify({
+            'success': False, 
+            'message': 'আপনি এই ভিডিওটি ইতিমধ্যে দেখে ফেলেছেন! এটি দ্বিতীয়বার দেখা যাবে না।'
+        })
 
-    # ২. ভিডিও তথ্য যাচাই
+    # ২. ভিডিওর সত্যতা যাচাই
     video = sb.table('yt_videos').select('*').eq('id', video_id).single().execute().data
     if not video or not video.get('is_active'):
-        return jsonify({'success': False, 'message': 'ভিডিওটি সক্রিয় নেই!'})
+        return jsonify({'success': False, 'message': 'ভিডিওটি পাওয়া যায়নি বা নিষ্ক্রিয় রয়েছে!'})
 
     amount = float(video['amount'])
 
-    # ৩. ইউজারের ব্যালেন্সে টাকা যোগ এবং ক্লেইম হিস্ট্রি তৈরি
+    # ৩. অ্যাকাউন্টে টাকা যোগ করা
     user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
     new_balance = float(user['balance']) + amount
 
     sb.table('users').update({'balance': new_balance}).eq('id', user_id).execute()
+
+    # ৪. দেখা সম্পন্ন হিসেবে রেকর্ড (যাতে পেজ থেকে চিরতরে হাইড হয়ে যায়)
     sb.table('yt_claims').insert({
         'video_id': video_id,
         'user_id': user_id,
@@ -954,7 +965,7 @@ def yt_claim():
         'message': f'🎉 অভিনন্দন! আপনি ৳{amount:.2f} সফলভাবে ক্লেইম করেছেন!',
         'new_balance': new_balance
     })
-
+    
 # ==========================================================
 # ADMIN YOUTUBE CONTROLLER
 # ==========================================================
