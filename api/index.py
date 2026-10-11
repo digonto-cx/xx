@@ -100,15 +100,33 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# ==========================================================
+# STRICT ADMIN SECURITY (ONLY admin@gmail.com PERMITTED)
+# ==========================================================
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # ১. লগইন না থাকলে ব্লক
+        if 'user_id' not in session:
+            flash("শুধুমাত্র অনুমোদিত অ্যাডমিন এক্সেস করতে পারবে!", "danger")
+            return redirect(url_for('index'))
+        
+        # ২. ইমেইল ভেরিফিকেশন: admin@gmail.com ছাড়া বাকি সবার জন্য চিরতরে ব্লক
+        sb = get_supabase()
+        user = sb.table('users').select('email').eq('id', session['user_id']).single().execute().data
+        if not user or user.get('email') != 'admin@gmail.com':
+            flash("অননুমোদিত প্রবেশ! আপনার এই পেজে আসার অনুমতি নেই।", "danger")
+            return redirect(url_for('dashboard'))
+
+        # ৩. অ্যাডমিন কি ভেরিফিকেশন
         if not session.get('is_admin'):
-            flash("অ্যাডমিন এক্সেস প্রয়োজন!", "danger")
             return redirect(url_for('admin_login'))
+
         return f(*args, **kwargs)
     return decorated_function
 
+
+    
 # ==========================================================
 # ImgBB Failover Engine (Multi-Key Support)
 # ==========================================================
@@ -642,19 +660,30 @@ def history():
         withdrawals=withdrawals
     )
     
-# ==========================================================
-# ADMIN CONTROLLER
-# ==========================================================
+
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
+    # লগইন না থাকলে সরাসরি হোমপেজে পাঠাবে
+    if 'user_id' not in session:
+        flash("প্রথমে admin@gmail.com দিয়ে লগইন করুন!", "danger")
+        return redirect(url_for('index'))
+
+    # admin@gmail.com ছাড়া অন্য কোনো ইউজার এই পেজ ওপেন করতে পারবে না
+    sb = get_supabase()
+    user = sb.table('users').select('email').eq('id', session['user_id']).single().execute().data
+    if not user or user.get('email') != 'admin@gmail.com':
+        flash("শুধুমাত্র প্রধান অ্যাডমিন (admin@gmail.com) এর জন্য সংরক্ষিত!", "danger")
+        return redirect(url_for('dashboard'))
+
     if request.method == 'POST':
         secret = request.form.get('admin_key', '')
         if secret == ADMIN_SECRET_PASS:
             session['is_admin'] = True
             return redirect(url_for('admin_dashboard'))
         flash("ভুল অ্যাডমিন সিক্রেট কি!", "danger")
-    return render_template('admin/login.html')
 
+    return render_template('admin/login.html')
+    
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
