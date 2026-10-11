@@ -18,19 +18,35 @@
 
     <!-- Active Video Player Box (Initially Hidden) -->
     <div id="playerSection" class="hidden bg-white border border-rose-100 rounded-[32px] p-5 sm:p-6 shadow-xl shadow-rose-100/50 relative overflow-hidden transition-all duration-300">
+        
+        <!-- Player Top Bar -->
         <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-3">
-            <div>
+            <div class="leading-tight">
                 <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">ভিডিও প্লেয়ার</span>
-                <h4 id="nowPlayingTitle" class="text-sm font-bold text-slate-800 line-clamp-1">ভিডিও চলছে...</h4>
+                <h4 id="nowPlayingTitle" class="text-xs sm:text-sm font-bold text-slate-800 line-clamp-1">ভিডিও চলছে...</h4>
             </div>
-            <button onclick="closePlayer()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+            
+            <div class="flex items-center gap-2">
+                <!-- Direct Open in YouTube App Button (Fallback) -->
+                <a id="directYtLink" href="#" target="_blank" 
+                   class="bg-red-50 hover:bg-red-100 text-red-600 text-[11px] font-bold px-3 py-1.5 rounded-xl border border-red-200 flex items-center gap-1.5 shadow-sm transition">
+                    <i class="fa-brands fa-youtube text-xs"></i>
+                    <span>YouTube অ্যাপে দেখুন</span>
+                </a>
+
+                <button onclick="closePlayer()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
         </div>
 
-        <!-- Embedded 16:9 Video -->
+        <!-- Embedded 16:9 Video (Using Privacy-Enhanced No-Cookie to Bypass Google Block) -->
         <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-inner">
-            <iframe id="ytIframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe id="ytIframe" class="w-full h-full" src="" frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+            </iframe>
         </div>
 
         <!-- 30-Second Countdown & Claim Bar -->
@@ -41,7 +57,7 @@
                 </div>
                 <div>
                     <span class="text-xs font-bold text-slate-800 block" id="timerStatusText">ভিডিওটি ৩০ সেকেন্ড দেখুন</span>
-                    <span class="text-[10px] text-slate-400">টাইমার শেষ হলে ক্লেইম বাটন আনলক হবে</span>
+                    <span class="text-[10px] text-slate-400">প্লে না হলে উপরের "YouTube অ্যাপে দেখুন" বাটনে ট্যাপ করুন</span>
                 </div>
             </div>
 
@@ -87,7 +103,7 @@
 
         </div>
         {% else %}
-        <!-- Empty State (When all videos are watched) -->
+        <!-- Empty State -->
         <div class="col-span-full bg-white border border-rose-50 rounded-[32px] p-12 text-center text-slate-400 shadow-sm space-y-2">
             <div class="w-16 h-16 mx-auto rounded-3xl bg-emerald-50 text-emerald-500 flex items-center justify-center text-2xl mb-2">
                 <i class="fa-solid fa-circle-check"></i>
@@ -103,7 +119,7 @@
         {% endfor %}
     </div>
 
-    <!-- Pagination (20 Videos per page) -->
+    <!-- Pagination -->
     {% if total_available > 0 %}
     <div class="flex items-center justify-center gap-3 pt-4">
         {% if page > 1 %}
@@ -138,10 +154,13 @@ function startWatching(id, vid, title, amount) {
     currentAmount = amount;
     secondsRemaining = 30;
 
-    // Show Player
+    // Show Player & Set Direct YouTube Fallback Link
     document.getElementById('playerSection').classList.remove('hidden');
     document.getElementById('nowPlayingTitle').innerText = title;
-    document.getElementById('ytIframe').src = `https://www.youtube.com/embed/${vid}?autoplay=1&enablejsapi=1`;
+    document.getElementById('directYtLink').href = `https://www.youtube.com/watch?v=${vid}`;
+
+    // Privacy-Enhanced URL to bypass Google Account restrictions
+    document.getElementById('ytIframe').src = `https://www.youtube-nocookie.com/embed/${vid}?autoplay=1&enablejsapi=1&rel=0&modestbranding=1`;
 
     const timerBadge = document.getElementById('timerBadge');
     const timerText = document.getElementById('timerStatusText');
@@ -156,7 +175,7 @@ function startWatching(id, vid, title, amount) {
 
     document.getElementById('playerSection').scrollIntoView({ behavior: 'smooth' });
 
-    // 30 Seconds Countdown
+    // 30 Seconds Countdown Timer
     watchTimer = setInterval(() => {
         secondsRemaining--;
         timerBadge.innerText = secondsRemaining;
@@ -192,8 +211,7 @@ function claimCurrentVideo() {
         if (data.success) {
             alert(data.message);
             closePlayer();
-            // পেজ রিলোড হবে এবং দেখা ভিডিওটি তালিকা থেকে সম্পূর্ণ হাইড হয়ে যাবে
-            window.location.reload();
+            window.location.reload(); // রিলোড হয়ে দেখা ভিডিওটি তালিকা থেকে পার্মানেন্ট হাইড হয়ে যাবে
         } else {
             alert(data.message);
             claimBtn.disabled = false;
