@@ -1116,6 +1116,51 @@ def pwa_manifest():
     }
     return jsonify(manifest_data)
 
+
+# ==========================================================
+# SINGLE TASK SUBMISSION APPROVE & REJECT CONTROLLER
+# ==========================================================
+@app.route('/admin/submit/<int:sub_id>/approve', methods=['POST'])
+@admin_required
+def admin_single_approve_submission(sub_id):
+    sb = get_supabase()
+    # সাবমিশন ও টাস্কের অ্যামাউন্ট বের করা
+    sub = sb.table('submissions').select('*, tasks(amount)').eq('id', sub_id).single().execute().data
+    
+    if not sub or sub.get('status') != 'pending':
+        flash("অবৈধ বা ইতিমধ্যে সম্পন্ন হওয়া সাবমিশন!", "danger")
+        return redirect(url_for('admin_submissions'))
+
+    # ১. সাবমিশন স্ট্যাটাস 'approved' করা
+    sb.table('submissions').update({'status': 'approved'}).eq('id', sub_id).execute()
+
+    # ২. ইউজারের একাউন্টে টাকা যোগ করা
+    user = sb.table('users').select('balance').eq('id', sub['user_id']).single().execute().data
+    task_amount = float(sub['tasks']['amount']) if sub.get('tasks') else 0.0
+    new_balance = float(user['balance']) + task_amount
+
+    sb.table('users').update({'balance': new_balance}).eq('id', sub['user_id']).execute()
+
+    flash(f"টাস্কটি সফলভাবে অ্যাপ্রুভ করা হয়েছে এবং ইউজারের অ্যাকাউন্টে ৳{task_amount:.2f} যোগ হয়েছে!", "success")
+    return redirect(url_for('admin_submissions'))
+
+
+@app.route('/admin/submit/<int:sub_id>/reject', methods=['POST'])
+@admin_required
+def admin_single_reject_submission(sub_id):
+    sb = get_supabase()
+    sub = sb.table('submissions').select('id, status').eq('id', sub_id).single().execute().data
+    
+    if not sub or sub.get('status') != 'pending':
+        flash("অবৈধ বা ইতিমধ্যে সম্পন্ন হওয়া সাবমিশন!", "danger")
+        return redirect(url_for('admin_submissions'))
+
+    # সাবমিশন স্ট্যাটাস 'rejected' করা
+    sb.table('submissions').update({'status': 'rejected'}).eq('id', sub_id).execute()
+
+    flash("টাস্কটি রিজেক্ট করা হয়েছে!", "warning")
+    return redirect(url_for('admin_submissions'))
+    
 @app.route('/sw.js')
 def pwa_sw():
     sw_code = """
