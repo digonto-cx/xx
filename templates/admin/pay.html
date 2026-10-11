@@ -1,0 +1,314 @@
+{% extends 'admin/base_admin.html' %}
+{% block admin_content %}
+<div class="max-w-5xl mx-auto space-y-6">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+        <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-[#E11D48] block">মার্কেটিং ও প্রুফ টুল</span>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> অটো পেমেন্ট প্রুফ ব্যানার জেনারেটর
+            </h2>
+        </div>
+        <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3.5 py-1.5 rounded-2xl shadow-sm">
+            Powered by : <strong class="text-indigo-600">BitGetWay</strong>
+        </span>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Controller Form (Left Panel) -->
+        <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4 h-fit">
+            <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-[#E11D48]"></i> ডাটা ইনপুট প্যানেল
+            </h3>
+
+            <!-- User Count Input -->
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">
+                    কতজন ইউজার (User সংখ্যা)
+                </label>
+                <div class="relative">
+                    <input type="number" id="inputUserCount" value="48" min="1" 
+                        class="w-full px-4 py-3 pl-10 rounded-2xl border border-slate-200 text-sm font-black text-slate-900 focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none bg-slate-50/50">
+                    <i class="fa-solid fa-users absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-1 ml-1">প্রতি ইউজারের গড়ে ৳৫০০-৳৮৫০ হিসাব হবে</p>
+            </div>
+
+            <!-- Custom Total Amount (Auto Calculated) -->
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">
+                    মোট পেমেন্ট অ্যামাউন্ট (৳)
+                </label>
+                <div class="relative">
+                    <input type="number" id="inputTotalAmount" value="31450" 
+                        class="w-full px-4 py-3 pl-10 rounded-2xl border border-slate-200 text-sm font-black text-emerald-600 focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none bg-slate-50/50">
+                    <span class="absolute left-3.5 top-3.5 text-slate-400 font-black text-xs">৳</span>
+                </div>
+            </div>
+
+            <!-- Custom Headline Time -->
+            <div>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">টাইমফ্রেম টেক্সট</label>
+                <input type="text" id="inputTimeframe" value="গত ১২ ঘন্টায় পেমেন্ট করা হয়েছে" 
+                    class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-[#E11D48] bg-slate-50/50">
+            </div>
+
+            <!-- Generate Button -->
+            <button onclick="calculateAndRender()" 
+                class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 rounded-2xl transition shadow-md shadow-rose-500/25 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-rotate text-xs"></i>
+                <span>র‍্যান্ডম হিসাব ও রিফ্রেশ</span>
+            </button>
+
+            <!-- Download Action Button -->
+            <button onclick="downloadGeneratedBanner()" id="btnDownload" 
+                class="w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs py-3.5 rounded-2xl transition shadow flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download text-xs text-rose-500"></i>
+                <span>ব্যানার ছবি ডাউনলোড করুন (HD)</span>
+            </button>
+        </div>
+
+        <!-- Banner Preview & Native Canvas (Right Panel) -->
+        <div class="lg:col-span-2 space-y-4">
+            
+            <div class="bg-white border border-slate-200 rounded-[32px] p-5 sm:p-6 shadow-sm space-y-3">
+                <div class="flex items-center justify-between px-1">
+                    <span class="text-xs font-black text-slate-800">লাইভ ব্যানার প্রিভিউ (1200x675 HD)</span>
+                    <span class="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full border border-emerald-100">
+                        ● Ready to Export
+                    </span>
+                </div>
+
+                <!-- Canvas Preview Container -->
+                <div class="rounded-2xl overflow-hidden shadow-2xl border-2 border-slate-900">
+                    <canvas id="bannerCanvas" width="1200" height="675" class="w-full h-auto block"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= 100% NATIVE HIGH-RES BANNER CANVAS ENGINE ================= -->
+<script>
+const canvas = document.getElementById('bannerCanvas');
+const ctx = canvas.getContext('2d');
+
+// Format Current Date & Time (e.g., 29 Mar, 2026 | 04:30 PM)
+function getFormattedDateTime() {
+    const now = new Date();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const day = now.getDate();
+    const month = months[now.getMonth()];
+    const year = now.getFullYear();
+    
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+
+    return `${day} ${month}, ${year} • ${hours}:${minutes} ${ampm}`;
+}
+
+// Formula: User x Randomly (500 to 850)
+function calculateAndRender() {
+    const userCount = parseInt(document.getElementById('inputUserCount').value) || 30;
+    
+    // Each user receives random between 500 and 850
+    let total = 0;
+    for (let i = 0; i < userCount; i++) {
+        total += Math.floor(Math.random() * (850 - 500 + 1)) + 500;
+    }
+    
+    // Round to nearest 50 for realistic financial look
+    total = Math.round(total / 50) * 50;
+
+    document.getElementById('inputTotalAmount').value = total;
+    renderBanner();
+}
+
+function renderBanner() {
+    const userCount = document.getElementById('inputUserCount').value;
+    const totalAmount = parseInt(document.getElementById('inputTotalAmount').value).toLocaleString('en-IN');
+    const timeframeText = document.getElementById('inputTimeframe').value;
+    const dateTimeStr = getFormattedDateTime();
+
+    const W = 1200;
+    const H = 675;
+
+    // 1. Executive Dark Gradient Backdrop
+    const bgGrad = ctx.createRadialGradient(W / 2, H / 2, 80, W / 2, H / 2, 700);
+    bgGrad.addColorStop(0, "#131926");
+    bgGrad.addColorStop(0.6, "#0b0f19");
+    bgGrad.addColorStop(1, "#05070c");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Subtle Grid Matrix Lines
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+    ctx.lineWidth = 1;
+    for (let x = 40; x < W; x += 60) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 40; y < H; y += 60) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // Outer Double Metallic Border
+    ctx.strokeStyle = "rgba(225, 29, 72, 0.35)";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(25, 25, W - 50, H - 50);
+
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(33, 33, W - 66, H - 66);
+
+    // 2. Header: Logo & Payout Clearance Badge
+    // Logo Flame
+    ctx.beginPath();
+    ctx.arc(80, 80, 24, 0, Math.PI * 2);
+    ctx.fillStyle = "#E11D48";
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 22px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("⚡", 80, 88);
+
+    // Brand Name
+    ctx.textAlign = "left";
+    ctx.font = "900 30px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("MICRO", 115, 89);
+    ctx.fillStyle = "#E11D48";
+    ctx.fillText("EARNX", 225, 89);
+
+    // Top Right Clearance Badge
+    ctx.textAlign = "right";
+    ctx.font = "bold 15px Courier, monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("OFFICIAL DISBURSEMENT REPORT", W - 70, 78);
+
+    ctx.font = "bold 15px Arial";
+    ctx.fillStyle = "#34d399";
+    ctx.fillText("● 100% SUCCESSFUL SETTLEMENT", W - 70, 102);
+
+    // 3. Center Announcement Ribbon
+    ctx.textAlign = "center";
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = "#fbbf24";
+    ctx.fillText("★ OFFICIAL PAYOUT NOTICE ★", W / 2, 175);
+
+    // Timeframe Headline
+    ctx.font = "900 38px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(timeframeText, W / 2, 230);
+
+    // 4. Center Mega Amount Box
+    const boxW = 1000;
+    const boxH = 175;
+    const boxX = (W - boxW) / 2;
+    const boxY = 270;
+
+    // Golden / Crimson Gradient Box
+    const boxGrad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
+    boxGrad.addColorStop(0, "rgba(225, 29, 72, 0.15)");
+    boxGrad.addColorStop(0.5, "rgba(251, 191, 36, 0.1)");
+    boxGrad.addColorStop(1, "rgba(225, 29, 72, 0.15)");
+    ctx.fillStyle = boxGrad;
+    ctx.roundRect(boxX, boxY, boxW, boxH, 28);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(251, 191, 36, 0.4)";
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+
+    // The Main Highlight Text: "___ জনে ___ টাকা!"
+    ctx.font = "900 68px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(`${userCount} জনে ৳ ${totalAmount} টাকা!`, W / 2, boxY + 112);
+
+    // 5. Payment Methods Tags
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("bKash Personal  •  Nagad Personal  •  Rocket", W / 2, 485);
+
+    // 6. Bottom Row: Date/Time, Powered By, Signature & Seal
+    // Divider
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(60, 520);
+    ctx.lineTo(W - 60, 520);
+    ctx.stroke();
+
+    // Date & Time (Left)
+    ctx.textAlign = "left";
+    ctx.font = "bold 14px Arial";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("DISBURSEMENT DATE & TIME", 70, 560);
+    ctx.font = "bold 18px Courier, monospace";
+    ctx.fillStyle = "#cbd5e1";
+    ctx.fillText(dateTimeStr, 70, 588);
+
+    // Center: Powered by BitGetWay
+    ctx.textAlign = "center";
+    ctx.font = "bold 13px Arial";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("PAYMENT GATEWAY ENGINE", W / 2, 560);
+
+    ctx.font = "900 22px Arial";
+    ctx.fillStyle = "#6366f1";
+    ctx.fillText("Powered by : BitGetWay", W / 2, 590);
+
+    // Right: Authorized Signature & Verified Stamp
+    ctx.textAlign = "right";
+    ctx.font = "italic bold 22px Brush Script MT, cursive, Arial";
+    ctx.fillStyle = "#f43f5e";
+    ctx.fillText("MicroEarnX Finance Auth.", W - 70, 568);
+
+    ctx.font = "900 13px Courier, monospace";
+    ctx.fillStyle = "#10b981";
+    ctx.fillText("[ SEAL: VERIFIED & CLEARED ]", W - 70, 595);
+
+    // Footer Edge
+    ctx.textAlign = "center";
+    ctx.font = "500 13px Arial";
+    ctx.fillStyle = "#475569";
+    ctx.fillText("MicroEarnX Official Automated Payment Settlement • microearnx.vercel.app", W / 2, 638);
+}
+
+// Initial Render on Page Load
+window.addEventListener('DOMContentLoaded', calculateAndRender);
+
+// Listen to input changes in realtime
+document.getElementById('inputUserCount').addEventListener('input', calculateAndRender);
+document.getElementById('inputTotalAmount').addEventListener('input', renderBanner);
+document.getElementById('inputTimeframe').addEventListener('input', renderBanner);
+
+// Instant High-Res PNG Download
+function downloadGeneratedBanner() {
+    const btn = document.getElementById('btnDownload');
+    btn.disabled = true;
+    btn.innerText = "ডাউনলোড হচ্ছে...";
+
+    canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const count = document.getElementById('inputUserCount').value;
+        a.download = `MicroEarnX_Payment_Proof_${count}_Users.png`;
+        a.href = url;
+        a.click();
+        URL.revokeObjectURL(url);
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-download text-xs text-rose-500"></i> ব্যানার ছবি ডাউনলোড করুন (HD)';
+    }, 'image/png');
+}
+</script>
+{% endblock %}
