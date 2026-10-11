@@ -844,6 +844,14 @@ def admin_imgbb_delete(key_id):
     flash("API Key ডিলিট করা হয়েছে!", "success")
     return redirect(url_for('admin_imgbb'))
 
+# ==========================================================
+# ADMIN AUTO PAYMENT PROOF IMAGE GENERATOR
+# ==========================================================
+@app.route('/admin/pay')
+@admin_required
+def admin_pay_generator():
+    return render_template('admin/pay.html')
+    
 @app.route('/admin/task', methods=['GET', 'POST'])
 @admin_required
 def admin_task():
