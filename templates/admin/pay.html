@@ -1,32 +1,38 @@
 {% extends 'admin/base_admin.html' %}
 {% block admin_content %}
-<div class="max-w-5xl mx-auto space-y-6">
+<div class="max-w-6xl mx-auto space-y-6 pb-12">
 
     <!-- Page Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
-            <span class="text-[10px] font-black uppercase tracking-widest text-[#E11D48] block">মার্কেটিং ও প্রুফ টুল</span>
+            <span class="text-[10px] font-black uppercase tracking-widest text-[#E11D48] block mb-0.5">অফিসিয়াল ফিন্যান্সিয়াল ইঞ্জিন</span>
             <h2 class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <i class="fa-solid fa-wand-magic-sparkles text-amber-500"></i> অটো পেমেন্ট প্রুফ ব্যানার জেনারেটর
+                <i class="fa-solid fa-certificate text-amber-500"></i> আল্ট্রা-প্রিমিয়াম পেমেন্ট ব্যানার জেনারেটর
             </h2>
         </div>
-        <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3.5 py-1.5 rounded-2xl shadow-sm">
-            Powered by : <strong class="text-indigo-600">BitGetWay</strong>
-        </span>
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-black text-slate-800 bg-white border border-slate-200 px-3.5 py-1.5 rounded-2xl shadow-sm flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                <span>Powered by : <strong class="text-indigo-600">BitGetWay</strong></span>
+            </span>
+        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Controller Form (Left Panel) -->
         <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4 h-fit">
-            <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
-                <i class="fa-solid fa-sliders text-[#E11D48]"></i> ডাটা ইনপুট প্যানেল
-            </h3>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-[#E11D48]"></i> প্যারামিটার কন্ট্রোল
+                </h3>
+                <span class="text-[9px] font-bold bg-rose-50 text-[#E11D48] px-2 py-0.5 rounded-full uppercase">Live Editor</span>
+            </div>
 
             <!-- User Count Input -->
             <div>
                 <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">
-                    কতজন ইউজার (User সংখ্যা)
+                    ইউজার সংখ্যা (কতজন ইউজার)
                 </label>
                 <div class="relative">
                     <input type="number" id="inputUserCount" value="48" min="1" 
@@ -36,7 +42,7 @@
                 <p class="text-[10px] text-slate-400 mt-1 ml-1">প্রতি ইউজারের গড়ে ৳৫০০-৳৮৫০ হিসাব হবে</p>
             </div>
 
-            <!-- Custom Total Amount (Auto Calculated) -->
+            <!-- Total Amount Input -->
             <div>
                 <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">
                     মোট পেমেন্ট অ্যামাউন্ট (৳)
@@ -48,57 +54,56 @@
                 </div>
             </div>
 
-            <!-- Custom Headline Time -->
+            <!-- Timeframe Title -->
             <div>
-                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">টাইমফ্রেম টেক্সট</label>
+                <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">ব্যানার শিরোনাম</label>
                 <input type="text" id="inputTimeframe" value="গত ১২ ঘন্টায় পেমেন্ট করা হয়েছে" 
                     class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-[#E11D48] bg-slate-50/50">
             </div>
 
-            <!-- Generate Button -->
+            <!-- Recalculate Button -->
             <button onclick="calculateAndRender()" 
                 class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 rounded-2xl transition shadow-md shadow-rose-500/25 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-rotate text-xs"></i>
-                <span>র‍্যান্ডম হিসাব ও রিফ্রেশ</span>
+                <span>র‍্যান্ডম রিক্যালকুলেট করুন</span>
             </button>
 
-            <!-- Download Action Button -->
+            <!-- Download Button -->
             <button onclick="downloadGeneratedBanner()" id="btnDownload" 
                 class="w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs py-3.5 rounded-2xl transition shadow flex items-center justify-center gap-2">
-                <i class="fa-solid fa-download text-xs text-rose-500"></i>
+                <i class="fa-solid fa-cloud-arrow-down text-xs text-rose-500"></i>
                 <span>ব্যানার ছবি ডাউনলোড করুন (HD)</span>
             </button>
         </div>
 
-        <!-- Banner Preview & Native Canvas (Right Panel) -->
-        <div class="lg:col-span-2 space-y-4">
-            
+        <!-- Banner Live Preview (Right Panel) -->
+        <div class="lg:col-span-2 space-y-3">
             <div class="bg-white border border-slate-200 rounded-[32px] p-5 sm:p-6 shadow-sm space-y-3">
                 <div class="flex items-center justify-between px-1">
-                    <span class="text-xs font-black text-slate-800">লাইভ ব্যানার প্রিভিউ (1200x675 HD)</span>
-                    <span class="text-[10px] font-bold bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full border border-emerald-100">
-                        ● Ready to Export
+                    <span class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                        <i class="fa-solid fa-eye text-emerald-500"></i> লাইভ আল্ট্রা-এইচডি ব্যানার প্রিভিউ
+                    </span>
+                    <span class="text-[10px] font-mono font-bold bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full">
+                        1200 x 675 PX
                     </span>
                 </div>
 
                 <!-- Canvas Preview Container -->
-                <div class="rounded-2xl overflow-hidden shadow-2xl border-2 border-slate-900">
+                <div class="rounded-2xl overflow-hidden shadow-2xl border border-slate-900 bg-black">
                     <canvas id="bannerCanvas" width="1200" height="675" class="w-full h-auto block"></canvas>
                 </div>
             </div>
-
         </div>
 
     </div>
 
 </div>
 
-<!-- ================= 100% NATIVE HIGH-RES BANNER CANVAS ENGINE ================= -->
+<!-- ================= 100% NATIVE ULTRA-LUXURY CANVAS 2D ENGINE ================= -->
 <script>
 const canvas = document.getElementById('bannerCanvas');
 const ctx = canvas.getContext('2d');
 
-// Format Current Date & Time (e.g., 29 Mar, 2026 | 04:30 PM)
 function getFormattedDateTime() {
     const now = new Date();
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -119,13 +124,10 @@ function getFormattedDateTime() {
 function calculateAndRender() {
     const userCount = parseInt(document.getElementById('inputUserCount').value) || 30;
     
-    // Each user receives random between 500 and 850
     let total = 0;
     for (let i = 0; i < userCount; i++) {
         total += Math.floor(Math.random() * (850 - 500 + 1)) + 500;
     }
-    
-    // Round to nearest 50 for realistic financial look
     total = Math.round(total / 50) * 50;
 
     document.getElementById('inputTotalAmount').value = total;
@@ -134,164 +136,230 @@ function calculateAndRender() {
 
 function renderBanner() {
     const userCount = document.getElementById('inputUserCount').value;
-    const totalAmount = parseInt(document.getElementById('inputTotalAmount').value).toLocaleString('en-IN');
+    const rawAmount = parseInt(document.getElementById('inputTotalAmount').value) || 0;
+    const totalAmount = rawAmount.toLocaleString('en-IN');
     const timeframeText = document.getElementById('inputTimeframe').value;
     const dateTimeStr = getFormattedDateTime();
 
     const W = 1200;
     const H = 675;
 
-    // 1. Executive Dark Gradient Backdrop
-    const bgGrad = ctx.createRadialGradient(W / 2, H / 2, 80, W / 2, H / 2, 700);
-    bgGrad.addColorStop(0, "#131926");
-    bgGrad.addColorStop(0.6, "#0b0f19");
+    // 1. Deep Obsidian Luxury Dark Backdrop
+    const bgGrad = ctx.createRadialGradient(W / 2, 200, 50, W / 2, H / 2, 750);
+    bgGrad.addColorStop(0, "#151b28");
+    bgGrad.addColorStop(0.5, "#0b0e17");
     bgGrad.addColorStop(1, "#05070c");
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // Subtle Grid Matrix Lines
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+    // Banknote Security Matrix Pattern
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.025)";
     ctx.lineWidth = 1;
-    for (let x = 40; x < W; x += 60) {
+    for (let x = 40; x < W; x += 50) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
     }
-    for (let y = 40; y < H; y += 60) {
+    for (let y = 40; y < H; y += 50) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
     }
 
-    // Outer Double Metallic Border
-    ctx.strokeStyle = "rgba(225, 29, 72, 0.35)";
-    ctx.lineWidth = 4;
-    ctx.strokeRect(25, 25, W - 50, H - 50);
+    // Volumetric Neon Corner Glows
+    const glowCrimson = ctx.createRadialGradient(0, 0, 10, 0, 0, 450);
+    glowCrimson.addColorStop(0, "rgba(225, 29, 72, 0.22)");
+    glowCrimson.addColorStop(1, "transparent");
+    ctx.fillStyle = glowCrimson;
+    ctx.fillRect(0, 0, 500, 500);
 
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-    ctx.lineWidth = 1.5;
-    ctx.strokeRect(33, 33, W - 66, H - 66);
+    const glowAmber = ctx.createRadialGradient(W, H, 10, W, H, 450);
+    glowAmber.addColorStop(0, "rgba(245, 158, 11, 0.18)");
+    glowAmber.addColorStop(1, "transparent");
+    ctx.fillStyle = glowAmber;
+    ctx.fillRect(W - 500, H - 500, 500, 500);
 
-    // 2. Header: Logo & Payout Clearance Badge
-    // Logo Flame
+    // Double Metallic Border
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(26, 26, W - 52, H - 52);
+
+    ctx.strokeStyle = "rgba(225, 29, 72, 0.5)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(34, 34, W - 68, H - 68);
+
+    // 2. Header: Logo & Realtime Status
+    // Logo Flame Circle
     ctx.beginPath();
-    ctx.arc(80, 80, 24, 0, Math.PI * 2);
+    ctx.arc(82, 82, 26, 0, Math.PI * 2);
     ctx.fillStyle = "#E11D48";
     ctx.fill();
 
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 22px Arial";
+    ctx.font = "bold 24px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("⚡", 80, 88);
+    ctx.fillText("⚡", 82, 91);
 
     // Brand Name
     ctx.textAlign = "left";
-    ctx.font = "900 30px Arial";
+    ctx.font = "900 32px Arial";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText("MICRO", 115, 89);
+    ctx.fillText("MICRO", 120, 92);
     ctx.fillStyle = "#E11D48";
-    ctx.fillText("EARNX", 225, 89);
+    ctx.fillText("EARNX", 238, 92);
 
-    // Top Right Clearance Badge
+    // Top Right Settlement Badge
     ctx.textAlign = "right";
-    ctx.font = "bold 15px Courier, monospace";
+    ctx.font = "bold 13px Courier, monospace";
     ctx.fillStyle = "#94a3b8";
-    ctx.fillText("OFFICIAL DISBURSEMENT REPORT", W - 70, 78);
+    ctx.fillText("SETTLEMENT REPORT ID: #MX-" + Math.floor(100000 + Math.random() * 900000), W - 75, 76);
 
-    ctx.font = "bold 15px Arial";
+    ctx.font = "900 15px Arial";
     ctx.fillStyle = "#34d399";
-    ctx.fillText("● 100% SUCCESSFUL SETTLEMENT", W - 70, 102);
+    ctx.fillText("● 100% AUTOMATED DISBURSEMENT", W - 75, 100);
 
-    // 3. Center Announcement Ribbon
+    // 3. Central Announcement Header Ribbon
     ctx.textAlign = "center";
-    ctx.font = "bold 18px Arial";
+    ctx.font = "800 16px Arial";
     ctx.fillStyle = "#fbbf24";
-    ctx.fillText("★ OFFICIAL PAYOUT NOTICE ★", W / 2, 175);
+    ctx.fillText("★ OFFICIAL FINANCIAL AUDIT NOTICE ★", W / 2, 168);
 
-    // Timeframe Headline
-    ctx.font = "900 38px Arial";
+    // Main Headline Text
+    ctx.font = "900 36px Arial";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(timeframeText, W / 2, 230);
+    ctx.fillText(timeframeText, W / 2, 218);
 
-    // 4. Center Mega Amount Box
-    const boxW = 1000;
+    // 4. Center 3D Floating Metallic Glass Box
+    const boxW = 1040;
     const boxH = 175;
     const boxX = (W - boxW) / 2;
-    const boxY = 270;
+    const boxY = 250;
 
-    // Golden / Crimson Gradient Box
+    // Glass Box Fill
     const boxGrad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
-    boxGrad.addColorStop(0, "rgba(225, 29, 72, 0.15)");
-    boxGrad.addColorStop(0.5, "rgba(251, 191, 36, 0.1)");
-    boxGrad.addColorStop(1, "rgba(225, 29, 72, 0.15)");
+    boxGrad.addColorStop(0, "rgba(255, 255, 255, 0.08)");
+    boxGrad.addColorStop(0.5, "rgba(225, 29, 72, 0.1)");
+    boxGrad.addColorStop(1, "rgba(255, 255, 255, 0.05)");
     ctx.fillStyle = boxGrad;
-    ctx.roundRect(boxX, boxY, boxW, boxH, 28);
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, 30);
     ctx.fill();
 
-    ctx.strokeStyle = "rgba(251, 191, 36, 0.4)";
-    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.lineWidth = 2;
     ctx.stroke();
 
-    // The Main Highlight Text: "___ জনে ___ টাকা!"
-    ctx.font = "900 68px Arial";
+    // Box Inner Sheen Line
+    ctx.strokeStyle = "rgba(251, 191, 36, 0.35)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(boxX + 6, boxY + 6, boxW - 12, boxH - 12, 24);
+    ctx.stroke();
+
+    // THE MAIN AMOUNT HIGHLIGHT: "___ জনে ___ টাকা!"
+    ctx.textAlign = "center";
+    
+    // User Count (White)
+    ctx.font = "900 66px Arial";
     ctx.fillStyle = "#ffffff";
-    ctx.fillText(`${userCount} জনে ৳ ${totalAmount} টাকা!`, W / 2, boxY + 112);
+    ctx.fillText(`${userCount} জনে `, W / 2 - 200, boxY + 112);
 
-    // 5. Payment Methods Tags
-    ctx.font = "bold 18px Arial";
-    ctx.fillStyle = "#94a3b8";
-    ctx.fillText("bKash Personal  •  Nagad Personal  •  Rocket", W / 2, 485);
+    // Glowing Golden Amount
+    ctx.fillStyle = "#fbbf24";
+    ctx.shadowColor = "rgba(251, 191, 36, 0.6)";
+    ctx.shadowBlur = 20;
+    ctx.fillText(`৳ ${totalAmount}`, W / 2 + 100, boxY + 112);
+    ctx.shadowBlur = 0; // reset shadow
 
-    // 6. Bottom Row: Date/Time, Powered By, Signature & Seal
-    // Divider
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+    // Taka Suffix
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(" টাকা!", W / 2 + 400, boxY + 112);
+
+    // 5. Payment Channel Badges with Official Colors (bKash, Nagad, Rocket)
+    const channelY = 465;
+    
+    function drawPill(x, y, w, h, bg, text, dotColor) {
+        ctx.fillStyle = bg;
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, 14);
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,0.15)";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(x + 16, y + h / 2, 4, 0, Math.PI * 2);
+        ctx.fillStyle = dotColor;
+        ctx.fill();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 14px Arial";
+        ctx.textAlign = "left";
+        ctx.fillText(text, x + 28, y + h / 2 + 5);
+    }
+
+    drawPill(W / 2 - 250, channelY, 150, 34, "rgba(226, 19, 110, 0.25)", "bKash Personal", "#e2136e");
+    drawPill(W / 2 - 75, channelY, 150, 34, "rgba(247, 148, 29, 0.25)", "Nagad Personal", "#f7941d");
+    drawPill(W / 2 + 100, channelY, 150, 34, "rgba(140, 43, 142, 0.25)", "Rocket Personal", "#a855f7");
+
+    // 6. Bottom Section: Timestamp, Gateway Chip, Seal & Signature
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(60, 520);
-    ctx.lineTo(W - 60, 520);
+    ctx.moveTo(60, 525);
+    ctx.lineTo(W - 60, 525);
     ctx.stroke();
 
-    // Date & Time (Left)
+    // Left: Timestamp
     ctx.textAlign = "left";
-    ctx.font = "bold 14px Arial";
+    ctx.font = "bold 13px Arial";
     ctx.fillStyle = "#64748b";
-    ctx.fillText("DISBURSEMENT DATE & TIME", 70, 560);
-    ctx.font = "bold 18px Courier, monospace";
-    ctx.fillStyle = "#cbd5e1";
+    ctx.fillText("SETTLEMENT TIMESTAMP", 70, 560);
+    ctx.font = "bold 17px Courier, monospace";
+    ctx.fillStyle = "#e2e8f0";
     ctx.fillText(dateTimeStr, 70, 588);
 
-    // Center: Powered by BitGetWay
+    // Center: Cryptographic BitGetWay Chip Badge
     ctx.textAlign = "center";
-    ctx.font = "bold 13px Arial";
+    ctx.font = "bold 12px Arial";
     ctx.fillStyle = "#94a3b8";
-    ctx.fillText("PAYMENT GATEWAY ENGINE", W / 2, 560);
+    ctx.fillText("AUTOMATED FINANCIAL GATEWAY", W / 2, 558);
 
-    ctx.font = "900 22px Arial";
-    ctx.fillStyle = "#6366f1";
-    ctx.fillText("Powered by : BitGetWay", W / 2, 590);
+    // BitGetWay Chip
+    ctx.fillStyle = "rgba(99, 102, 241, 0.15)";
+    ctx.beginPath();
+    ctx.roundRect(W / 2 - 130, 568, 260, 36, 12);
+    ctx.fill();
+    ctx.strokeStyle = "rgba(99, 102, 241, 0.4)";
+    ctx.stroke();
 
-    // Right: Authorized Signature & Verified Stamp
+    ctx.font = "900 16px Arial";
+    ctx.fillStyle = "#818cf8";
+    ctx.fillText("⚡ Powered by : BitGetWay", W / 2, 592);
+
+    // Right: Authorized Signature & Verified Seal Stamp
     ctx.textAlign = "right";
     ctx.font = "italic bold 22px Brush Script MT, cursive, Arial";
     ctx.fillStyle = "#f43f5e";
-    ctx.fillText("MicroEarnX Finance Auth.", W - 70, 568);
+    ctx.fillText("MicroEarnX Settlement Auth.", W - 70, 566);
 
-    ctx.font = "900 13px Courier, monospace";
+    // Double Ring Official Stamp
+    ctx.font = "900 12px Courier, monospace";
     ctx.fillStyle = "#10b981";
-    ctx.fillText("[ SEAL: VERIFIED & CLEARED ]", W - 70, 595);
+    ctx.fillText("★ SEAL: 100% VERIFIED & CLEARED ★", W - 70, 594);
 
-    // Footer Edge
+    // 7. Footer Edge Microcopy
     ctx.textAlign = "center";
     ctx.font = "500 13px Arial";
-    ctx.fillStyle = "#475569";
-    ctx.fillText("MicroEarnX Official Automated Payment Settlement • microearnx.vercel.app", W / 2, 638);
+    ctx.fillStyle = "#334155";
+    ctx.fillText("MicroEarnX Official Automated Clearing House Protocol • 100% Guaranteed Disbursement", W / 2, 642);
 }
 
-// Initial Render on Page Load
+// Initial Render
 window.addEventListener('DOMContentLoaded', calculateAndRender);
 
-// Listen to input changes in realtime
+// Realtime Listeners
 document.getElementById('inputUserCount').addEventListener('input', calculateAndRender);
 document.getElementById('inputTotalAmount').addEventListener('input', renderBanner);
 document.getElementById('inputTimeframe').addEventListener('input', renderBanner);
 
-// Instant High-Res PNG Download
+// 1-Click PNG Download (1200x675 HD)
 function downloadGeneratedBanner() {
     const btn = document.getElementById('btnDownload');
     btn.disabled = true;
@@ -301,13 +369,13 @@ function downloadGeneratedBanner() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         const count = document.getElementById('inputUserCount').value;
-        a.download = `MicroEarnX_Payment_Proof_${count}_Users.png`;
+        a.download = `MicroEarnX_Official_Disbursement_${count}_Users.png`;
         a.href = url;
         a.click();
         URL.revokeObjectURL(url);
 
         btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-download text-xs text-rose-500"></i> ব্যানার ছবি ডাউনলোড করুন (HD)';
+        btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down text-xs text-rose-500"></i> ব্যানার ছবি ডাউনলোড করুন (HD)';
     }, 'image/png');
 }
 </script>
