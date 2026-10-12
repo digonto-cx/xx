@@ -41,13 +41,7 @@
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                 </h1>
             </div>
-            
-            <!-- Quick Potential Earning Chip -->
-            {% set total_amount = tasks|map(attribute='amount')|sum %}
-            <div class="text-right bg-white/10 border border-white/10 px-3 py-1.5 rounded-2xl backdrop-blur-sm">
-                <span class="text-[9px] text-slate-300 font-bold uppercase block">মোট সম্ভাব্য আয়</span>
-                <span class="text-base font-black text-emerald-400 tabular-nums">৳ {{ "%.2f"|format(total_amount) }}</span>
-            </div>
+        
         </div>
 
         <!-- Realtime Live Search Input -->
