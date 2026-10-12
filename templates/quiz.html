@@ -1,0 +1,214 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-md mx-auto space-y-4 pb-14">
+
+    <!-- Header & Back Button -->
+    <div class="flex items-center justify-between px-1">
+        <a href="/allwork" class="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-[#E11D48] transition">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>আর্নিং সেন্টারে ফিরুন</span>
+        </a>
+        <span class="text-[10px] font-black bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full border border-indigo-100 uppercase tracking-wider flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-calculator text-xs"></i> ম্যাথ কুইজ
+        </span>
+    </div>
+
+    <!-- Main Quiz Card -->
+    <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/40 border border-rose-50/80 text-center space-y-5 relative overflow-hidden">
+        
+        <!-- Top Info -->
+        <div>
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-2 shadow-sm">
+                <i class="fa-solid fa-brain"></i>
+            </div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight">ম্যাথ কুইজ সমাধান করুন</h2>
+            <p class="text-xs text-slate-400 mt-0.5">প্রতিটি সঠিক উত্তরে পান ৳৩.০০ থেকে ৳৬.০০ ক্যাশ</p>
+        </div>
+
+        <!-- Remaining & Live Balance Grid -->
+        <div class="w-full grid grid-cols-2 gap-2 bg-slate-50 border border-slate-100 rounded-2xl p-2.5 text-xs">
+            <div class="text-left pl-2">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">২৪ ঘণ্টায় বাকি</span>
+                <span class="text-xs font-black text-[#E11D48]" id="remainingBadge">
+                    {{ remaining }} / ১৫ বার
+                </span>
+            </div>
+            <div class="text-right pr-2">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">বর্তমান ব্যালেন্স</span>
+                <span class="text-xs font-black text-emerald-600" id="liveBalText">
+                    ৳ {{ "%.2f"|format(user.balance) }}
+                </span>
+            </div>
+        </div>
+
+        <!-- ================= THE MATH QUESTION BOX ================= -->
+        <div class="relative bg-gradient-to-tr from-slate-900 to-slate-800 text-white rounded-3xl p-6 shadow-xl border border-slate-700/80 space-y-3">
+            <span class="text-[10px] font-mono tracking-widest text-slate-400 font-bold uppercase block">
+                অংকের সমাধান করুন:
+            </span>
+
+            <!-- Math Expression Display -->
+            <div class="text-4xl sm:text-5xl font-black tracking-tight text-white py-2" id="questionText">
+                {{ question }} = ?
+            </div>
+
+            <!-- 20-Second Progress Timer Bar -->
+            <div class="w-full bg-slate-700/60 rounded-full h-1.5 overflow-hidden">
+                <div id="quizTimerBar" class="bg-gradient-to-r from-indigo-400 to-[#E11D48] h-full w-full transition-all duration-1000 linear"></div>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400" id="timerSecondsText">সময় বাকি: ২০ সেকেন্ড</span>
+        </div>
+
+        <!-- 4 Multiple Choice Options (A, B, C, D) -->
+        <div class="grid grid-cols-2 gap-3 pt-1" id="optionsContainer">
+            {% for opt in options %}
+            <button onclick="submitQuizAnswer('{{ opt }}', this)" 
+                    class="quiz-opt-btn bg-slate-50 hover:bg-rose-50 hover:border-rose-200 border-2 border-slate-200 text-slate-800 font-black text-lg py-3.5 px-4 rounded-2xl transition active:scale-95 shadow-sm">
+                {{ opt }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Status Message Banner -->
+        <div id="feedbackBanner" class="hidden p-3.5 rounded-2xl text-xs font-black flex items-center justify-center gap-2"></div>
+
+        <!-- Next Question Button -->
+        <button id="nextQuestionBtn" onclick="loadNextQuestion()" 
+                class="hidden w-full bg-slate-900 hover:bg-slate-800 active:scale-95 text-white font-black text-xs py-3.5 rounded-2xl transition shadow flex items-center justify-center gap-2">
+            <span>পরবর্তী অংক সমাধান করুন</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================= QUIZ CONTROLLER SCRIPT ================= -->
+<script>
+let remainingCount = parseInt("{{ remaining }}") || 0;
+let isAnswered = false;
+let quizTimer = null;
+let secondsLeft = 20;
+
+function startTimer() {
+    if (quizTimer) clearInterval(quizTimer);
+    secondsLeft = 20;
+    const bar = document.getElementById('quizTimerBar');
+    const text = document.getElementById('timerSecondsText');
+
+    quizTimer = setInterval(() => {
+        secondsLeft--;
+        text.innerText = `সময় বাকি: ${secondsLeft} সেকেন্ড`;
+        bar.style.width = `${(secondsLeft / 20) * 100}%`;
+
+        if (secondsLeft <= 0) {
+            clearInterval(quizTimer);
+            if (!isAnswered) {
+                timeOutFailed();
+            }
+        }
+    }, 1000);
+}
+
+startTimer();
+
+function timeOutFailed() {
+    isAnswered = true;
+    disableButtons();
+    showFeedback(false, "সময় শেষ! ২০ সেকেন্ডের মধ্যে উত্তর দিতে হবে।");
+    document.getElementById('nextQuestionBtn').classList.remove('hidden');
+}
+
+function submitQuizAnswer(selectedAns, btnElement) {
+    if (isAnswered) return;
+    if (remainingCount <= 0) {
+        alert("আপনার আজকের ১৫টি কুইজের লিমিট শেষ হয়েছে! ২৪ ঘণ্টা পর আবার আসুন।");
+        return;
+    }
+
+    isAnswered = true;
+    clearInterval(quizTimer);
+    disableButtons();
+
+    // Call backend API
+    fetch('/quiz/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answer: selectedAns })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) {
+            alert(data.message);
+            return;
+        }
+
+        if (data.remaining !== undefined) {
+            remainingCount = data.remaining;
+            document.getElementById('remainingBadge').innerText = `${remainingCount} / ১৫ বার`;
+        }
+
+        if (data.correct) {
+            btnElement.classList.remove('bg-slate-50', 'border-slate-200');
+            btnElement.classList.add('bg-emerald-500', 'border-emerald-600', 'text-white');
+            document.getElementById('liveBalText').innerText = `৳ ${parseFloat(data.new_balance).toFixed(2)}`;
+            showFeedback(true, data.message);
+        } else {
+            btnElement.classList.remove('bg-slate-50', 'border-slate-200');
+            btnElement.classList.add('bg-rose-500', 'border-rose-600', 'text-white');
+            showFeedback(false, data.message);
+        }
+
+        if (remainingCount > 0) {
+            document.getElementById('nextQuestionBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('nextQuestionBtn').classList.add('hidden');
+        }
+    })
+    .catch(() => {
+        alert("সার্ভার ত্রুটি! পেজটি রিফ্রেশ দিন।");
+    });
+}
+
+function showFeedback(isSuccess, text) {
+    const banner = document.getElementById('feedbackBanner');
+    banner.classList.remove('hidden', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-rose-50', 'text-rose-800', 'border-rose-200');
+    if (isSuccess) {
+        banner.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+    } else {
+        banner.classList.add('bg-rose-50', 'text-rose-800', 'border', 'border-rose-200');
+    }
+    banner.innerText = text;
+}
+
+function disableButtons() {
+    document.querySelectorAll('.quiz-opt-btn').forEach(btn => btn.disabled = true);
+}
+
+function loadNextQuestion() {
+    if (remainingCount <= 0) return;
+
+    fetch('/quiz/next', { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+        isAnswered = false;
+        document.getElementById('questionText').innerText = `${data.question} = ?`;
+        document.getElementById('feedbackBanner').classList.add('hidden');
+        document.getElementById('nextQuestionBtn').classList.add('hidden');
+
+        // Re-generate buttons
+        const container = document.getElementById('optionsContainer');
+        container.innerHTML = '';
+        data.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = "quiz-opt-btn bg-slate-50 hover:bg-rose-50 hover:border-rose-200 border-2 border-slate-200 text-slate-800 font-black text-lg py-3.5 px-4 rounded-2xl transition active:scale-95 shadow-sm";
+            btn.innerText = opt;
+            btn.onclick = function() { submitQuizAnswer(opt, btn); };
+            container.appendChild(btn);
+        });
+
+        startTimer();
+    });
+}
+</script>
+{% endblock %}
