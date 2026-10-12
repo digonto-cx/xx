@@ -1,25 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* Card Hover & Smooth Entrance */
-    @keyframes taskFadeIn {
-        from { opacity: 0; transform: translateY(16px); }
-        to { opacity: 1; transform: translateY(0); }
+    /* Native App List Transition */
+    .task-feed-card {
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .animate-task-hub {
-        animation: taskFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
-    .task-hub-card {
-        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .task-hub-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 20px 35px -10px rgba(225, 29, 72, 0.12), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
-        border-color: rgba(254, 205, 211, 1);
+    .task-feed-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px -5px rgba(225, 29, 72, 0.1), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
+        border-color: rgba(225, 29, 72, 0.25);
     }
 </style>
 
-<div class="max-w-4xl mx-auto space-y-5 pb-14 animate-task-hub">
+<div class="max-w-xl mx-auto space-y-4 pb-14">
 
     <!-- Header & Back Button -->
     <div class="flex items-center justify-between px-1">
@@ -27,70 +20,69 @@
             <i class="fa-solid fa-arrow-left"></i>
             <span>আর্নিং সেন্টারে ফিরুন</span>
         </a>
-        <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-3 py-1 rounded-full border border-rose-100 uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
-            <i class="fa-solid fa-briefcase text-xs"></i> মাইক্রো জব সেন্টার
+        <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-3 py-1 rounded-full border border-rose-100 uppercase tracking-wider flex items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-bolt text-xs"></i> টাস্ক ফিড
         </span>
     </div>
 
-    <!-- ================= 1. EARNING POTENTIAL & STATS SUMMARY CARD ================= -->
-    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-[32px] p-6 text-white shadow-xl shadow-slate-900/20 relative overflow-hidden border border-slate-800">
+    <!-- ================= 1. MISSION HERO & LIVE SEARCH CARD ================= -->
+    <div class="bg-gradient-to-tr from-slate-950 via-slate-900 to-slate-950 text-white rounded-[32px] p-5 sm:p-6 shadow-xl border border-slate-800 space-y-4 relative overflow-hidden">
         
         <!-- Ambient Glow -->
-        <div class="absolute -right-10 -bottom-10 w-44 h-44 bg-[#E11D48]/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-[#E11D48]/25 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center justify-between relative z-10">
             <div>
-                <span class="text-[10px] font-mono tracking-widest text-slate-400 font-bold uppercase block mb-1">
-                    LIVE TASK VAULT
+                <span class="text-[9px] font-mono tracking-widest text-slate-400 font-bold uppercase block mb-0.5">
+                    DAILY TASK MISSION
                 </span>
-                <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
-                    উপলব্ধ কাজের তালিকা
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <h1 class="text-xl sm:text-2xl font-black text-white tracking-tight flex items-center gap-2">
+                    আজকের কাজের তালিকা
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                 </h1>
-                <p class="text-xs text-slate-400 mt-1 max-w-sm leading-relaxed">
-                    সঠিক নিয়মে কাজ সম্পন্ন করে স্ক্রিনশট প্রুফ দিন এবং সাথে সাথে আয় নিশ্চিত করুন।
-                </p>
             </div>
-
-            <!-- Mini Summary Counters -->
-            <div class="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-md shrink-0">
-                <div class="text-left pr-3 border-r border-white/10">
-                    <span class="text-[9px] font-bold text-slate-400 uppercase block">মোট কাজ</span>
-                    <span class="text-lg font-black text-white">{{ tasks|length }} টি</span>
-                </div>
-                <div class="text-left pl-1">
-                    <span class="text-[9px] font-bold text-slate-400 uppercase block">সম্ভাব্য মোট আয়</span>
-                    {% set total_available_amount = tasks|map(attribute='amount')|sum %}
-                    <span class="text-lg font-black text-emerald-400">৳ {{ "%.2f"|format(total_available_amount) }}</span>
-                </div>
+            
+            <!-- Quick Potential Earning Chip -->
+            {% set total_amount = tasks|map(attribute='amount')|sum %}
+            <div class="text-right bg-white/10 border border-white/10 px-3 py-1.5 rounded-2xl backdrop-blur-sm">
+                <span class="text-[9px] text-slate-300 font-bold uppercase block">মোট সম্ভাব্য আয়</span>
+                <span class="text-base font-black text-emerald-400 tabular-nums">৳ {{ "%.2f"|format(total_amount) }}</span>
             </div>
         </div>
+
+        <!-- Realtime Live Search Input -->
+        <div class="relative z-10">
+            <input type="text" id="taskSearchInput" onkeyup="searchTasksLive()" placeholder="কাজের নাম লিখে খুঁজুন (যেমন: YouTube, Facebook...)" 
+                class="w-full px-4 py-3 pl-10 rounded-2xl bg-white/10 border border-white/15 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/40 focus:border-[#E11D48] transition backdrop-blur-md">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+        </div>
+
     </div>
 
-    <!-- ================= 2. LIVE FILTER CHIPS (INSTANT CLIENT-SIDE FILTER) ================= -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs font-bold">
-        <button onclick="filterTasks('all', this)" class="filter-chip active-chip px-4 py-2 rounded-xl transition whitespace-nowrap bg-[#E11D48] text-white shadow-sm">
+    <!-- ================= 2. CATEGORY & SORTING PILLS ================= -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar text-xs font-bold px-0.5">
+        <button onclick="applyFilter('all', this)" class="filter-pill px-4 py-2 rounded-xl transition whitespace-nowrap bg-[#E11D48] text-white shadow-sm">
             সব কাজ ({{ tasks|length }})
         </button>
-        <button onclick="filterTasks('youtube', this)" class="filter-chip px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
+        <button onclick="applySortHighRate(this)" class="filter-pill px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
+            <i class="fa-solid fa-fire text-amber-500 mr-1"></i> সর্বোচ্চ রেট
+        </button>
+        <button onclick="applyFilter('youtube', this)" class="filter-pill px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
             <i class="fa-brands fa-youtube text-red-500 mr-1"></i> YouTube
         </button>
-        <button onclick="filterTasks('facebook', this)" class="filter-chip px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
+        <button onclick="applyFilter('facebook', this)" class="filter-pill px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
             <i class="fa-brands fa-facebook text-blue-600 mr-1"></i> Facebook
         </button>
-        <button onclick="filterTasks('telegram', this)" class="filter-chip px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
+        <button onclick="applyFilter('telegram', this)" class="filter-pill px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
             <i class="fa-brands fa-telegram text-sky-500 mr-1"></i> Telegram
-        </button>
-        <button onclick="filterTasks('app', this)" class="filter-chip px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50">
-            <i class="fa-solid fa-mobile-screen text-emerald-600 mr-1"></i> App & Web
         </button>
     </div>
 
-    <!-- ================= 3. TASKS GRID (NEWEST TASKS FIRST) ================= -->
-    <div id="tasksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <!-- ================= 3. MODERN APP-STYLE TASK FEED ================= -->
+    <div id="tasksFeedContainer" class="space-y-3">
         {% for task in tasks %}
         
-        <!-- Category Detection for Client Filter -->
+        <!-- Category & Platform Detection -->
         {% set cat = 'general' %}
         {% if 'youtube' in task.title|lower or 'youtube' in task.link|lower %}
             {% set cat = 'youtube' %}
@@ -98,59 +90,72 @@
             {% set cat = 'facebook' %}
         {% elif 'telegram' in task.title|lower or 't.me' in task.link|lower %}
             {% set cat = 'telegram' %}
-        {% elif 'app' in task.title|lower or 'play.google' in task.link|lower or 'web' in task.title|lower %}
+        {% elif 'app' in task.title|lower or 'play.google' in task.link|lower %}
             {% set cat = 'app' %}
         {% endif %}
 
-        <div class="task-card-item bg-white border border-rose-100/70 rounded-[28px] p-5 shadow-sm task-hub-card flex flex-col justify-between group relative overflow-hidden"
-             data-category="{{ cat }}">
+        <!-- Modern Task Feed Card Item -->
+        <div class="task-feed-item bg-white border border-slate-200/90 rounded-[26px] p-4 sm:p-4.5 shadow-sm task-feed-card flex items-center justify-between gap-3 group relative overflow-hidden"
+             data-category="{{ cat }}"
+             data-amount="{{ task.amount }}"
+             data-title="{{ task.title|lower }}">
             
-            <div>
-                <!-- Top Row: Icon + Reward Badge -->
-                <div class="flex items-start justify-between gap-2 mb-3">
+            <!-- Left: Platform Icon & Task Details -->
+            <div class="flex items-start gap-3 min-w-0">
+                
+                <!-- 3D Platform Icon Badge -->
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shrink-0 shadow-sm group-hover:scale-105 transition duration-200
+                    {% if cat == 'youtube' %} bg-red-50 text-red-600 border border-red-100
+                    {% elif cat == 'facebook' %} bg-blue-50 text-blue-600 border border-blue-100
+                    {% elif cat == 'telegram' %} bg-sky-50 text-sky-500 border border-sky-100
+                    {% elif cat == 'app' %} bg-emerald-50 text-emerald-600 border border-emerald-100
+                    {% else %} bg-rose-50 text-[#E11D48] border border-rose-100 {% endif %}">
                     
-                    <!-- Dynamic Social / App Icon -->
-                    <div class="w-11 h-11 rounded-2xl flex items-center justify-center text-lg shadow-sm shrink-0 group-hover:scale-105 transition duration-300
-                        {% if cat == 'youtube' %} bg-red-50 text-red-600
-                        {% elif cat == 'facebook' %} bg-blue-50 text-blue-600
-                        {% elif cat == 'telegram' %} bg-sky-50 text-sky-500
-                        {% elif cat == 'app' %} bg-emerald-50 text-emerald-600
-                        {% else %} bg-rose-50 text-[#E11D48] {% endif %}">
-                        
-                        {% if cat == 'youtube' %}<i class="fa-brands fa-youtube"></i>
-                        {% elif cat == 'facebook' %}<i class="fa-brands fa-facebook"></i>
-                        {% elif cat == 'telegram' %}<i class="fa-brands fa-telegram"></i>
-                        {% elif cat == 'app' %}<i class="fa-solid fa-mobile-screen"></i>
-                        {% else %}<i class="fa-solid fa-briefcase"></i>{% endif %}
-                    </div>
-
-                    <!-- Glowing Reward Pill -->
-                    <div class="text-right shrink-0">
-                        <span class="text-[9px] font-bold text-slate-400 block uppercase tracking-wider">পুরস্কার</span>
-                        <span class="text-sm font-black text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-xl border border-emerald-100/80 inline-block">
-                            ৳ {{ "%.2f"|format(task.amount) }}
-                        </span>
-                    </div>
+                    {% if cat == 'youtube' %}<i class="fa-brands fa-youtube"></i>
+                    {% elif cat == 'facebook' %}<i class="fa-brands fa-facebook"></i>
+                    {% elif cat == 'telegram' %}<i class="fa-brands fa-telegram"></i>
+                    {% elif cat == 'app' %}<i class="fa-solid fa-mobile-screen"></i>
+                    {% else %}<i class="fa-solid fa-briefcase"></i>{% endif %}
                 </div>
 
-                <!-- Title & Description Snippet -->
-                <h3 class="font-extrabold text-slate-900 text-sm leading-snug mb-1.5 line-clamp-2 group-hover:text-[#E11D48] transition">
-                    {{ task.title }}
-                </h3>
-                <p class="text-[11px] text-slate-400 leading-relaxed line-clamp-2 mb-4 font-medium">
-                    {{ task.description }}
-                </p>
+                <!-- Text Details -->
+                <div class="min-w-0 leading-tight">
+                    
+                    <!-- Micro Badges -->
+                    <div class="flex items-center gap-1.5 mb-1 flex-wrap">
+                        <span class="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full
+                            {% if cat == 'youtube' %} bg-red-50 text-red-600
+                            {% elif cat == 'facebook' %} bg-blue-50 text-blue-600
+                            {% elif cat == 'telegram' %} bg-sky-50 text-sky-500
+                            {% else %} bg-slate-100 text-slate-600 {% endif %}">
+                            {{ cat|upper }}
+                        </span>
+                        <span class="text-[9px] font-bold text-slate-400 flex items-center gap-1">
+                            <i class="fa-regular fa-clock text-[8px]"></i> ২-৩ মিনিট
+                        </span>
+                        <span class="text-[9px] font-bold text-emerald-600 flex items-center gap-0.5">
+                            <i class="fa-solid fa-circle-check text-[8px]"></i> ভেরিফাইড
+                        </span>
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="font-black text-slate-900 text-xs sm:text-sm line-clamp-1 group-hover:text-[#E11D48] transition">
+                        {{ task.title }}
+                    </h3>
+
+                    <!-- Reward Text -->
+                    <span class="text-sm font-black text-emerald-600 block mt-1 tabular-nums">
+                        + ৳ {{ "%.2f"|format(task.amount) }}
+                    </span>
+                </div>
+
             </div>
 
-            <!-- Bottom Row: Meta & CTA Button -->
-            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
-                <span class="text-[10px] font-bold text-slate-400 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-check text-emerald-500 text-[9px]"></i> ভেরিফাইড জব
-                </span>
-
+            <!-- Right: Action CTA Button -->
+            <div class="shrink-0 pl-1">
                 <a href="/task/{{ task.id }}" 
-                   class="bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-extrabold text-xs py-2 px-3.5 rounded-xl transition shadow-md shadow-rose-500/20 flex items-center gap-1.5">
-                    <span>কাজ করুন</span>
+                   class="bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-extrabold text-xs px-4 py-2.5 rounded-2xl shadow-md shadow-rose-500/25 flex items-center gap-1.5 transition">
+                    <span>শুরু করুন</span>
                     <i class="fa-solid fa-arrow-right text-[9px]"></i>
                 </a>
             </div>
@@ -158,44 +163,73 @@
         </div>
         {% else %}
         <!-- Empty State -->
-        <div class="col-span-full bg-white border border-rose-100 rounded-[32px] p-12 text-center text-slate-400 shadow-sm space-y-2">
-            <div class="w-16 h-16 mx-auto rounded-3xl bg-slate-50 text-slate-300 flex items-center justify-center text-2xl mb-2">
-                <i class="fa-solid fa-inbox"></i>
+        <div class="bg-white border border-rose-100 rounded-[32px] p-10 text-center text-slate-400 shadow-sm space-y-2">
+            <div class="w-14 h-14 mx-auto rounded-3xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl mb-1">
+                <i class="fa-solid fa-circle-check"></i>
             </div>
-            <h3 class="text-sm font-black text-slate-800">বর্তমানে কোনো কাজ বাকি নেই!</h3>
-            <p class="text-xs text-slate-400">আপনি সব কাজ ইতিমধ্যে সম্পন্ন করেছেন। নতুন কাজ আসা মাত্রই এখানে দেখতে পাবেন।</p>
-            <div class="pt-3 flex justify-center gap-2">
-                <a href="/yt" class="bg-red-600 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm">
-                    <i class="fa-brands fa-youtube mr-1"></i> ভিডিও দেখুন
-                </a>
-                <a href="/spin" class="bg-amber-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-sm">
-                    <i class="fa-solid fa-dharmachakra mr-1"></i> স্পিন করুন
-                </a>
-            </div>
+            <h3 class="text-sm font-black text-slate-800">সব কাজ সম্পন্ন হয়েছে!</h3>
+            <p class="text-xs text-slate-400">বর্তমানে কোনো কাজ বাকি নেই। নতুন কাজ আসলে তালিকায় দেখতে পাবেন।</p>
         </div>
         {% endfor %}
     </div>
 
 </div>
 
-<!-- REALTIME CLIENT-SIDE CATEGORY FILTER SCRIPT -->
+<!-- REALTIME CLIENT-SIDE SEARCH & FILTER CONTROLLER -->
 <script>
-function filterTasks(category, btn) {
-    // 1. Update chip styles
-    document.querySelectorAll('.filter-chip').forEach(c => {
-        c.className = "filter-chip px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50";
-    });
-    btn.className = "filter-chip active-chip px-4 py-2 rounded-xl transition whitespace-nowrap bg-[#E11D48] text-white shadow-sm";
+// 1. Live Instant Search (Typing Search)
+function searchTasksLive() {
+    const query = document.getElementById('taskSearchInput').value.trim().toLowerCase();
+    const items = document.querySelectorAll('.task-feed-item');
 
-    // 2. Filter card items
-    const cards = document.querySelectorAll('.task-card-item');
-    cards.forEach(card => {
-        const itemCat = card.getAttribute('data-category');
-        if (category === 'all' || itemCat === category) {
-            card.style.display = 'flex';
+    items.forEach(item => {
+        const title = item.getAttribute('data-title');
+        const cat = item.getAttribute('data-category');
+        if (title.includes(query) || cat.includes(query)) {
+            item.style.display = 'flex';
         } else {
-            card.style.display = 'none';
+            item.style.display = 'none';
         }
+    });
+}
+
+// 2. Filter by Category
+function applyFilter(category, btn) {
+    document.querySelectorAll('.filter-pill').forEach(b => {
+        b.className = "filter-pill px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50";
+    });
+    btn.className = "filter-pill px-4 py-2 rounded-xl transition whitespace-nowrap bg-[#E11D48] text-white shadow-sm";
+
+    const items = document.querySelectorAll('.task-feed-item');
+    items.forEach(item => {
+        const itemCat = item.getAttribute('data-category');
+        if (category === 'all' || itemCat === category) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// 3. Sort by Highest Reward (Amount Descending)
+function applySortHighRate(btn) {
+    document.querySelectorAll('.filter-pill').forEach(b => {
+        b.className = "filter-pill px-3.5 py-2 rounded-xl transition whitespace-nowrap bg-white border border-slate-200 text-slate-600 hover:bg-slate-50";
+    });
+    btn.className = "filter-pill px-4 py-2 rounded-xl transition whitespace-nowrap bg-amber-500 text-white shadow-sm";
+
+    const container = document.getElementById('tasksFeedContainer');
+    const items = Array.from(document.querySelectorAll('.task-feed-item'));
+
+    items.sort((a, b) => {
+        const amountA = parseFloat(a.getAttribute('data-amount')) || 0;
+        const amountB = parseFloat(b.getAttribute('data-amount')) || 0;
+        return amountB - amountA; // Descending
+    });
+
+    items.forEach(item => {
+        item.style.display = 'flex';
+        container.appendChild(item);
     });
 }
 </script>
