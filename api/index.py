@@ -347,6 +347,133 @@ def login():
         flash("ভুল পাসওয়ার্ড দিয়েছেন!", "danger")
         return redirect(url_for('index'))
 
+# ==========================================================
+# MATH QUIZ EARNING CONTROLLER (15 CHANCES / 24 HOURS)
+# ==========================================================
+def generate_math_problem():
+    """মিড-লেভেল অংক এবং ৪টি সম্ভাব্য অপশন তৈরি করে"""
+    op_type = random.choice(['add', 'sub', 'mul'])
+    
+    if op_type == 'add':
+        n1 = random.randint(25, 75)
+        n2 = random.randint(15, 65)
+        ans = n1 + n2
+        expr = f"{n1} + {n2}"
+    elif op_type == 'sub':
+        n1 = random.randint(50, 99)
+        n2 = random.randint(15, 49)
+        ans = n1 - n2
+        expr = f"{n1} - {n2}"
+    else:
+        n1 = random.randint(8, 16)
+        n2 = random.randint(5, 12)
+        ans = n1 * n2
+        expr = f"{n1} × {n2}"
+
+    # ৩টি ভুল ও ১টি সঠিক অপশন তৈরি
+    options = {ans}
+    while len(options) < 4:
+        offset = random.choice([-10, -5, -2, -1, 1, 2, 5, 10])
+        fake = ans + offset
+        if fake > 0:
+            options.add(fake)
+
+    opts = list(options)
+    random.shuffle(opts)
+    return expr, ans, opts
+
+@app.route('/quiz')
+@login_required
+def math_quiz():
+    sb = get_supabase()
+    user_id = session['user_id']
+    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
+
+    # বিগত ২৪ ঘণ্টার হিসাব
+    past_24h = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    quizzes_done = sb.table('daily_activities').select('id') \
+        .eq('user_id', user_id).eq('activity_type', 'quiz') \
+        .gte('created_at', past_24h).execute().data or []
+
+    remaining = max(0, 15 - len(quizzes_done))
+    expr, ans, opts = generate_math_problem()
+    session['quiz_answer'] = ans
+
+    return render_template(
+        'quiz.html', 
+        user=user, 
+        remaining=remaining, 
+        question=expr, 
+        options=opts
+    )
+
+@app.route('/quiz/submit', methods=['POST'])
+@login_required
+def quiz_submit():
+    sb = get_supabase()
+    user_id = session['user_id']
+    data = request.get_json() or {}
+    user_ans = data.get('answer')
+
+    # ২৪ ঘণ্টার লিমিট চেক
+    past_24h = (datetime.now(timezone.utc) - timedelta(hours=24)).isoformat()
+    quizzes_done = sb.table('daily_activities').select('id') \
+        .eq('user_id', user_id).eq('activity_type', 'quiz') \
+        .gte('created_at', past_24h).execute().data or []
+
+    if len(quizzes_done) >= 15:
+        return jsonify({"success": False, "message": "আপনার আজকের ১৫টি কুইজের সুযোগ শেষ! ২৪ ঘণ্টা পর আবার আসুন।", "remaining": 0})
+
+    correct_ans = session.get('quiz_answer')
+    if correct_ans is None:
+        return jsonify({"success": False, "message": "প্রশ্নটি মেয়াদোত্তীর্ণ, রিফ্রেশ দিন!"})
+
+    # উত্তর যাচাই
+    if str(user_ans).strip() == str(correct_ans):
+        # রিওয়ার্ড: ৩ থেকে ৬ টাকা (র‍্যান্ডম)
+        reward_pool = [3.00, 3.50, 4.00, 4.50, 5.00, 5.50, 6.00]
+        reward = random.choice(reward_pool)
+
+        user = sb.table('users').select('balance').eq('id', user_id).single().execute().data
+        new_bal = float(user['balance']) + reward
+
+        sb.table('users').update({'balance': new_bal}).eq('id', user_id).execute()
+        sb.table('daily_activities').insert({
+            'user_id': user_id,
+            'activity_type': 'quiz',
+            'reward_earned': reward
+        }).execute()
+
+        remaining = max(0, 15 - (len(quizzes_done) + 1))
+        session.pop('quiz_answer', None)
+
+        return jsonify({
+            "success": True, 
+            "correct": True, 
+            "reward": reward, 
+            "new_balance": new_bal, 
+            "remaining": remaining,
+            "message": f"🎉 দারুণ! সঠিক উত্তর। আপনি ৳{reward:.2f} জিতেছেন!"
+        })
+    else:
+        # ভুল উত্তর
+        session.pop('quiz_answer', None)
+        remaining = max(0, 15 - len(quizzes_done))
+        return jsonify({
+            "success": True, 
+            "correct": False, 
+            "correct_ans": correct_ans,
+            "remaining": remaining,
+            "message": f"ভুল উত্তর! সঠিক উত্তর ছিল: {correct_ans}। টাকা যোগ হয়নি।"
+        })
+
+@app.route('/quiz/next', methods=['POST'])
+@login_required
+def quiz_next():
+    expr, ans, opts = generate_math_problem()
+    session['quiz_answer'] = ans
+    return jsonify({"question": expr, "options": opts})
+    
 @app.route('/logout')
 def logout():
     session.clear()
