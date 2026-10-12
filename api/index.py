@@ -441,21 +441,28 @@ def dashboard():
         notice=site_notice, 
         referral_count=ref_count
     )
-
+    
+# ==========================================================
+# USER TASKS HUB (নতুন টাস্ক সবার উপরে থাকবে)
+# ==========================================================
 @app.route('/tasks')
 @login_required
 def tasks():
     sb = get_supabase()
-    # ইউজারের পেন্ডিং ও অনুমোদিত টাস্ক তালিকা
-    user_subs = sb.table('submissions').select('task_id, status').eq('user_id', session['user_id']).execute().data or []
+    user_id = session['user_id']
+
+    # ১. ইউজারের পেন্ডিং ও অনুমোদিত টাস্ক তালিকা আনা
+    user_subs = sb.table('submissions').select('task_id, status').eq('user_id', user_id).execute().data or []
     hidden_task_ids = [s['task_id'] for s in user_subs if s['status'] in ['pending', 'approved']]
 
-    # অ্যাক্টিভ টাস্ক ফিল্টার
-    all_tasks = sb.table('tasks').select('*').eq('is_active', True).execute().data or []
+    # ২. নতুন টাস্ক সবার উপরে আনার জন্য order('id', desc=True) যোগ করা হলো
+    all_tasks = sb.table('tasks').select('*').eq('is_active', True).order('id', desc=True).execute().data or []
+    
+    # ৩. ইতিমধ্যে সম্পন্ন করা কাজ ফিল্টার করে নতুন কাজগুলো ক্রমানুসারে রাখা
     available_tasks = [t for t in all_tasks if t['id'] not in hidden_task_ids]
 
     return render_template('tasks.html', tasks=available_tasks)
-
+    
 @app.route('/task/<int:task_id>', methods=['GET', 'POST'])
 @login_required
 def task_detail(task_id):
@@ -635,6 +642,40 @@ def withdraw():
     return redirect(url_for('dashboard'))
 
 
+# ==========================================================
+# ADMIN TASK EDIT & DELETE CONTROLLER
+# ==========================================================
+@app.route('/admin/task/<int:task_id>/edit', methods=['POST'])
+@admin_required
+def admin_task_edit(task_id):
+    sb = get_supabase()
+    title = request.form.get('title', '').strip()
+    description = request.form.get('description', '').strip()
+    link = request.form.get('link', '').strip()
+    try:
+        amount = float(request.form.get('amount', 0))
+    except ValueError:
+        amount = 0.0
+
+    sb.table('tasks').update({
+        'title': title,
+        'description': description,
+        'amount': amount,
+        'link': link
+    }).eq('id', task_id).execute()
+
+    flash("টাস্কের তথ্য সফলভাবে আপডেট করা হয়েছে!", "success")
+    return redirect(url_for('admin_task'))
+
+
+@app.route('/admin/task/<int:task_id>/delete', methods=['POST'])
+@admin_required
+def admin_task_delete(task_id):
+    sb = get_supabase()
+    sb.table('tasks').delete().eq('id', task_id).execute()
+    flash("টাস্কটি স্থায়ীভাবে মুছে ফেলা হয়েছে!", "success")
+    return redirect(url_for('admin_task'))
+    
 # ==========================================================
 # USER HISTORY (TASKS & WITHDRAWALS)
 # ==========================================================
