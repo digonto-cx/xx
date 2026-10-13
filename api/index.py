@@ -395,7 +395,7 @@ def math_quiz():
         .eq('user_id', user_id).eq('activity_type', 'quiz') \
         .gte('created_at', past_24h).execute().data or []
 
-    remaining = max(0, 15 - len(quizzes_done))
+    remaining = max(0, 5 - len(quizzes_done))
     expr, ans, opts = generate_math_problem()
     session['quiz_answer'] = ans
 
@@ -421,8 +421,8 @@ def quiz_submit():
         .eq('user_id', user_id).eq('activity_type', 'quiz') \
         .gte('created_at', past_24h).execute().data or []
 
-    if len(quizzes_done) >= 15:
-        return jsonify({"success": False, "message": "আপনার আজকের ১৫টি কুইজের সুযোগ শেষ! ২৪ ঘণ্টা পর আবার আসুন।", "remaining": 0})
+    if len(quizzes_done) >= 5:
+        return jsonify({"success": False, "message": "আপনার আজকের ৫টি কুইজের সুযোগ শেষ! ২৪ ঘণ্টা পর আবার আসুন।", "remaining": 0})
 
     correct_ans = session.get('quiz_answer')
     if correct_ans is None:
@@ -444,7 +444,7 @@ def quiz_submit():
             'reward_earned': reward
         }).execute()
 
-        remaining = max(0, 15 - (len(quizzes_done) + 1))
+        remaining = max(0, 5 - (len(quizzes_done) + 1))
         session.pop('quiz_answer', None)
 
         return jsonify({
@@ -458,7 +458,7 @@ def quiz_submit():
     else:
         # ভুল উত্তর
         session.pop('quiz_answer', None)
-        remaining = max(0, 15 - len(quizzes_done))
+        remaining = max(0, 5 - len(quizzes_done))
         return jsonify({
             "success": True, 
             "correct": False, 
