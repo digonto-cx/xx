@@ -322,6 +322,51 @@ def register():
         
     return redirect(url_for('index'))
 
+# ==========================================================
+# ADMIN USER PASSWORD RESET CONTROLLER (/admin/pass)
+# ==========================================================
+@app.route('/admin/pass', methods=['GET', 'POST'])
+@admin_required
+def admin_change_password():
+    sb = get_supabase()
+    
+    if request.method == 'POST':
+        user_identifier = request.form.get('user_identifier', '').strip()
+        new_password = request.form.get('new_password', '').strip()
+
+        if not user_identifier or not new_password:
+            flash("ইউজারের ইমেইল/আইডি এবং নতুন পাসওয়ার্ড উভয়ই আবশ্যক!", "danger")
+            return redirect(url_for('admin_change_password'))
+
+        # ইমেইল অথবা আইডি দিয়ে ইউজার খোঁজা
+        query = sb.table('users').select('id, name, email')
+        if user_identifier.isdigit():
+            user_data = query.eq('id', int(user_identifier)).execute().data
+        else:
+            user_data = query.eq('email', user_identifier.lower()).execute().data
+
+        if not user_data:
+            flash(f"'{user_identifier}' দিয়ে কোনো ইউজার খুঁজে পাওয়া যায়নি!", "danger")
+            return redirect(url_for('admin_change_password'))
+
+        target_user = user_data[0]
+
+        # নতুন পাসওয়ার্ড হ্যাশ করে ডেটাবেসে আপডেট
+        hashed_password = generate_password_hash(new_password)
+        sb.table('users').update({'password_hash': hashed_password}).eq('id', target_user['id']).execute()
+
+        flash(f"🎉 ইউজার '{target_user['name']}' ({target_user['email']}) এর পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!", "success")
+        return redirect(url_for('admin_change_password'))
+
+    # GET: সার্চ অথবা সাম্প্রতিক ইউজার তালিকা
+    search_q = request.args.get('q', '').strip()
+    u_query = sb.table('users').select('id, name, email, referral_code, created_at')
+    if search_q:
+        u_query = u_query.ilike('email', f"%{search_q}%")
+    recent_users = u_query.order('id', desc=True).limit(10).execute().data or []
+
+    return render_template('admin/pass.html', users=recent_users, search_q=search_q)
+    
 @app.route('/login', methods=['POST'])
 def login():
     sb = get_supabase()
