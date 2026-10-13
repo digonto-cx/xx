@@ -321,14 +321,14 @@ def register():
         flash("রেজিস্ট্রেশন ব্যর্থ হয়েছে। পরে চেষ্টা করুন।", "danger")
         
     return redirect(url_for('index'))
-
 # ==========================================================
-# ADMIN USER PASSWORD RESET CONTROLLER (/admin/pass)
+# ADMIN USER PASSWORD RESET & CARD GENERATOR (/admin/pass)
 # ==========================================================
 @app.route('/admin/pass', methods=['GET', 'POST'])
 @admin_required
 def admin_change_password():
     sb = get_supabase()
+    reset_data = None
     
     if request.method == 'POST':
         user_identifier = request.form.get('user_identifier', '').strip()
@@ -338,7 +338,6 @@ def admin_change_password():
             flash("ইউজারের ইমেইল/আইডি এবং নতুন পাসওয়ার্ড উভয়ই আবশ্যক!", "danger")
             return redirect(url_for('admin_change_password'))
 
-        # ইমেইল অথবা আইডি দিয়ে ইউজার খোঁজা
         query = sb.table('users').select('id, name, email')
         if user_identifier.isdigit():
             user_data = query.eq('id', int(user_identifier)).execute().data
@@ -351,21 +350,34 @@ def admin_change_password():
 
         target_user = user_data[0]
 
-        # নতুন পাসওয়ার্ড হ্যাশ করে ডেটাবেসে আপডেট
+        # পাসওয়ার্ড হ্যাশ করে আপডেট
         hashed_password = generate_password_hash(new_password)
         sb.table('users').update({'password_hash': hashed_password}).eq('id', target_user['id']).execute()
 
-        flash(f"🎉 ইউজার '{target_user['name']}' ({target_user['email']}) এর পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!", "success")
-        return redirect(url_for('admin_change_password'))
+        flash(f"🎉 ইউজার '{target_user['name']}' এর পাসওয়ার্ড সফলভাবে রিসেট হয়েছে!", "success")
+        
+        # ইউজারকে পাঠানোর জন্য রেডিমেড ডাটা পাস করা
+        reset_data = {
+            'id': target_user['id'],
+            'name': target_user['name'],
+            'email': target_user['email'],
+            'password': new_password,
+            'time': datetime.now().strftime('%d %b, %Y • %I:%M %p')
+        }
 
-    # GET: সার্চ অথবা সাম্প্রতিক ইউজার তালিকা
+    # ইউজার তালিকা আনা
     search_q = request.args.get('q', '').strip()
     u_query = sb.table('users').select('id, name, email, referral_code, created_at')
     if search_q:
         u_query = u_query.ilike('email', f"%{search_q}%")
     recent_users = u_query.order('id', desc=True).limit(10).execute().data or []
 
-    return render_template('admin/pass.html', users=recent_users, search_q=search_q)
+    return render_template(
+        'admin/pass.html', 
+        users=recent_users, 
+        search_q=search_q, 
+        reset_data=reset_data
+        )
     
 @app.route('/login', methods=['POST'])
 def login():
