@@ -1,20 +1,92 @@
 {% extends 'admin/base_admin.html' %}
 {% block admin_content %}
-<div class="max-w-5xl mx-auto space-y-6 pb-12">
+<div class="max-w-5xl mx-auto space-y-6 pb-14">
 
     <!-- Page Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
         <div>
             <span class="text-[10px] font-black uppercase tracking-widest text-[#E11D48] block mb-0.5">সিকিউরিটি ও এক্সেস কন্ট্রোল</span>
             <h2 class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                <i class="fa-solid fa-key text-amber-500"></i> ইউজার পাসওয়ার্ড পরিবর্তন ও রিসেট
+                <i class="fa-solid fa-key text-amber-500"></i> ইউজার পাসওয়ার্ড রিসেট ও নোটিশ জেনারেটর
             </h2>
         </div>
         <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3.5 py-1.5 rounded-2xl shadow-sm">
-            <i class="fa-solid fa-lock text-rose-500 mr-1"></i> রুট অ্যাডমিন মোড
+            <i class="fa-solid fa-shield-halved text-[#E11D48] mr-1"></i> Root Security
         </span>
     </div>
 
+    <!-- ================= SUCCESS SECTION: READY MESSAGE & GENERATED PIC ================= -->
+    {% if reset_data %}
+    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-[32px] p-6 text-white border border-rose-500/30 shadow-2xl space-y-5">
+        
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                <h3 class="text-sm font-black text-white">ইউজারকে পাঠানোর রেডিমেড মেসেজ ও অফিসিয়াল কার্ড</h3>
+            </div>
+            <span class="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                Password Changed Successfully
+            </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            
+            <!-- 1. Copyable Text Message Box -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                        <i class="fa-solid fa-comment-dots text-sky-400 mr-1"></i> মেসেজ টেক্সট (১-ক্লিকে কপি করুন):
+                    </span>
+                    <textarea id="copyableUserMsg" readonly rows="8" 
+                        class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-300 font-mono leading-relaxed outline-none select-all resize-none">🔐 MicroEarnX — অ্যাকাউন্ট পাসওয়ার্ড রিসেট নোটিশ
+
+প্রিয় {{ reset_data.name }},
+আপনার অনুরোধের প্রেক্ষিতে MicroEarnX অ্যাকাউন্টের পাসওয়ার্ড সফলভাবে রিসেট করা হয়েছে।
+
+📌 আপনার নতুন লগইন তথ্য:
+━━━━━━━━━━━━━━━━━━━━━
+👤 একাউন্ট নাম: {{ reset_data.name }}
+📧 ইমেইল: {{ reset_data.email }}
+🔑 নতুন পাসওয়ার্ড: {{ reset_data.password }}
+🌐 লগইন লিংক: {{ request.host_url }}
+━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ সতর্কতা: অ্যাকাউন্টে প্রবেশ করে প্রোফাইল থেকে নিজের পছন্দমতো পাসওয়ার্ড পরিবর্তন করে নিন।
+
+ধন্যবাদান্তে,
+MicroEarnX সিকিউরিটি টিম</textarea>
+                </div>
+
+                <button onclick="copyTextMessage()" class="w-full bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-extrabold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>মেসেজ কপি করুন (Copy Message)</span>
+                </button>
+            </div>
+
+            <!-- 2. Generated Official Card Image Preview & Download -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3 flex flex-col justify-between">
+                <div>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                        <i class="fa-solid fa-image text-rose-400 mr-1"></i> অফিসিয়াল সিকিউরিটি রসিদ ছবি:
+                    </span>
+                    <div class="rounded-xl overflow-hidden border border-slate-800 shadow-md bg-black">
+                        <canvas id="resetCardCanvas" width="1200" height="675" class="w-full h-auto block"></canvas>
+                    </div>
+                </div>
+
+                <button onclick="downloadResetCard()" id="btnDownloadCard" 
+                    class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-extrabold text-xs py-3 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-rose-500/25">
+                    <i class="fa-solid fa-download"></i>
+                    <span>কার্ড ছবি ডাউনলোড করুন (HD Image)</span>
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- ================= MAIN CONTROLLER FORM & QUICK SELECTOR ================= -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <!-- Password Change Form (Left Panel) -->
@@ -28,13 +100,13 @@
 
             <form action="/admin/pass" method="POST" class="space-y-4">
                 
-                <!-- User Identifier (Email or ID) -->
+                <!-- User Identifier -->
                 <div>
                     <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">
                         ইউজারের ইমেইল বা আইডি
                     </label>
                     <div class="relative">
-                        <input type="text" name="user_identifier" id="userIdentifierInput" required placeholder="user@gmail.com অথবা ID (যেমন: 7062)" 
+                        <input type="text" name="user_identifier" id="userIdentifierInput" required placeholder="user@gmail.com অথবা ID" 
                             class="w-full px-4 py-3 pl-10 rounded-2xl border border-slate-200 text-xs text-slate-900 font-bold focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none bg-slate-50/50">
                         <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
                     </div>
@@ -52,12 +124,9 @@
                     </div>
 
                     <div class="relative">
-                        <input type="text" name="new_password" id="newPassInput" required placeholder="নতুন পাসওয়ার্ড লিখুন..." 
-                            class="w-full px-4 py-3 pl-10 pr-10 rounded-2xl border border-slate-200 text-xs text-slate-900 font-mono font-bold focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none bg-slate-50/50">
+                        <input type="text" name="new_password" id="newPassInput" required placeholder="নতুন পাসওয়ার্ড..." 
+                            class="w-full px-4 py-3 pl-10 rounded-2xl border border-slate-200 text-xs text-slate-900 font-mono font-bold focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none bg-slate-50/50">
                         <i class="fa-solid fa-lock absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
-                        <button type="button" onclick="copyPassword()" class="absolute right-3.5 top-3 text-slate-400 hover:text-slate-600" title="পাসওয়ার্ড কপি করুন">
-                            <i class="fa-regular fa-copy text-xs"></i>
-                        </button>
                     </div>
                 </div>
 
@@ -65,22 +134,22 @@
                 <button type="submit" 
                     class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 px-4 rounded-2xl transition shadow-md shadow-rose-500/25 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-check text-xs"></i>
-                    <span>পাসওয়ার্ড আপডেট করুন</span>
+                    <span>পাসওয়ার্ড রিসেট ও কার্ড তৈরি করুন</span>
                 </button>
             </form>
         </div>
 
-        <!-- User Quick Picker & Search (Right Panel) -->
+        <!-- Quick User Picker (Right Panel) -->
         <div class="lg:col-span-2 bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4">
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
                 <div>
-                    <h3 class="text-sm font-black text-slate-900">ইউজার অনুসন্ধান ও সিলেক্ট করুন</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">তালিকায় ক্লিক করলে ইমেইল স্বয়ংক্রিয়ভাবে ফর্মে বসে যাবে</p>
+                    <h3 class="text-sm font-black text-slate-900">ইউজার সার্চ ও এক-ক্লিকে সিলেক্ট</h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">সিলেক্ট করলে ইমেইল স্বয়ংক্রিয়ভাবে ফর্মে বসে যাবে</p>
                 </div>
 
                 <form method="GET" action="/admin/pass" class="flex items-center gap-2">
-                    <input type="text" name="q" value="{{ search_q }}" placeholder="ইমেইল দিয়ে খুঁজুন..." 
+                    <input type="text" name="q" value="{{ search_q or '' }}" placeholder="ইমেইল দিয়ে খুঁজুন..." 
                         class="px-3.5 py-1.5 border border-slate-200 rounded-xl text-xs outline-none focus:border-[#E11D48] bg-slate-50">
                     <button type="submit" class="bg-slate-900 text-white font-bold px-3 py-1.5 rounded-xl text-xs">সার্চ</button>
                 </form>
@@ -128,7 +197,7 @@
 
 </div>
 
-<!-- SCRIPT: GENERATE RANDOM PASS & AUTOFILL -->
+<!-- ================= 100% NATIVE CARD DRAWING & DOWNLOAD SCRIPT ================= -->
 <script>
 function selectUserForPassword(email) {
     document.getElementById('userIdentifierInput').value = email;
@@ -144,12 +213,186 @@ function generateRandomPassword() {
     document.getElementById('newPassInput').value = password;
 }
 
-function copyPassword() {
-    const passInput = document.getElementById('newPassInput');
-    if (!passInput.value) return;
-    navigator.clipboard.writeText(passInput.value).then(() => {
-        alert("পাসওয়ার্ড কপি হয়েছে: " + passInput.value);
+function copyTextMessage() {
+    const copyText = document.getElementById("copyableUserMsg");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(copyText.value).then(() => {
+        alert("🎉 ইউজারকে পাঠানোর মেসেজ সফলভাবে কপি হয়েছে!");
     });
 }
+
+{% if reset_data %}
+// Draw Official Security Password Reset Card (1200x675 HD)
+function renderResetCardImage() {
+    const canvas = document.getElementById('resetCardCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const W = 1200;
+    const H = 675;
+
+    // 1. Dark Backdrop
+    const bgGrad = ctx.createRadialGradient(W / 2, H / 2, 50, W / 2, H / 2, 700);
+    bgGrad.addColorStop(0, "#131926");
+    bgGrad.addColorStop(0.6, "#0b0f19");
+    bgGrad.addColorStop(1, "#05070c");
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, W, H);
+
+    // Matrix lines
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.03)";
+    ctx.lineWidth = 1;
+    for (let x = 40; x < W; x += 60) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+    }
+    for (let y = 40; y < H; y += 60) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+
+    // Outer Border
+    ctx.strokeStyle = "rgba(225, 29, 72, 0.4)";
+    ctx.lineWidth = 3;
+    ctx.strokeRect(30, 30, W - 60, H - 60);
+
+    // 2. Header
+    ctx.beginPath();
+    ctx.arc(80, 80, 24, 0, Math.PI * 2);
+    ctx.fillStyle = "#E11D48";
+    ctx.fill();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 22px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("⚡", 80, 88);
+
+    ctx.textAlign = "left";
+    ctx.font = "900 28px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("MICRO", 115, 89);
+    ctx.fillStyle = "#E11D48";
+    ctx.fillText("EARNX", 220, 89);
+
+    ctx.textAlign = "right";
+    ctx.font = "bold 15px Courier, monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("SECURITY CREDENTIALS NOTICE", W - 70, 80);
+
+    ctx.font = "bold 15px Arial";
+    ctx.fillStyle = "#34d399";
+    ctx.fillText("● AUTHENTICATION RESET", W - 70, 104);
+
+    // 3. Center Box
+    const boxW = 1000;
+    const boxH = 340;
+    const boxX = (W - boxW) / 2;
+    const boxY = 160;
+
+    const boxGrad = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
+    boxGrad.addColorStop(0, "rgba(255, 255, 255, 0.06)");
+    boxGrad.addColorStop(1, "rgba(225, 29, 72, 0.08)");
+    ctx.fillStyle = boxGrad;
+    ctx.beginPath();
+    ctx.roundRect(boxX, boxY, boxW, boxH, 28);
+    ctx.fill();
+
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.15)";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Box Header
+    ctx.textAlign = "left";
+    ctx.font = "bold 16px Arial";
+    ctx.fillStyle = "#fbbf24";
+    ctx.fillText("★ OFFICIAL ACCOUNT CREDENTIALS UPDATE ★", boxX + 50, boxY + 45);
+
+    // User Name
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("অ্যাকাউন্ট ব্যবহারকারী:", boxX + 50, boxY + 95);
+
+    ctx.font = "900 32px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("{{ reset_data.name }}", boxX + 50, boxY + 135);
+
+    // User Email
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("রেজিস্টার্ড ইমেইল:", boxX + 50, boxY + 185);
+
+    ctx.font = "bold 24px Courier, monospace";
+    ctx.fillStyle = "#38bdf8";
+    ctx.fillText("{{ reset_data.email }}", boxX + 50, boxY + 215);
+
+    // New Password Badge
+    ctx.font = "bold 18px Arial";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("আপনার নতুন পাসওয়ার্ড:", boxX + 50, boxY + 265);
+
+    // Password Highlight Box
+    ctx.fillStyle = "#E11D48";
+    ctx.beginPath();
+    ctx.roundRect(boxX + 50, boxY + 280, 400, 48, 14);
+    ctx.fill();
+
+    ctx.font = "900 28px Courier, monospace";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText("{{ reset_data.password }}", boxX + 70, boxY + 314);
+
+    // Right Side Verified Stamp
+    ctx.textAlign = "center";
+    ctx.font = "bold 14px Arial";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("STATUS", boxX + boxW - 160, boxY + 140);
+
+    ctx.font = "900 18px Arial";
+    ctx.fillStyle = "#10b981";
+    ctx.fillText("✓ PASSWORD RESET", boxX + boxW - 160, boxY + 170);
+
+    ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+    ctx.lineWidth = 2;
+    ctx.strokeRect(boxX + boxW - 270, boxY + 115, 220, 80);
+
+    // 4. Footer Row
+    ctx.textAlign = "left";
+    ctx.font = "bold 15px Arial";
+    ctx.fillStyle = "#64748b";
+    ctx.fillText("RESET TIMESTAMP: {{ reset_data.time }}", 70, 560);
+
+    ctx.font = "bold 15px Arial";
+    ctx.fillStyle = "#38bdf8";
+    ctx.fillText("LOGIN PORTAL: {{ request.host_url }}", 70, 590);
+
+    ctx.textAlign = "right";
+    ctx.font = "italic bold 22px Brush Script MT, cursive, Arial";
+    ctx.fillStyle = "#f43f5e";
+    ctx.fillText("MicroEarnX Security Auth.", W - 70, 565);
+
+    ctx.font = "900 13px Courier, monospace";
+    ctx.fillStyle = "#94a3b8";
+    ctx.fillText("[ SYSTEM VERIFIED CREDENTIALS ]", W - 70, 590);
+
+    ctx.textAlign = "center";
+    ctx.font = "500 13px Arial";
+    ctx.fillStyle = "#475569";
+    ctx.fillText("MicroEarnX Official Security Infrastructure • microearnx.vercel.app", W / 2, 640);
+}
+
+window.addEventListener('DOMContentLoaded', renderResetCardImage);
+
+function downloadResetCard() {
+    const canvas = document.getElementById('resetCardCanvas');
+    if (!canvas) return;
+
+    canvas.toBlob(function(blob) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.download = `MicroEarnX_Reset_Card_{{ reset_data.name }}.png`;
+        a.href = url;
+        a.click();
+        URL.revokeObjectURL(url);
+    }, 'image/png');
+}
+{% endif %}
 </script>
 {% endblock %}
