@@ -445,6 +445,193 @@ def generate_math_problem():
     random.shuffle(opts)
     return expr, ans, opts
 
+# ==========================================================
+# GMAIL FARMING CONTROLLER (AUTO 2-HOUR LOCK & RELEASE)
+# ==========================================================
+def auto_release_expired_gmail_tasks(sb):
+    """২ ঘণ্টা পার হয়ে যাওয়া লকড টাস্কগুলোকে সবার জন্য পুনরায় উন্মুক্ত করে"""
+    two_hours_ago = (datetime.now(timezone.utc) - timedelta(hours=2)).isoformat()
+    sb.table('gmail_tasks').update({
+        'status': 'available',
+        'locked_by': None,
+        'locked_at': None
+    }).eq('status', 'locked').lt('locked_at', two_hours_ago).execute()
+
+@app.route('/gmail')
+@login_required
+def gmail_hub():
+    sb = get_supabase()
+    user_id = session['user_id']
+    auto_release_expired_gmail_tasks(sb)
+
+    # ইউজারের বর্তমান লক করা কোনো কাজ আছে কিনা চেক
+    my_locked_task = sb.table('gmail_tasks').select('*') \
+        .eq('locked_by', user_id).in_('status', ['locked', 'submitted']).execute().data
+
+    active_task = my_locked_task[0] if my_locked_task else None
+
+    # সবার জন্য উন্মুক্ত টাস্কগুলো আনা
+    available_tasks = sb.table('gmail_tasks').select('*') \
+        .eq('status', 'available').order('id', desc=True).execute().data or []
+
+    return render_template('gmail.html', active_task=active_task, tasks=available_tasks)
+
+@app.route('/gmail/lock/<int:task_id>', methods=['POST'])
+@login_required
+def gmail_lock_task(task_id):
+    sb = get_supabase()
+    user_id = session['user_id']
+    auto_release_expired_gmail_tasks(sb)
+
+    # ১ জন ইউজার একসাথে ১টির বেশি টাস্ক লক রাখতে পারবে না
+    existing = sb.table('gmail_tasks').select('id') \
+        .eq('locked_by', user_id).eq('status', 'locked').execute().data
+    if existing:
+        flash("আপনার ইতিমধ্যে একটি কাজ চালু রয়েছে! সেটি সম্পন্ন বা বাতিল করুন।", "warning")
+        return redirect(url_for('gmail_hub'))
+
+    # টাস্কটি এখনো অ্যাভেইলেবল আছে কিনা চেক
+    task = sb.table('gmail_tasks').select('*').eq('id', task_id).single().execute().data
+    if not task or task.get('status') != 'available':
+        flash("এই কাজটি ইতিমধ্যে অন্য একজন ইউজার নিয়ে নিয়েছে!", "danger")
+        return redirect(url_for('gmail_hub'))
+
+    # টাস্কটি এই ইউজারের জন্য ২ ঘণ্টার জন্য লক করা
+    sb.table('gmail_tasks').update({
+        'status': 'locked',
+        'locked_by': user_id,
+        'locked_at': datetime.now(timezone.utc).isoformat()
+    }).eq('id', task_id).execute()
+
+    flash("টাস্কটি আপনার জন্য সফলভাবে ২ ঘণ্টার জন্য লক করা হয়েছে!", "success")
+    return redirect(url_for('gmail_hub'))
+
+@app.route('/gmail/submit/<int:task_id>', methods=['POST'])
+@login_required
+def gmail_submit_task(task_id):
+    sb = get_supabase()
+    user_id = session['user_id']
+    submitted_email = request.form.get('submitted_email', '').strip().lower()
+
+    if not submitted_email or not submitted_email.endswith('@gmail.com'):
+        flash("অনুগ্রহ করে আপনার তৈরিকৃত সঠিক জিমেইল অ্যাড্রেস দিন!", "danger")
+        return redirect(url_for('gmail_hub'))
+
+    task = sb.table('gmail_tasks').select('*').eq('id', task_id).single().execute().data
+    if not task or task.get('locked_by') != user_id:
+        flash("অবৈধ রিকোয়েস্ট!", "danger")
+        return redirect(url_for('gmail_hub'))
+
+    # সাবমিট করা হলো (অ্যাডমিন রিভিউর অপেক্ষায়)
+    sb.table('gmail_tasks').update({
+        'status': 'submitted',
+        'submitted_email': submitted_email,
+        'submitted_at': datetime.now(timezone.utc).isoformat()
+    }).eq('id', task_id).execute()
+
+    flash("🎉 জিমেইল সফলভাবে জমা হয়েছে! অ্যাডমিন চেক করে টাকা ব্যালেন্সে যুক্ত করে দেবে।", "success")
+    return redirect(url_for('gmail_hub'))
+
+@app.route('/gmail/cancel/<int:task_id>', methods=['POST'])
+@login_required
+def gmail_cancel_task(task_id):
+    sb = get_supabase()
+    user_id = session['user_id']
+    # লক বাতিল করে পুনরায় সবার জন্য উন্মুক্ত করা
+    sb.table('gmail_tasks').update({
+        'status': 'available',
+        'locked_by': None,
+        'locked_at': None
+    }).eq('id', task_id).eq('locked_by', user_id).eq('status', 'locked').execute()
+
+    flash("টাস্কটি বাতিল করা হয়েছে এবং সবার জন্য উন্মুক্ত করে দেওয়া হয়েছে।", "info")
+    return redirect(url_for('gmail_hub'))
+
+# ==========================================================
+# ADMIN GMAIL FARM CONTROLLER (/admin/gmail)
+# ==========================================================
+@app.route('/admin/gmail', methods=['GET', 'POST'])
+@admin_required
+def admin_gmail():
+    sb = get_supabase()
+    auto_release_expired_gmail_tasks(sb)
+
+    # নতুন জিমেইল টাস্ক তৈরি
+    if request.method == 'POST':
+        first_name = request.form.get('first_name', '').strip()
+        email_prefix = request.form.get('email_prefix', '').strip()
+        password = request.form.get('password', '').strip()
+        try:
+            price = float(request.form.get('price', 8.00))
+        except ValueError:
+            price = 8.00
+
+        sb.table('gmail_tasks').insert({
+            'first_name': first_name,
+            'email_prefix': email_prefix,
+            'password': password,
+            'price': price,
+            'status': 'available'
+        }).execute()
+
+        flash("নতুন জিমেইল ফার্মিং টাস্ক সফলভাবে তৈরি হয়েছে!", "success")
+        return redirect(url_for('admin_gmail'))
+
+    # পর্যালোচনার জন্য জমা পড়া কাজ
+    submitted_tasks = sb.table('gmail_tasks').select('*, users(name, email)') \
+        .eq('status', 'submitted').order('submitted_at', desc=True).execute().data or []
+
+    # সকল টাস্কের তালিকা
+    all_tasks = sb.table('gmail_tasks').select('*').order('id', desc=True).limit(50).execute().data or []
+
+    return render_template('admin/gmail.html', submitted=submitted_tasks, all_tasks=all_tasks)
+
+@app.route('/admin/gmail/<int:task_id>/approve', methods=['POST'])
+@admin_required
+def admin_gmail_approve(task_id):
+    sb = get_supabase()
+    task = sb.table('gmail_tasks').select('*').eq('id', task_id).single().execute().data
+    if not task or task.get('status') != 'submitted':
+        flash("অবৈধ টাস্ক!", "danger")
+        return redirect(url_for('admin_gmail'))
+
+    # ইউজারের ব্যালেন্সে টাকা যোগ
+    user = sb.table('users').select('balance').eq('id', task['locked_by']).single().execute().data
+    new_bal = float(user['balance']) + float(task['price'])
+    sb.table('users').update({'balance': new_bal}).eq('id', task['locked_by']).execute()
+
+    # স্ট্যাটাস completed করা
+    sb.table('gmail_tasks').update({'status': 'completed'}).eq('id', task_id).execute()
+
+    flash(f"জিমেইল অ্যাপ্রুভ হয়েছে এবং ইউজারের অ্যাকাউন্টে ৳{task['price']} যোগ হয়েছে!", "success")
+    return redirect(url_for('admin_gmail'))
+
+@app.route('/admin/gmail/<int:task_id>/reject', methods=['POST'])
+@admin_required
+def admin_gmail_reject(task_id):
+    sb = get_supabase()
+    # শর্ত: রিজেক্ট করলে কাজটি পুনরায় সবার জন্য available হয়ে যাবে
+    sb.table('gmail_tasks').update({
+        'status': 'available',
+        'locked_by': None,
+        'locked_at': None,
+        'submitted_email': None,
+        'submitted_at': None
+    }).eq('id', task_id).execute()
+
+    flash("টাস্কটি রিজেক্ট করা হয়েছে এবং পুনরায় সবার জন্য সাইটে লাইভ করে দেওয়া হয়েছে!", "warning")
+    return redirect(url_for('admin_gmail'))
+
+@app.route('/admin/gmail/<int:task_id>/delete', methods=['POST'])
+@admin_required
+def admin_gmail_delete(task_id):
+    sb = get_supabase()
+    sb.table('gmail_tasks').delete().eq('id', task_id).execute()
+    flash("টাস্কটি ডিলিট করা হয়েছে!", "success")
+    return redirect(url_for('admin_gmail'))
+    
+
+
 @app.route('/quiz')
 @login_required
 def math_quiz():
