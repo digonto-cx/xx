@@ -137,6 +137,40 @@
             });
         }
     </script>
+
+    <!-- Collision-Free Device Security & Referral Tracker -->
+<script>
+    (function initUniqueDeviceAndReferral() {
+        // ১. প্রতিটি ফোনের ব্রাউজারের জন্য ১০০% স্বতন্ত্র ডিভাইস টোকেন
+        let deviceToken = localStorage.getItem('mx_device_unique_token');
+        if (!deviceToken) {
+            deviceToken = 'DEV-' + 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                let r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            }).toUpperCase();
+            localStorage.setItem('mx_device_unique_token', deviceToken);
+        }
+
+        // ২. URL থেকে রেফারেল কোড মেমোরিতে সেভ রাখা
+        const urlParams = new URLSearchParams(window.location.search);
+        const ref = urlParams.get('ref');
+        if (ref) {
+            localStorage.setItem('mx_referral_cached', ref.trim().toUpperCase());
+        }
+
+        // ৩. ফর্মে অটো-ইনপুট বসানো
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('input[name="device_id"]').forEach(el => el.value = deviceToken);
+            
+            const cachedRef = localStorage.getItem('mx_referral_cached');
+            const refInput = document.getElementById('refField') || document.querySelector('input[name="ref_by"]');
+            if (cachedRef && refInput && !refInput.value) {
+                refInput.value = cachedRef;
+            }
+        });
+    })();
+</script>
+    
 </head>
 <body class="bg-gradient-to-b from-rose-50/60 via-white to-amber-50/40 min-h-screen flex flex-col font-sans antialiased text-slate-800 pb-28 md:pb-12 selection:bg-rose-100 selection:text-[#E11D48]">
 
