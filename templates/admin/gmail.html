@@ -1,0 +1,179 @@
+{% extends 'admin/base_admin.html' %}
+{% block admin_content %}
+<div class="max-w-6xl mx-auto space-y-6 pb-14">
+
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-[#E11D48] block mb-0.5">জিমেইল ফার্মিং কন্ট্রোল</span>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-envelope text-red-500"></i> জিমেইল টাস্ক তৈরি ও রিভিউ প্যানেল
+            </h2>
+        </div>
+        <span class="text-xs font-bold text-slate-500 bg-white border border-slate-200 px-3.5 py-1.5 rounded-2xl shadow-sm">
+            রিভিউ পেন্ডিং: <strong class="text-amber-600">{{ submitted|length }} টি</strong>
+        </span>
+    </div>
+
+    <!-- 1. PENDING SUBMISSIONS FOR REVIEW (অ্যাপ্রুভ ও রিজেক্ট) -->
+    <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+                <h3 class="text-sm font-black text-slate-900">জমা পড়া জিমেইল রিভিউ করুন</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">পাসওয়ার্ড চেক করে অ্যাপ্রুভ করুন (রিজেক্ট করলে কাজটি পুনরায় লাইভ হবে)</p>
+            </div>
+            <span class="text-[10px] font-black bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                Action Required
+            </span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-slate-100 text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                        <th class="py-2.5 px-3">মেম্বার</th>
+                        <th class="py-2.5 px-3">তৈরিকৃত জিমেইল</th>
+                        <th class="py-2.5 px-3">পাসওয়ার্ড</th>
+                        <th class="py-2.5 px-3">পুরস্কার</th>
+                        <th class="py-2.5 px-3 text-right">সিদ্ধান্ত</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for s in submitted %}
+                    <tr class="hover:bg-slate-50/50 transition">
+                        <td class="py-3 px-3">
+                            <span class="font-bold text-slate-900 block">{{ s.users.name }}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">{{ s.users.email }}</span>
+                        </td>
+                        <td class="py-3 px-3 font-mono font-bold text-sky-600 text-xs">
+                            {{ s.submitted_email }}
+                        </td>
+                        <td class="py-3 px-3 font-mono font-bold text-rose-500 text-xs">
+                            {{ s.password }}
+                        </td>
+                        <td class="py-3 px-3 font-black text-emerald-600">
+                            ৳ {{ "%.2f"|format(s.price) }}
+                        </td>
+                        <td class="py-3 px-3 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                <form action="/admin/gmail/{{ s.id }}/approve" method="POST">
+                                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-3 py-1.5 rounded-xl text-xs transition shadow-sm">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form action="/admin/gmail/{{ s.id }}/reject" method="POST" onsubmit="return confirm('রিজেক্ট করতে চান? কাজটি আবার সবার জন্য লাইভ হয়ে যাবে।');">
+                                    <button type="submit" class="bg-rose-50 hover:bg-rose-100 text-rose-600 font-extrabold px-3 py-1.5 rounded-xl text-xs transition border border-rose-100">
+                                        Reject
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="py-8 text-center text-slate-400">রিভিউ করার মতো কোনো জিমেইল জমা নেই।</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. CREATE NEW GMAIL TASK FORM & ALL TASKS LIST -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Create Task Form -->
+        <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4 h-fit">
+            <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-plus-circle text-[#E11D48]"></i> নতুন জিমেইল টাস্ক তৈরি
+            </h3>
+
+            <form action="/admin/gmail" method="POST" class="space-y-3.5 text-xs">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1 ml-1">First Name (নাম)</label>
+                    <input type="text" name="first_name" required placeholder="যেমন: Alex বা John" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 font-bold outline-none focus:border-[#E11D48] bg-slate-50/50">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1 ml-1">Email Prefix (প্রস্তাবিত ইউজারনেম)</label>
+                    <input type="text" name="email_prefix" required placeholder="যেমন: alex.dev.88" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 font-mono outline-none focus:border-[#E11D48] bg-slate-50/50">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1 ml-1">Password (যে পাসওয়ার্ড দিতে হবে)</label>
+                    <input type="text" name="password" required placeholder="যেমন: Pass@123456" 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 font-mono outline-none focus:border-[#E11D48] bg-slate-50/50">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-600 uppercase mb-1 ml-1">পুরস্কারের টাকা (Price ৳)</label>
+                    <input type="number" step="0.5" name="price" value="8.00" required 
+                        class="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-slate-900 font-black outline-none focus:border-[#E11D48] bg-slate-50/50">
+                </div>
+
+                <button type="submit" 
+                    class="w-full bg-[#E11D48] hover:bg-[#BE123C] text-white font-black text-xs py-3.5 rounded-xl transition shadow-md shadow-rose-500/25">
+                    + টাস্ক প্রকাশ করুন
+                </button>
+            </form>
+        </div>
+
+        <!-- All Tasks Monitor -->
+        <div class="lg:col-span-2 bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4">
+            <h3 class="text-sm font-black text-slate-900">সকল জিমেইল টাস্কের লাইভ স্ট্যাটাস</h3>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="border-b border-slate-100 text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                            <th class="py-2.5 px-3">নাম ও প্রেফিক্স</th>
+                            <th class="py-2.5 px-3">পাসওয়ার্ড</th>
+                            <th class="py-2.5 px-3">টাকা</th>
+                            <th class="py-2.5 px-3">স্ট্যাটাস</th>
+                            <th class="py-2.5 px-3 text-right">ডিলিট</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for t in all_tasks %}
+                        <tr class="hover:bg-slate-50/50 transition">
+                            <td class="py-3 px-3">
+                                <span class="font-bold text-slate-900 block">{{ t.first_name }}</span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ t.email_prefix }}</span>
+                            </td>
+                            <td class="py-3 px-3 font-mono text-slate-600">{{ t.password }}</td>
+                            <td class="py-3 px-3 font-black text-emerald-600">৳ {{ "%.2f"|format(t.price) }}</td>
+                            <td class="py-3 px-3">
+                                {% if t.status == 'available' %}
+                                    <span class="text-[9px] font-black bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">Available</span>
+                                {% elif t.status == 'locked' %}
+                                    <span class="text-[9px] font-black bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full border border-amber-100">Locked (User #{{ t.locked_by }})</span>
+                                {% elif t.status == 'submitted' %}
+                                    <span class="text-[9px] font-black bg-sky-50 text-sky-600 px-2 py-0.5 rounded-full border border-sky-100">Submitted</span>
+                                {% else %}
+                                    <span class="text-[9px] font-black bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">Completed</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-3 text-right">
+                                <form action="/admin/gmail/{{ t.id }}/delete" method="POST" onsubmit="return confirm('টাস্কটি ডিলিট করতে চান?');">
+                                    <button type="submit" class="text-rose-500 hover:text-rose-700 font-bold p-1">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="py-8 text-center text-slate-400">কোনো টাস্ক তৈরি করা হয়নি।</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
