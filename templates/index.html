@@ -5,7 +5,7 @@
     .real-input-box {
         background: #ffffff;
         border: 1.5px solid #cbd5e1;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.25s ease-in-out;
     }
     .real-input-box:focus-within {
         border-color: #E11D48;
@@ -48,42 +48,65 @@
 
     <!-- 3. Form Heading -->
     <div class="space-y-0.5 text-left px-1">
-        <h1 class="text-xl font-black text-slate-900 tracking-tight">অ্যাকাউন্টে প্রবেশ করুন</h1>
-        <p class="text-xs text-slate-400 font-medium">আপনার রেজিস্টার্ড ইমেইল ও পাসওয়ার্ড প্রদান করুন</p>
+        <h1 class="text-xl font-black text-slate-900 tracking-tight">নতুন অ্যাকাউন্ট খুলুন</h1>
+        <p class="text-xs text-slate-400 font-medium">নিচের তথ্যগুলো দিয়ে আপনার ফ্রি অ্যাকাউন্ট সম্পন্ন করুন</p>
     </div>
 
     <!-- 4. REAL VISIBLE INPUT BOXES -->
-    <form action="/login" method="POST" onsubmit="return validateGmailForm('loginEmail')" class="space-y-3 pt-1">
-        
+    <form action="/register" method="POST" onsubmit="return validateGmailForm('regEmail')" class="space-y-3 pt-1">
+        <input type="hidden" name="device_id">
+
+        <!-- Name Input -->
+        <div class="space-y-1">
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider ml-1">আপনার পূর্ণ নাম</label>
+            <div class="real-input-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5">
+                <i class="fa-solid fa-user text-slate-400 text-xs w-4 text-center"></i>
+                <input type="text" id="regName" name="name" required placeholder="আপনার নাম লিখুন..." 
+                       class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder-slate-400">
+            </div>
+        </div>
+
         <!-- Email Input -->
         <div class="space-y-1">
             <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider ml-1">ইমেইল অ্যাড্রেস</label>
             <div class="real-input-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5">
                 <i class="fa-solid fa-envelope text-slate-400 text-xs w-4 text-center"></i>
-                <input type="email" id="loginEmail" name="email" required placeholder="user@gmail.com" 
+                <input type="email" id="regEmail" name="email" required placeholder="user@gmail.com" 
                        class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder-slate-400">
             </div>
         </div>
 
         <!-- Password Input with Show/Hide Toggle -->
         <div class="space-y-1">
-            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider ml-1">পাসওয়ার্ড</label>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider ml-1">পাসওয়ার্ড তৈরি করুন</label>
             <div class="real-input-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5 relative">
                 <i class="fa-solid fa-lock text-slate-400 text-xs w-4 text-center"></i>
-                <input type="password" id="loginPassInput" name="password" required placeholder="••••••••" 
+                <input type="password" id="regPassInput" name="password" required placeholder="••••••••" 
                        class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder-slate-400 pr-8">
                 
-                <button type="button" onclick="togglePass('loginPassInput', 'loginEyeIcon')" 
+                <button type="button" onclick="togglePass('regPassInput', 'regEyeIcon')" 
                         class="absolute right-3.5 text-slate-400 hover:text-slate-600 p-1">
-                    <i id="loginEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
+                    <i id="regEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
                 </button>
+            </div>
+        </div>
+
+        <!-- Referral Code Input (Optional) -->
+        <div class="space-y-1">
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider ml-1">
+                রেফারেল কোড <span class="text-rose-600">(ঐচ্ছিক - ৳১০০ বোনাস)</span>
+            </label>
+            <div class="real-input-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5">
+                <i class="fa-solid fa-gift text-rose-500 text-xs w-4 text-center"></i>
+                <input type="text" name="ref_by" id="refField" placeholder="রেফার কোড থাকলে দিন..." 
+                       class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder-slate-400">
             </div>
         </div>
 
         <!-- Submit Button -->
         <button type="submit" 
                 class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] text-white font-black text-xs sm:text-sm py-3.5 px-6 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition duration-200 mt-2">
-            <span>লগইন করুন</span>
+            <span>অ্যাকাউন্ট খুলুন (এগিয়ে যান)</span>
             <i class="fa-solid fa-arrow-right text-xs"></i>
         </button>
     </form>
@@ -91,29 +114,63 @@
     <!-- 5. Password/Account Issue Direct Help Box -->
     <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
         <span class="text-[11px] font-bold text-slate-600 block">
-            <i class="fa-solid fa-key text-amber-500 mr-1"></i> পাসওয়ার্ড বা একাউন্ট সংক্রান্ত সমস্যা?
+            <i class="fa-solid fa-circle-question text-sky-500 mr-1"></i> একাউন্ট খুলতে কোনো সমস্যা হচ্ছে?
         </span>
         <a href="https://t.me/micro_earnx" target="_blank" 
            class="inline-flex items-center gap-1.5 text-sky-600 hover:text-sky-700 text-xs font-black transition">
             <i class="fa-brands fa-telegram text-sm"></i>
-            <span>সরাসরি হেল্পলাইনে মেসেজ দিন &raquo;</span>
+            <span>টেলিগ্রাম সাপোর্টে মেসেজ দিন &raquo;</span>
         </a>
     </div>
 
-    <!-- 6. Switch to Registration Link -->
+    <!-- 6. Switch to Login Link -->
     <div class="text-center pt-2">
         <p class="text-xs text-slate-500 font-medium">
-            অ্যাকাউন্ট নেই? 
-            <a href="/" class="text-[#E11D48] font-black hover:underline ml-1">
-                নতুন একাউন্ট খুলুন &raquo;
+            ইতিমধ্যে অ্যাকাউন্ট আছে? 
+            <a href="/login" class="text-[#E11D48] font-black hover:underline ml-1">
+                লগইন করুন &raquo;
             </a>
         </p>
     </div>
 
 </div>
 
+<!-- POPUP MODAL: EMAIL NOT FOUND -->
+<div id="emailNotFoundModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="w-full max-w-xs bg-white rounded-[32px] p-6 shadow-2xl border border-rose-50 text-center space-y-4 transform scale-90 transition-transform duration-300" id="notFoundCard">
+        
+        <div class="w-12 h-12 mx-auto rounded-2xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-xl shadow-sm animate-bounce">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+
+        <div class="space-y-1">
+            <h3 class="text-sm font-black text-slate-900">অ্যাকাউন্ট পাওয়া যায়নি!</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                এই ইমেইলে কোনো অ্যাকাউন্ট নেই। আপনি কি নতুন একটি অ্যাকাউন্ট খুলতে চান?
+            </p>
+            <span id="notFoundEmailTag" class="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-lg inline-block truncate max-w-[200px]">
+                user@gmail.com
+            </span>
+        </div>
+
+        <div class="space-y-2 pt-1">
+            <button onclick="confirmAutofillEmail()" 
+                    class="w-full bg-[#E11D48] hover:bg-[#BE123C] text-white font-black text-xs py-3 px-4 rounded-xl shadow-md transition">
+                Yes, অ্যাকাউন্ট খুলতে চাই
+            </button>
+            <button onclick="closeNotFoundModal()" 
+                    class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs py-2 rounded-xl transition">
+                না, বাতিল
+            </button>
+        </div>
+
+    </div>
+</div>
+
 <!-- SCRIPT -->
 <script>
+let pendingEmail = "";
+
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
@@ -135,5 +192,48 @@ function validateGmailForm(emailId) {
     }
     return true;
 }
+
+function openNotFoundModal(email) {
+    pendingEmail = email;
+    document.getElementById('notFoundEmailTag').innerText = email;
+    const modal = document.getElementById('emailNotFoundModal');
+    const card = document.getElementById('notFoundCard');
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modal.classList.add('opacity-100');
+    card.classList.remove('scale-90');
+    card.classList.add('scale-100');
+}
+
+function closeNotFoundModal() {
+    const modal = document.getElementById('emailNotFoundModal');
+    const card = document.getElementById('notFoundCard');
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100');
+    card.classList.add('scale-95');
+    card.classList.remove('scale-100');
+}
+
+function confirmAutofillEmail() {
+    closeNotFoundModal();
+    if (pendingEmail) {
+        document.getElementById('regEmail').value = pendingEmail;
+        document.getElementById('regName').focus();
+    }
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const notFoundEmail = urlParams.get('not_found_email');
+    if (notFoundEmail) {
+        openNotFoundModal(notFoundEmail);
+    }
+
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+        const refInput = document.getElementById('refField');
+        if (refInput) refInput.value = refCode;
+    }
+});
 </script>
 {% endblock %}
