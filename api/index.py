@@ -88,6 +88,14 @@ def handle_global_error(e):
         content="সার্ভারে সাময়িক চাপ রয়েছে। অনুগ্রহ করে রিলোড দিন।"
     ), 200
 
+# গ্লোবাল রেফারেল ট্র্যাকার (ইউজার যে পেজেই যাক রেফার কোড নষ্ট হবে না)
+@app.before_request
+def capture_global_referral_and_session():
+    session.permanent = True
+    ref = request.args.get('ref')
+    if ref:
+        session['cached_ref'] = ref.strip().upper()
+        
 # ==========================================================
 # Authentication Guards (Decorators)
 # ==========================================================
@@ -300,61 +308,65 @@ def help_vote():
 
     return jsonify({"success": True, "message": "ভোট সফলভাবে জমা হয়েছে!"})
     
-
 @app.route('/register', methods=['POST'])
 def register():
     sb = get_supabase()
     name = request.form.get('name', '').strip()
     email = request.form.get('email', '').strip().lower()
     password = request.form.get('password', '')
-    ref_by = request.form.get('ref_by', '').strip()
+    
+    # ফর্ম অথবা সেশন থেকে রেফারেল কোড নেওয়া (বড়-ছোট হাতের যেকোনো অক্ষর সমর্থন করবে)
+    ref_by = request.form.get('ref_by', '').strip().upper() or session.get('cached_ref', '')
     device_id = request.form.get('device_id', '').strip()
 
-    if not name or not email or not password or not device_id:
+    if not name or not email or not password:
         flash("সবগুলো তথ্য সঠিকভাবে পূরণ করুন!", "danger")
         return redirect(url_for('index'))
 
-    # /register রাউটের ভেতর
+    # শুধুমাত্র জিমেইল গ্রহণযোগ্য
     if not email.endswith('@gmail.com'):
-        flash("অনুগ্রহ করে একটি সঠিক ও বৈধ ইমেইল প্রদান করুন!", "danger")
-        return redirect(url_for('index'))
-    
-    # শর্ত: ১ ডিভাইসে কেবল ১টি অ্যাকাউন্ট
-    existing_device = sb.table('users').select('id').eq('device_id', device_id).execute().data
-    if existing_device:
-        flash("এই ডিভাইস থেকে ইতিমধ্যে একটি অ্যাকাউন্ট খোলা হয়েছে! নতুন অ্যাকাউন্ট খোলা যাবে না।", "danger")
+        flash("অনুগ্রহ করে একটি সঠিক ও বৈধ ইমেইল অ্যাড্রেস প্রদান করুন!", "danger")
         return redirect(url_for('index'))
 
-    # ইমেইল চেক
+    # ১ ডিভাইসে একাধিক অ্যাকাউন্ট ব্লক (যদি ডিভাইস টোকেন থাকে)
+    if device_id:
+        existing_device = sb.table('users').select('id').eq('device_id', device_id).execute().data
+        if existing_device:
+            flash("এই ডিভাইস থেকে ইতিমধ্যে একটি অ্যাকাউন্ট খোলা হয়েছে!", "danger")
+            return redirect(url_for('index'))
+
+    # ইমেইল ডুপ্লিকেট চেক
     existing_email = sb.table('users').select('id').eq('email', email).execute().data
     if existing_email:
         flash("এই ইমেইল দিয়ে ইতিমধ্যে অ্যাকাউন্ট তৈরি করা আছে!", "danger")
         return redirect(url_for('index'))
 
-    ref_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-    initial_balance = 50.00  # সরাসরি সাইন-আপ বোনাস
+    # নতুন ইউজারের জন্য নিজস্ব ইউনিক রেফার কোড
+    my_ref_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    initial_balance = 50.00  # সরাসরি সাইন-আপে ৫০ টাকা
 
-    # রেফারেল সিস্টেম ভ্যালিডেশন
+    # রেফারেল বোনাস লজিক
     valid_referrer = None
     if ref_by:
-        referrer_res = sb.table('users').select('*').eq('referral_code', ref_by).execute().data
+        # কেস-ইনসেনসিটিভ সার্চ (ছোট-বড় যেকোনো অক্ষরে কাজ করবে)
+        referrer_res = sb.table('users').select('*').ilike('referral_code', ref_by).execute().data
         if referrer_res:
-            referrer = referrer_res[0]
-            # একই ডিভাইসে সেলফ-রেফার ব্লক
-            if referrer['device_id'] != device_id:
-                valid_referrer = referrer
-                initial_balance = 100.00  # রেফারে জয়েন করলে ১০০ টাকা
-                # রেফারার পাবে ১৫ টাকা
-                sb.table('users').update({
-                    'balance': float(referrer['balance']) + 15.00
-                }).eq('id', referrer['id']).execute()
+            ref_user = referrer_res[0]
+            # নিজের অ্যাকাউন্টে নিজে রেফার করা ব্লক
+            if ref_user['email'] != email and ref_user.get('device_id') != device_id:
+                valid_referrer = ref_user
+                initial_balance = 100.00  # রেফারে জয়েন করায় ১০০ টাকা বোনাস
+
+                # রেফারারকে সরাসরি ১৫ টাকা দেওয়া
+                new_ref_bal = float(ref_user['balance']) + 15.00
+                sb.table('users').update({'balance': new_ref_bal}).eq('id', ref_user['id']).execute()
 
     new_user = {
         'name': name,
         'email': email,
         'password_hash': generate_password_hash(password),
-        'device_id': device_id,
-        'referral_code': ref_code,
+        'device_id': device_id if device_id else 'DEV-' + ''.join(random.choices(string.hexdigits, k=16)).upper(),
+        'referral_code': my_ref_code,
         'referred_by': valid_referrer['referral_code'] if valid_referrer else None,
         'balance': initial_balance
     }
@@ -365,12 +377,14 @@ def register():
             session.permanent = True
             session['user_id'] = inserted.data[0]['id']
             session['user_name'] = name
+            session.pop('cached_ref', None) # ক্লিয়ার সেশন
             flash(f"অভিনন্দন! আপনি ৳{initial_balance:.2f} জয়েনিং বোনাস পেয়েছেন।", "success")
             return redirect(url_for('dashboard'))
-    except Exception:
-        flash("রেজিস্ট্রেশন ব্যর্থ হয়েছে। পরে চেষ্টা করুন।", "danger")
+    except Exception as e:
+        flash("রেজিস্ট্রেশন ত্রুটি, অনুগ্রহ করে পুনরায় চেষ্টা করুন।", "danger")
         
     return redirect(url_for('index'))
+    
 # ==========================================================
 # ADMIN USER PASSWORD RESET & CARD GENERATOR (/admin/pass)
 # ==========================================================
