@@ -1,115 +1,118 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* bKash Signature Flat Input Styling */
-    .bkash-input-group {
-        background: #f8fafc;
-        border-bottom: 2px solid #e2e8f0;
-        transition: all 0.25s ease;
-    }
-    .bkash-input-group:focus-within {
+    /* Premium Real Input Box Styling */
+    .real-input-box {
         background: #ffffff;
-        border-bottom-color: #E11D48;
-        box-shadow: 0 4px 12px -2px rgba(225, 29, 72, 0.08);
+        border: 1.5px solid #cbd5e1;
+        transition: all 0.2s ease-in-out;
     }
+    .real-input-box:focus-within {
+        border-color: #E11D48;
+        box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.1);
+        background: #ffffff;
+    }
+    /* Hide blurry halo on auth screens */
+    .neon-aura-ring { display: none !important; }
+    .x-letter-glow { color: #E11D48 !important; text-shadow: none !important; }
 </style>
 
-<div class="max-w-md mx-auto min-h-[85vh] flex flex-col justify-between py-4 px-2 sm:px-4">
+<div class="max-w-sm mx-auto py-2 px-2 space-y-4">
 
-    <!-- Top Content Area -->
-    <div class="space-y-6">
-
-        <!-- bKash Style Brand Top Header -->
-        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-            <div class="flex items-center gap-2.5">
-                <div class="w-11 h-11 rounded-full border-2 border-rose-200 p-0.5 bg-white shadow-sm overflow-hidden flex items-center justify-center shrink-0">
-                    <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" alt="Logo" class="w-full h-full object-cover rounded-full">
-                </div>
-                <div>
-                    <div class="flex items-center">
-                        <span class="font-black text-slate-900 text-lg tracking-tight">MicroEarn</span>
-                        <div class="neon-x-wrapper">
-                            <span class="neon-aura-ring"></span>
-                            <span class="x-letter-glow">X</span>
-                        </div>
-                    </div>
-                    <span class="text-[10px] text-slate-400 font-bold block">অফিসিয়াল আর্নিং প্ল্যাটফর্ম</span>
-                </div>
-            </div>
-
-            <a href="/" class="text-xs font-black text-slate-600 bg-slate-100 px-3.5 py-1.5 rounded-full hover:bg-slate-200 transition">
-                নতুন একাউন্ট &raquo;
-            </a>
+    <!-- 1. Clean Brand Header (NO BLURRY RED GLOW) -->
+    <div class="text-center space-y-1">
+        <div class="w-12 h-12 mx-auto rounded-full border-2 border-rose-200 p-0.5 bg-white shadow-sm overflow-hidden flex items-center justify-center">
+            <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" alt="Logo" class="w-full h-full object-cover rounded-full">
         </div>
+        <div class="flex items-center justify-center gap-0.5 pt-1 select-none">
+            <span class="font-black text-slate-900 text-lg tracking-tight">MicroEarn</span>
+            <span class="font-black text-[#E11D48] text-xl">X</span>
+            <span class="text-amber-500 text-sm ml-0.5">⚡</span>
+        </div>
+    </div>
 
-        <!-- Headline Typography -->
+    <!-- 2. Video Guide Banner -->
+    <a href="/tutorial" 
+       class="flex items-center justify-between p-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-600 text-white rounded-2xl shadow-sm hover:scale-[1.01] active:scale-95 transition-all">
+        <div class="flex items-center gap-2.5">
+            <div class="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-play"></i>
+            </div>
+            <div class="text-left leading-tight">
+                <span class="text-xs font-black block">কাজের ভিডিও টিউটোরিয়াল দেখুন</span>
+                <span class="text-[9px] text-blue-100 opacity-90">কীভাবে কাজ করবেন তা ১ মিনিটে শিখে নিন</span>
+            </div>
+        </div>
+        <i class="fa-solid fa-chevron-right text-xs opacity-75 mr-1"></i>
+    </a>
+
+    <!-- 3. Form Heading -->
+    <div class="space-y-0.5 text-left px-1">
+        <h1 class="text-xl font-black text-slate-900 tracking-tight">অ্যাকাউন্টে প্রবেশ করুন</h1>
+        <p class="text-xs text-slate-400 font-medium">আপনার রেজিস্টার্ড ইমেইল ও পাসওয়ার্ড প্রদান করুন</p>
+    </div>
+
+    <!-- 4. REAL VISIBLE INPUT BOXES -->
+    <form action="/login" method="POST" onsubmit="return validateGmailForm('loginEmail')" class="space-y-3 pt-1">
+        
+        <!-- Email Input -->
         <div class="space-y-1">
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">অ্যাকাউন্টে প্রবেশ করুন</h1>
-            <p class="text-xs text-slate-400 font-medium">আপনার রেজিস্টার্ড ইমেইল ও পাসওয়ার্ড প্রদান করুন</p>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider ml-1">ইমেইল অ্যাড্রেস</label>
+            <div class="real-input-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5">
+                <i class="fa-solid fa-envelope text-slate-400 text-xs w-4 text-center"></i>
+                <input type="email" id="loginEmail" name="email" required placeholder="user@gmail.com" 
+                       class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder-slate-400">
+            </div>
         </div>
 
-        <!-- ================= BKASH STYLE FLAT LOGIN FORM ================= -->
-        <form action="/login" method="POST" onsubmit="return validateGmailForm('loginEmail')" class="space-y-4 pt-1">
-            
-            <!-- 1. Email Input -->
-            <div class="bkash-input-group rounded-2xl px-4 py-2.5 flex items-center gap-3">
-                <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-xs shrink-0">
-                    <i class="fa-solid fa-envelope"></i>
-                </div>
-                <div class="flex-1">
-                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">ইমেইল অ্যাড্রেস</label>
-                    <input type="email" id="loginEmail" name="email" required placeholder="user@gmail.com" 
-                           class="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none placeholder-slate-400 py-0.5">
-                </div>
-            </div>
-
-            <!-- 2. Password Input with Show/Hide Toggle -->
-            <div class="bkash-input-group rounded-2xl px-4 py-2.5 flex items-center gap-3 relative">
-                <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-xs shrink-0">
-                    <i class="fa-solid fa-lock"></i>
-                </div>
-                <div class="flex-1 pr-8">
-                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">পাসওয়ার্ড</label>
-                    <input type="password" id="loginPassInput" name="password" required placeholder="••••••••" 
-                           class="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none placeholder-slate-400 py-0.5">
-                </div>
+        <!-- Password Input with Show/Hide Toggle -->
+        <div class="space-y-1">
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider ml-1">পাসওয়ার্ড</label>
+            <div class="real-input-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5 relative">
+                <i class="fa-solid fa-lock text-slate-400 text-xs w-4 text-center"></i>
+                <input type="password" id="loginPassInput" name="password" required placeholder="••••••••" 
+                       class="w-full bg-transparent text-xs font-bold text-slate-900 focus:outline-none placeholder-slate-400 pr-8">
+                
                 <button type="button" onclick="togglePass('loginPassInput', 'loginEyeIcon')" 
-                        class="absolute right-4 text-slate-400 hover:text-slate-600 p-1">
+                        class="absolute right-3.5 text-slate-400 hover:text-slate-600 p-1">
                     <i id="loginEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
                 </button>
             </div>
+        </div>
 
-            <!-- bKash Signature Forward Action Button -->
-            <div class="pt-4">
-                <button type="submit" 
-                        class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] text-white font-black text-sm py-4 px-6 rounded-2xl shadow-xl shadow-rose-500/25 flex items-center justify-between transition duration-200">
-                    <span>লগইন করুন</span>
-                    <i class="fa-solid fa-arrow-right text-sm"></i>
-                </button>
-            </div>
-        </form>
+        <!-- Submit Button -->
+        <button type="submit" 
+                class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] text-white font-black text-xs sm:text-sm py-3.5 px-6 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 transition duration-200 mt-2">
+            <span>লগইন করুন</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+    </form>
 
+    <!-- 5. Password/Account Issue Direct Help Box -->
+    <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
+        <span class="text-[11px] font-bold text-slate-600 block">
+            <i class="fa-solid fa-key text-amber-500 mr-1"></i> পাসওয়ার্ড বা একাউন্ট সংক্রান্ত সমস্যা?
+        </span>
+        <a href="https://t.me/micro_earnx" target="_blank" 
+           class="inline-flex items-center gap-1.5 text-sky-600 hover:text-sky-700 text-xs font-black transition">
+            <i class="fa-brands fa-telegram text-sm"></i>
+            <span>সরাসরি হেল্পলাইনে মেসেজ দিন &raquo;</span>
+        </a>
     </div>
 
-    <!-- Bottom Switch Link & Support -->
-    <div class="text-center pt-6 space-y-3">
+    <!-- 6. Switch to Registration Link -->
+    <div class="text-center pt-2">
         <p class="text-xs text-slate-500 font-medium">
             অ্যাকাউন্ট নেই? 
             <a href="/" class="text-[#E11D48] font-black hover:underline ml-1">
-                নতুন অ্যাকাউন্ট খুলুন &raquo;
+                নতুন একাউন্ট খুলুন &raquo;
             </a>
         </p>
-
-        <a href="https://t.me/your_support_channel" target="_blank" 
-           class="inline-flex items-center gap-2 text-slate-400 hover:text-slate-600 text-xs font-bold transition">
-            <i class="fa-brands fa-telegram text-sky-500 text-sm"></i>
-            <span>সাহায্য প্রয়োজন? টেলিগ্রাম সাপোর্ট</span>
-        </a>
     </div>
 
 </div>
 
-<!-- JAVASCRIPT CONTROLLERS -->
+<!-- SCRIPT -->
 <script>
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
