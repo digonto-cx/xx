@@ -20,11 +20,11 @@
         </div>
         <div class="text-xs text-amber-950 leading-relaxed">
             <strong class="block text-amber-900 font-black mb-0.5">⚠️ কঠোর সতর্কতা ও নিয়ম:</strong>
-            জিমেইল তৈরির সময় <strong>কোনো Recovery Email বা ফোন নম্বর যোগ করবেন না</strong>! কাজ লক করার পর <strong>২ ঘণ্টার মধ্যে</strong> তৈরি করে সাবমিট করতে হবে।
+            জিমেইল তৈরির সময় <strong>কোনো Recovery Email বা ফোন নম্বর যোগ করবেন না</strong>! কাজ লক করার পর <strong>২ ঘণ্টার মধ্যে</strong> তৈরি করে নিচে সাবমিট বাটনে চাপ দিন।
         </div>
     </div>
 
-    <!-- ================= 1. ACTIVE LOCKED WORKSTATION (IF USER HAS LOCKED A TASK) ================= -->
+    <!-- ================= 1. ACTIVE LOCKED WORKSTATION ================= -->
     {% if active_task %}
     <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-[32px] p-6 sm:p-7 text-white shadow-2xl border border-rose-500/40 space-y-5">
         
@@ -46,13 +46,13 @@
         <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-2">
             <i class="fa-solid fa-clock-rotate-left text-amber-400 text-3xl mb-1 block"></i>
             <h4 class="text-sm font-bold text-white">জিমেইলটি পর্যালোচনায় রয়েছে!</h4>
-            <p class="text-xs text-slate-400 font-mono">{{ active_task.submitted_email }}</p>
-            <p class="text-[11px] text-slate-500">অ্যাডমিন পাসওয়ার্ড ও ডাটা চেক করে আপনার অ্যাকাউন্টে টাকা যোগ করে দেবে।</p>
+            <p class="text-xs text-emerald-400 font-mono font-bold">{{ active_task.email_prefix }}@gmail.com</p>
+            <p class="text-[11px] text-slate-400">অ্যাডমিন পাসওয়ার্ড ও ডাটা চেক করে আপনার অ্যাকাউন্টে টাকা যোগ করে দেবে।</p>
         </div>
         {% else %}
         <!-- Active Doing State (Credentials to Copy) -->
         <div class="space-y-3">
-            <p class="text-xs text-slate-300">নিচের তথ্যগুলো হুবহু ব্যবহার করে জিমেইল তৈরি করুন:</p>
+            <p class="text-xs text-slate-300">নিচের তথ্যগুলো কপি করে নিয়ে জিমেইলটি তৈরি করুন:</p>
 
             <!-- Credential 1: First Name -->
             <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
@@ -87,27 +87,17 @@
                 </button>
             </div>
 
-            <!-- Submit Form -->
-            <form action="/gmail/submit/{{ active_task.id }}" method="POST" class="pt-2 space-y-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                        তৈরিকৃত পুরো জিমেইল অ্যাড্রেসটি লিখুন:
-                    </label>
-                    <input type="email" name="submitted_email" required placeholder="example@gmail.com" 
-                        class="w-full px-4 py-3 rounded-2xl border border-slate-700 bg-slate-900 text-xs text-white focus:outline-none focus:border-[#E11D48] font-mono">
-                </div>
-
-                <div class="flex items-center gap-2 pt-1">
-                    <button type="submit" 
-                        class="flex-1 bg-[#E11D48] hover:bg-[#BE123C] text-white font-black text-xs py-3.5 px-4 rounded-2xl transition shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-check text-xs"></i>
-                        <span>কাজ শেষ! সাবমিট করুন</span>
-                    </button>
-                </div>
+            <!-- 1-Click Done / Submit Action Form (No Input Box) -->
+            <form action="/gmail/submit/{{ active_task.id }}" method="POST" class="pt-3 space-y-2">
+                <button type="submit" 
+                    class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs sm:text-sm py-4 px-4 rounded-2xl transition shadow-xl shadow-rose-500/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-check text-sm"></i>
+                    <span>জিমেইল তৈরি শেষ! সাবমিট করুন (Done)</span>
+                </button>
             </form>
 
             <!-- Cancel Button -->
-            <form action="/gmail/cancel/{{ active_task.id }}" method="POST" onsubmit="return confirm('কাজটি ছেড়ে দিতে চান? এটি সবার জন্য উন্মুক্ত হয়ে যাবে।');">
+            <form action="/gmail/cancel/{{ active_task.id }}" method="POST" onsubmit="return confirm('কাজটি ছেড়ে দিতে চান? এটি সবার জন্য আবার উন্মুক্ত হয়ে যাবে।');">
                 <button type="submit" class="w-full text-center text-[10px] text-slate-400 hover:text-rose-400 py-1 transition">
                     কাজটি করতে পারছি না (ছেড়ে দিন)
                 </button>
@@ -142,7 +132,7 @@
                             </span>
                         </div>
                         <span class="text-[11px] text-slate-500 block">নাম: <strong>{{ t.first_name }}</strong></span>
-                        <span class="text-[10px] text-slate-400 font-mono">{{ t.email_prefix }}...</span>
+                        <span class="text-[10px] text-slate-400 font-mono">{{ t.email_prefix }}@...</span>
                     </div>
                 </div>
 
