@@ -100,6 +100,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+    
 # ==========================================================
 # STRICT ADMIN SECURITY (ONLY admin@gmail.com PERMITTED)
 # ==========================================================
@@ -126,6 +127,7 @@ def admin_required(f):
     return decorated_function
 
 
+    
     
 # ==========================================================
 # ImgBB Failover Engine (Multi-Key Support)
@@ -183,6 +185,7 @@ def index():
 @app.route('/about')
 def about_page():
     return render_template('about.html')
+
     
 # ==========================================================
 # SPONSORSHIP & PARTNER PROGRAM CONTROLLER
@@ -455,7 +458,8 @@ def admin_user_check():
         withdrawals=withdrawals,
         stats=stats
         )
-    
+
+
 @app.route('/login', methods=['POST'])
 def login():
     sb = get_supabase()
