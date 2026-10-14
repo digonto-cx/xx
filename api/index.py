@@ -378,6 +378,83 @@ def admin_change_password():
         search_q=search_q, 
         reset_data=reset_data
         )
+
+# ==========================================================
+# ADMIN USER ID INVESTIGATION & FULL AUDIT (/admin/check)
+# ==========================================================
+@app.route('/admin/check')
+@admin_required
+def admin_user_check():
+    sb = get_supabase()
+    q = request.args.get('q', '').strip()
+    
+    target_user = None
+    referrer = None
+    referred_members = []
+    task_subs = []
+    withdrawals = []
+    stats = {}
+
+    if q:
+        # ১. UID (সংখ্যা), Email বা Referral Code দিয়ে ইউজার খোঁজা
+        if q.isdigit():
+            res = sb.table('users').select('*').eq('id', int(q)).execute().data
+            if res: target_user = res[0]
+            
+        if not target_user:
+            res = sb.table('users').select('*').eq('email', q.lower()).execute().data
+            if res: target_user = res[0]
+            
+        if not target_user:
+            res = sb.table('users').select('*').eq('referral_code', q.upper()).execute().data
+            if res: target_user = res[0]
+
+        # ২. ইউজার পাওয়া গেলে তার সব ডাটা বের করা
+        if target_user:
+            u_id = target_user['id']
+            ref_code = target_user['referral_code']
+
+            # ক) এই ইউজারকে কে রেফার করেছে (Referrer)
+            if target_user.get('referred_by'):
+                ref_res = sb.table('users').select('id, name, email, referral_code').eq('referral_code', target_user['referred_by']).execute().data
+                if ref_res: referrer = ref_res[0]
+
+            # খ) এই ইউজারের রেফার করা সব মেম্বার ও তাদের বর্তমান ব্যালেন্স
+            referred_members = sb.table('users').select('id, name, email, balance, is_banned, created_at') \
+                .eq('referred_by', ref_code).order('id', desc=True).execute().data or []
+
+            # গ) টাস্ক সাবমিশন হিস্ট্রি
+            task_subs = sb.table('submissions').select('*, tasks(title, amount)') \
+                .eq('user_id', u_id).order('id', desc=True).execute().data or []
+
+            # ঘ) উইথড্রয়াল হিস্ট্রি (রিজেক্ট সহ)
+            withdrawals = sb.table('withdrawals').select('*') \
+                .eq('user_id', u_id).order('id', desc=True).execute().data or []
+
+            # ঙ) সামারি ও অ্যাক্টিভিটি হিসাব
+            total_ref_balance = sum(float(m.get('balance', 0)) for m in referred_members)
+            rejected_withdraws = sum(1 for w in withdrawals if w.get('status') == 'rejected')
+            approved_withdraws = sum(1 for w in withdrawals if w.get('status') == 'approved')
+            
+            stats = {
+                'total_ref_count': len(referred_members),
+                'total_ref_balance': total_ref_balance,
+                'rejected_withdraws': rejected_withdraws,
+                'approved_withdraws': approved_withdraws,
+                'total_tasks': len(task_subs),
+                'approved_tasks': sum(1 for t in task_subs if t.get('status') == 'approved')
+            }
+
+    return render_template(
+        'admin/check.html',
+        q=q,
+        user=target_user,
+        referrer=referrer,
+        referred_members=referred_members,
+        task_subs=task_subs,
+        withdrawals=withdrawals,
+        stats=stats
+        )
     
 @app.route('/login', methods=['POST'])
 def login():
