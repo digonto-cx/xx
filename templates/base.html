@@ -108,36 +108,6 @@
         }
     </style>
 
-    <!-- Client-Side Device Security Token & Service Worker -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            try {
-                let canvas = document.createElement('canvas');
-                let ctx = canvas.getContext('2d');
-                ctx.textBaseline = "top";
-                ctx.font = "14px 'Arial'";
-                ctx.fillText("MicroEarnX#DeviceToken", 2, 2);
-                let raw = canvas.toDataURL() + screen.width + "x" + screen.height + navigator.userAgent;
-                let hash = 0;
-                for (let i = 0; i < raw.length; i++) {
-                    hash = ((hash << 5) - hash) + raw.charCodeAt(i);
-                    hash |= 0;
-                }
-                let token = "DEV-" + Math.abs(hash).toString(16).toUpperCase();
-                let stored = localStorage.getItem('mx_device_id') || token;
-                localStorage.setItem('mx_device_id', stored);
-                document.querySelectorAll('input[name="device_id"]').forEach(input => input.value = stored);
-            } catch(e) {}
-        });
-
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js');
-            });
-        }
-    </script>
-
     <!-- Collision-Free Device Security & Referral Tracker -->
 <script>
     (function initUniqueDeviceAndReferral() {
