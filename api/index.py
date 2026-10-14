@@ -604,6 +604,49 @@ def admin_gmail_approve(task_id):
     flash(f"জিমেইল অ্যাপ্রুভ হয়েছে এবং ইউজারের অ্যাকাউন্টে ৳{task['price']} যোগ হয়েছে!", "success")
     return redirect(url_for('admin_gmail'))
 
+# ==========================================================
+# ADMIN SPONSORSHIP MANAGEMENT CONTROLLER (/admin/sponsor)
+# ==========================================================
+@app.route('/admin/sponsor')
+@admin_required
+def admin_sponsors():
+    sb = get_supabase()
+    all_sponsors = sb.table('sponsors').select('*').order('id', desc=True).execute().data or []
+    
+    pending_count = sum(1 for s in all_sponsors if s.get('status') == 'pending')
+    approved_count = sum(1 for s in all_sponsors if s.get('status') == 'approved')
+
+    return render_template(
+        'admin/sponsor.html', 
+        sponsors=all_sponsors,
+        pending_count=pending_count,
+        approved_count=approved_count
+    )
+
+@app.route('/admin/sponsor/<int:sponsor_id>/approve', methods=['POST'])
+@admin_required
+def admin_sponsor_approve(sponsor_id):
+    sb = get_supabase()
+    sb.table('sponsors').update({'status': 'approved'}).eq('id', sponsor_id).execute()
+    flash("স্পনসরশিপ আবেদনটি সফলভাবে অনুমোদন (Approved) করা হয়েছে!", "success")
+    return redirect(url_for('admin_sponsors'))
+
+@app.route('/admin/sponsor/<int:sponsor_id>/reject', methods=['POST'])
+@admin_required
+def admin_sponsor_reject(sponsor_id):
+    sb = get_supabase()
+    sb.table('sponsors').update({'status': 'rejected'}).eq('id', sponsor_id).execute()
+    flash("স্পনসরশিপ আবেদনটি রিজেক্ট করা হয়েছে!", "warning")
+    return redirect(url_for('admin_sponsors'))
+
+@app.route('/admin/sponsor/<int:sponsor_id>/delete', methods=['POST'])
+@admin_required
+def admin_sponsor_delete(sponsor_id):
+    sb = get_supabase()
+    sb.table('sponsors').delete().eq('id', sponsor_id).execute()
+    flash("আবেদনটি ডাটাবেস থেকে মুছে ফেলা হয়েছে!", "success")
+    return redirect(url_for('admin_sponsors'))
+    
 @app.route('/admin/gmail/<int:task_id>/reject', methods=['POST'])
 @admin_required
 def admin_gmail_reject(task_id):
