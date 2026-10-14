@@ -1,176 +1,140 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* Card Entry Animation */
-    @keyframes card-fade-up {
-        from { opacity: 0; transform: translateY(16px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0); }
+    /* bKash Signature Flat Input Styling */
+    .bkash-input-group {
+        background: #f8fafc;
+        border-bottom: 2px solid #e2e8f0;
+        transition: all 0.25s ease;
     }
-    .animate-card-entry {
-        animation: card-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    .bkash-input-group:focus-within {
+        background: #ffffff;
+        border-bottom-color: #E11D48;
+        box-shadow: 0 4px 12px -2px rgba(225, 29, 72, 0.08);
     }
 </style>
 
-<div class="min-h-[82vh] flex flex-col items-center justify-center p-2 sm:p-4">
-    
-    <!-- Floating Card Container -->
-    <div class="w-full max-w-sm bg-white rounded-[32px] p-6 sm:p-8 shadow-2xl shadow-rose-200/50 border border-rose-50/80 flex flex-col relative overflow-hidden animate-card-entry">
-        
-        <!-- Brand Logo with Circular Border -->
-        <div class="flex justify-center mb-2">
-            <div class="w-14 h-14 rounded-full border-2 border-rose-300 p-0.5 bg-white shadow-sm flex items-center justify-center overflow-hidden">
-                <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" 
-                     alt="MicroEarnX Logo" 
-                     class="w-full h-full object-cover rounded-full">
-            </div>
-        </div>
+<div class="max-w-md mx-auto min-h-[85vh] flex flex-col justify-between py-4 px-2 sm:px-4">
 
-        <!-- Brand Name with Animated Neon X -->
-        <div class="flex items-center justify-center mb-1 select-none">
-            <span class="font-black text-slate-900 text-lg tracking-tight">MicroEarn</span>
-            <div class="neon-x-wrapper">
-                <span class="neon-aura-ring"></span>
-                <span class="x-letter-glow">X</span>
-            </div>
-            <span class="text-amber-500 text-sm ml-1">⚡</span>
-        </div>
-        
-        <p class="text-[11px] text-slate-400 text-center font-medium mb-4">
-            টাস্ক সম্পন্ন করে প্রতিদিন নিশ্চিত আয় করুন
-        </p>
+    <!-- Top Content Area -->
+    <div class="space-y-6">
 
-        <!-- ================= TUTORIAL CTA BANNER ================= -->
-        <a href="/tutorial" 
-           class="group relative overflow-hidden flex items-center justify-between p-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-600 text-white rounded-2xl shadow-md shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-300 mb-4">
+        <!-- bKash Style Brand Top Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
             <div class="flex items-center gap-2.5">
-                <div class="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center text-white text-xs group-hover:rotate-12 transition">
-                    <i class="fa-solid fa-play"></i>
+                <div class="w-11 h-11 rounded-full border-2 border-rose-200 p-0.5 bg-white shadow-sm overflow-hidden flex items-center justify-center shrink-0">
+                    <img src="https://i.ibb.co/1JbqCDHq/Add-Text-10-10-03-15-45.jpg" alt="Logo" class="w-full h-full object-cover rounded-full">
                 </div>
-                <div class="text-left leading-tight">
-                    <span class="text-xs font-black block">কাজের ভিডিও টিউটোরিয়াল</span>
-                    <span class="text-[9px] text-blue-100 opacity-90">কীভাবে কাজ করবেন তা ১ মিনিটে দেখুন</span>
+                <div>
+                    <div class="flex items-center">
+                        <span class="font-black text-slate-900 text-lg tracking-tight">MicroEarn</span>
+                        <div class="neon-x-wrapper">
+                            <span class="neon-aura-ring"></span>
+                            <span class="x-letter-glow">X</span>
+                        </div>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-bold block">অফিসিয়াল আর্নিং প্ল্যাটফর্ম</span>
                 </div>
             </div>
-            <i class="fa-solid fa-chevron-right text-xs opacity-75 group-hover:translate-x-1 transition mr-1"></i>
-        </a>
 
-        <!-- ================= 1. LOGIN FORM ================= -->
-        <div id="loginSection" class="transition-opacity duration-300 space-y-3.5">
-            
-            <!-- SWITCH TEXT PLACED ABOVE THE LOGIN FORM -->
-            <div class="p-2.5 rounded-2xl bg-rose-50/70 border border-rose-100 text-center">
-                <span class="text-xs text-slate-600 font-medium">একাউন্ট নেই?</span>
-                <button type="button" onclick="toggleAuth('register')" class="text-xs font-black text-[#E11D48] hover:underline ml-1">
-                    অ্যাকাউন্ট খুলতে এখানে ক্লিক করুন &raquo;
-                </button>
-            </div>
-
-            <h3 class="text-sm font-black text-slate-900 text-center pt-1">
-                অ্যাকাউন্টে প্রবেশ করুন
-            </h3>
-
-            <form action="/login" method="POST" onsubmit="return validateGmailForm('loginEmail')" class="space-y-3.5">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">ইমেইল অ্যাড্রেস</label>
-                    <div class="relative">
-                        <input type="email" id="loginEmail" name="email" required placeholder="user@gmail.com" 
-                            class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                        <i class="fa-regular fa-envelope absolute right-4 top-3 text-slate-400 text-xs"></i>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পাসওয়ার্ড</label>
-                    <div class="relative">
-                        <input type="password" id="loginPassInput" name="password" required placeholder="••••••••" 
-                            class="w-full px-4 py-2.5 pr-10 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                        
-                        <button type="button" onclick="togglePass('loginPassInput', 'loginEyeIcon')" 
-                                class="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 transition p-0.5">
-                            <i id="loginEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-2">
-                    <span>লগইন করুন</span>
-                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- ================= 2. REGISTRATION FORM ================= -->
-        <div id="registerSection" class="hidden transition-opacity duration-300 space-y-3.5">
-            
-            <!-- SWITCH TEXT PLACED ABOVE REGISTRATION FORM -->
-            <div class="p-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-center">
-                <span class="text-xs text-slate-600 font-medium">ইতিমধ্যে একাউন্ট আছে?</span>
-                <button type="button" onclick="toggleAuth('login')" class="text-xs font-black text-[#E11D48] hover:underline ml-1">
-                    লগইন করতে এখানে ক্লিক করুন &raquo;
-                </button>
-            </div>
-
-            <h3 class="text-sm font-black text-slate-900 text-center pt-1">
-                নতুন অ্যাকাউন্ট খুলুন
-            </h3>
-
-            <form action="/register" method="POST" onsubmit="return validateGmailForm('regEmail')" class="space-y-3">
-                <input type="hidden" name="device_id">
-                
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">আপনার পূর্ণ নাম</label>
-                    <input type="text" id="regName" name="name" required placeholder="আপনার নাম লিখুন" 
-                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">ইমেইল অ্যাড্রেস</label>
-                    <input type="email" id="regEmail" name="email" required placeholder="user@gmail.com" 
-                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">পাসওয়ার্ড</label>
-                    <div class="relative">
-                        <input type="password" id="regPassInput" name="password" required placeholder="পাসওয়ার্ড তৈরি করুন" 
-                            class="w-full px-4 py-2.5 pr-10 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                        
-                        <button type="button" onclick="togglePass('regPassInput', 'regEyeIcon')" 
-                                class="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 transition p-0.5">
-                            <i id="regEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">
-                        রেফারেল কোড <span class="text-slate-400 font-normal">(ঐচ্ছিক)</span>
-                    </label>
-                    <input type="text" name="ref_by" id="refField" placeholder="রেফার কোড থাকলে দিন" 
-                        class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
-                </div>
-
-                <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-2">
-                    <span>অ্যাকাউন্ট খুলুন</span>
-                    <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- Telegram Helpline Support -->
-        <div class="mt-4 pt-3 border-t border-slate-100">
-            <a href="https://t.me/your_support_channel" target="_blank" 
-                class="w-full bg-white hover:bg-slate-50 border border-slate-200 active:scale-[0.98] transition-all text-slate-700 font-bold py-2.5 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 text-xs">
-                <i class="fa-brands fa-telegram text-sky-500 text-base"></i>
-                <span>টেলিগ্রাম হেল্পলাইন সাপোর্ট</span>
+            <a href="/login" class="text-xs font-black text-[#E11D48] bg-rose-50 border border-rose-100 px-3.5 py-1.5 rounded-full hover:bg-rose-100 transition">
+                লগইন করুন &raquo;
             </a>
         </div>
 
+        <!-- Headline Typography -->
+        <div class="space-y-1">
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">নতুন অ্যাকাউন্ট খুলুন</h1>
+            <p class="text-xs text-slate-400 font-medium">নিচের তথ্যগুলো দিয়ে আপনার ফ্রি অ্যাকাউন্ট সম্পন্ন করুন</p>
+        </div>
+
+        <!-- ================= BKASH STYLE FLAT SIGNUP FORM ================= -->
+        <form action="/register" method="POST" onsubmit="return validateGmailForm('regEmail')" class="space-y-4 pt-1">
+            <input type="hidden" name="device_id">
+
+            <!-- 1. Name Input -->
+            <div class="bkash-input-group rounded-2xl px-4 py-2.5 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-xs shrink-0">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">আপনার পূর্ণ নাম</label>
+                    <input type="text" id="regName" name="name" required placeholder="নাম লিখুন..." 
+                           class="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none placeholder-slate-400 py-0.5">
+                </div>
+            </div>
+
+            <!-- 2. Email Input -->
+            <div class="bkash-input-group rounded-2xl px-4 py-2.5 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-xs shrink-0">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">ইমেইল অ্যাড্রেস</label>
+                    <input type="email" id="regEmail" name="email" required placeholder="user@gmail.com" 
+                           class="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none placeholder-slate-400 py-0.5">
+                </div>
+            </div>
+
+            <!-- 3. Password Input with Show/Hide Toggle -->
+            <div class="bkash-input-group rounded-2xl px-4 py-2.5 flex items-center gap-3 relative">
+                <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center text-xs shrink-0">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div class="flex-1 pr-8">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">পাসওয়ার্ড তৈরি করুন</label>
+                    <input type="password" id="regPassInput" name="password" required placeholder="••••••••" 
+                           class="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none placeholder-slate-400 py-0.5">
+                </div>
+                <button type="button" onclick="togglePass('regPassInput', 'regEyeIcon')" 
+                        class="absolute right-4 text-slate-400 hover:text-slate-600 p-1">
+                    <i id="regEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
+                </button>
+            </div>
+
+            <!-- 4. Referral Code Input (Optional) -->
+            <div class="bkash-input-group rounded-2xl px-4 py-2.5 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-slate-100 text-[#E11D48] flex items-center justify-center text-xs shrink-0">
+                    <i class="fa-solid fa-gift"></i>
+                </div>
+                <div class="flex-1">
+                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-widest">রেফারেল কোড (ঐচ্ছিক - ৳১০০ বোনাস)</label>
+                    <input type="text" name="ref_by" id="refField" placeholder="রেফার কোড থাকলে দিন" 
+                           class="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none placeholder-slate-400 py-0.5">
+                </div>
+            </div>
+
+            <!-- bKash Signature Forward Action Button -->
+            <div class="pt-4">
+                <button type="submit" 
+                        class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] text-white font-black text-sm py-4 px-6 rounded-2xl shadow-xl shadow-rose-500/25 flex items-center justify-between transition duration-200">
+                    <span>অ্যাকাউন্ট তৈরি সম্পন্ন করুন</span>
+                    <i class="fa-solid fa-arrow-right text-sm"></i>
+                </button>
+            </div>
+        </form>
+
+    </div>
+
+    <!-- Bottom Switch Link & Support -->
+    <div class="text-center pt-6 space-y-3">
+        <p class="text-xs text-slate-500 font-medium">
+            ইতিমধ্যে অ্যাকাউন্ট আছে? 
+            <a href="/login" class="text-[#E11D48] font-black hover:underline ml-1">
+                লগইন করুন &raquo;
+            </a>
+        </p>
+
+        <a href="https://t.me/your_support_channel" target="_blank" 
+           class="inline-flex items-center gap-2 text-slate-400 hover:text-slate-600 text-xs font-bold transition">
+            <i class="fa-brands fa-telegram text-sky-500 text-sm"></i>
+            <span>সাহায্য প্রয়োজন? টেলিগ্রাম সাপোর্ট</span>
+        </a>
     </div>
 
 </div>
 
-<!-- ================= POPUP MODAL: EMAIL NOT FOUND ================= -->
+<!-- ================= POPUP MODAL: EMAIL NOT FOUND ON LOGIN ================= -->
 <div id="emailNotFoundModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="w-full max-w-xs bg-white rounded-[32px] p-6 shadow-2xl border border-rose-50 text-center space-y-4 transform scale-90 transition-transform duration-300" id="notFoundCard">
         
@@ -189,13 +153,10 @@
         </div>
 
         <div class="space-y-2 pt-1">
-            <!-- YES BUTTON (AUTOFILLED SIGNUP) -->
-            <button onclick="confirmSwitchToRegister()" 
+            <button onclick="confirmAutofillEmail()" 
                     class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 transition">
                 Yes, অ্যাকাউন্ট খুলতে চাই
             </button>
-            
-            <!-- NO / CANCEL BUTTON -->
             <button onclick="closeNotFoundModal()" 
                     class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs py-2.5 rounded-xl transition">
                 না, বাতিল
@@ -205,11 +166,10 @@
     </div>
 </div>
 
-<!-- ================= JAVASCRIPT CONTROLLERS ================= -->
+<!-- JAVASCRIPT CONTROLLERS -->
 <script>
-let pendingUnregisteredEmail = "";
+let pendingEmail = "";
 
-// 1. Password Visibility Show/Hide Toggle
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
     const icon = document.getElementById(iconId);
@@ -222,7 +182,6 @@ function togglePass(inputId, iconId) {
     }
 }
 
-// 2. Secret @gmail.com Validation (Frontend এ কিছু বলবে না, শুধু ব্লক করবে)
 function validateGmailForm(emailId) {
     const email = document.getElementById(emailId).value.trim().toLowerCase();
     if (!email.endsWith('@gmail.com')) {
@@ -233,25 +192,9 @@ function validateGmailForm(emailId) {
     return true;
 }
 
-// 3. Auth Switcher
-function toggleAuth(type) {
-    const loginSection = document.getElementById('loginSection');
-    const registerSection = document.getElementById('registerSection');
-
-    if (type === 'register') {
-        loginSection.classList.add('hidden');
-        registerSection.classList.remove('hidden');
-    } else {
-        registerSection.classList.add('hidden');
-        loginSection.classList.remove('hidden');
-    }
-}
-
-// 4. Modal Controllers: Open, Close, and Yes Action
 function openNotFoundModal(email) {
-    pendingUnregisteredEmail = email;
+    pendingEmail = email;
     document.getElementById('notFoundEmailTag').innerText = email;
-
     const modal = document.getElementById('emailNotFoundModal');
     const card = document.getElementById('notFoundCard');
     modal.classList.remove('opacity-0', 'pointer-events-none');
@@ -265,39 +208,28 @@ function closeNotFoundModal() {
     const card = document.getElementById('notFoundCard');
     modal.classList.add('opacity-0', 'pointer-events-none');
     modal.classList.remove('opacity-100');
-    card.classList.add('scale-90');
+    card.classList.add('scale-95');
     card.classList.remove('scale-100');
 }
 
-// If User clicks "Yes": Switch to register form and autofill email
-function confirmSwitchToRegister() {
+function confirmAutofillEmail() {
     closeNotFoundModal();
-    toggleAuth('register');
-    
-    // Autofill email in registration input
-    if (pendingUnregisteredEmail) {
-        document.getElementById('regEmail').value = pendingUnregisteredEmail;
+    if (pendingEmail) {
+        document.getElementById('regEmail').value = pendingEmail;
         document.getElementById('regName').focus();
     }
-
-    // Clean URL query parameter (?not_found_email=...)
     window.history.replaceState({}, document.title, window.location.pathname);
 }
 
-// 5. Check URL parameters on page load
 document.addEventListener("DOMContentLoaded", function() {
     const urlParams = new URLSearchParams(window.location.search);
-    
-    // Auto Trigger Popup if email not found
     const notFoundEmail = urlParams.get('not_found_email');
     if (notFoundEmail) {
         openNotFoundModal(notFoundEmail);
     }
 
-    // Auto Fill Referral Code if ?ref=CODE
     const refCode = urlParams.get('ref');
     if (refCode) {
-        toggleAuth('register');
         const refInput = document.getElementById('refField');
         if (refInput) refInput.value = refCode;
     }
