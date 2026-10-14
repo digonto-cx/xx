@@ -171,7 +171,7 @@ def tutorial():
     return render_template('tutorial.html', fb_reel_url=fb_reel_url)
     
 # ==========================================================
-# User Auth & Device Security
+# AUTHENTICATION CONTROLLER (INDEX = SIGNUP, /login = LOGIN)
 # ==========================================================
 @app.route('/')
 def index():
@@ -179,6 +179,53 @@ def index():
         return redirect(url_for('dashboard'))
     return render_template('index.html')
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
+
+    # GET রিকোয়েস্টে নতুন ফ্ল্যাট লগইন পেজ ওপেন হবে
+    if request.method == 'GET':
+        return render_template('login.html')
+
+    # POST রিকোয়েস্টে লগইন প্রসেস
+    sb = get_supabase()
+    email = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '').strip()
+
+    if not email or not password:
+        flash("ইমেইল ও পাসওয়ার্ড প্রদান করুন!", "danger")
+        return redirect(url_for('login'))
+
+    # ডেটাবেস কোল্ড-বুট ফিক্স (অটো ৩ বার ট্রাই)
+    user_res = None
+    for _ in range(3):
+        try:
+            res = sb.table('users').select('*').eq('email', email).execute()
+            if res.data:
+                user_res = res.data
+                break
+        except Exception:
+            time.sleep(0.3)
+
+    # একাউন্ট না পাওয়া গেলে সাইনআপ পেজে (Index) রিডাইরেক্ট করে পপআপ দেখাবে
+    if not user_res:
+        return redirect(url_for('index', not_found_email=email))
+
+    user = user_res[0]
+    if user['is_banned']:
+        flash("আপনার অ্যাকাউন্টটি স্থায়ীভাবে ব্যান করা হয়েছে!", "danger")
+        return redirect(url_for('login'))
+
+    if check_password_hash(user['password_hash'], password):
+        session.permanent = True
+        session['user_id'] = user['id']
+        session['user_name'] = user['name']
+        return redirect(url_for('dashboard'))
+    else:
+        flash("ভুল পাসওয়ার্ড দিয়েছেন! দয়া করে সঠিক পাসওয়ার্ড দিন।", "danger")
+        return redirect(url_for('login'))
+        
 # ==========================================================
 # ABOUT US & BUSINESS MODEL CONTROLLER
 # ==========================================================
@@ -382,35 +429,6 @@ def admin_change_password():
         reset_data=reset_data
         )
 
-
-
-@app.route('/login', methods=['POST'])
-def login():
-    sb = get_supabase()
-    email = request.form.get('email', '').strip().lower()
-    password = request.form.get('password', '')
-
-    user_res = sb.table('users').select('*').eq('email', email).execute().data
-    
-    # ১. যদি এই ইমেইলে কোনো অ্যাকাউন্ট না থাকে -> পপআপ ট্রিগার করার জন্য ইমেইল সহ রিডাইরেক্ট
-    if not user_res:
-        return redirect(url_for('index', not_found_email=email))
-
-    user = user_res[0]
-    if user['is_banned']:
-        flash("আপনার অ্যাকাউন্টটি স্থায়ীভাবে ব্যান করা হয়েছে!", "danger")
-        return redirect(url_for('index'))
-
-    # ২. পাসওয়ার্ড চেক
-    if check_password_hash(user['password_hash'], password):
-        session.permanent = True
-        session['user_id'] = user['id']
-        session['user_name'] = user['name']
-        return redirect(url_for('dashboard'))
-    else:
-        flash("ভুল পাসওয়ার্ড দিয়েছেন! পুনরায় চেষ্টা করুন।", "danger")
-        return redirect(url_for('index'))
-        
 
 # ==========================================================
 # MATH QUIZ EARNING CONTROLLER (15 CHANCES / 24 HOURS)
