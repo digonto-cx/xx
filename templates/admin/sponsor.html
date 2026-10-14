@@ -1,0 +1,142 @@
+{% extends 'admin/base_admin.html' %}
+{% block admin_content %}
+<div class="max-w-6xl mx-auto space-y-6 pb-14">
+
+    <!-- Page Header & Counter Badges -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 pb-4">
+        <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-[#E11D48] block mb-0.5">কমিউনিটি ও পার্টনারশিপ হাব</span>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <i class="fa-solid fa-handshake text-rose-500"></i> স্পনসরশিপ আবেদন ম্যানেজমেন্ট
+            </h2>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 px-3 py-1.5 rounded-2xl shadow-sm">
+                পেন্ডিং রিভিউ: <strong>{{ pending_count }} টি</strong>
+            </span>
+            <span class="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-2xl shadow-sm">
+                অনুমোদিত পার্টনার: <strong>{{ approved_count }} জন</strong>
+            </span>
+        </div>
+    </div>
+
+    <!-- Sponsors Application Table Card -->
+    <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4">
+        
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+                <h3 class="text-sm font-black text-slate-900">সকল পার্টনারশিপ আবেদন</h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">চ্যানেল লিংক চেক করে সিদ্ধান্ত নিন</p>
+            </div>
+            <span class="text-[10px] font-mono text-slate-500 bg-slate-100 px-2.5 py-1 rounded-xl">
+                মোট আবেদন: {{ sponsors|length }} টি
+            </span>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="border-b border-slate-100 text-[10px] text-slate-400 uppercase font-bold tracking-wider">
+                        <th class="py-3 px-3">আবেদনকারী</th>
+                        <th class="py-3 px-3">চ্যানেল / পেজ লিংক</th>
+                        <th class="py-3 px-3">টিম ও কমিউনিটি বিবরণ</th>
+                        <th class="py-3 px-3">তারিখ</th>
+                        <th class="py-3 px-3">স্ট্যাটাস</th>
+                        <th class="py-3 px-3 text-right">সিদ্ধান্ত (অ্যাকশন)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for s in sponsors %}
+                    <tr class="hover:bg-slate-50/50 transition">
+                        
+                        <!-- Applicant Info -->
+                        <td class="py-3.5 px-3">
+                            <span class="font-extrabold text-slate-900 block">{{ s.name }}</span>
+                            <span class="text-[10px] text-slate-400 font-mono">{{ s.email }}</span>
+                        </td>
+
+                        <!-- Community Link -->
+                        <td class="py-3.5 px-3">
+                            <a href="{{ s.link }}" target="_blank" 
+                               class="bg-rose-50 hover:bg-rose-100 text-[#E11D48] font-bold px-3 py-1.5 rounded-xl inline-flex items-center gap-1.5 border border-rose-100 transition shadow-2xs">
+                                <span>চ্যানেল খুলুন</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i>
+                            </a>
+                        </td>
+
+                        <!-- Description -->
+                        <td class="py-3.5 px-3 max-w-[260px]">
+                            <p class="text-slate-600 line-clamp-2 leading-relaxed text-[11px]" title="{{ s.description }}">
+                                {{ s.description }}
+                            </p>
+                        </td>
+
+                        <!-- Date -->
+                        <td class="py-3.5 px-3 text-slate-400 font-mono text-[10px] whitespace-nowrap">
+                            {{ s.created_at[:10] }}
+                        </td>
+
+                        <!-- Status Badge -->
+                        <td class="py-3.5 px-3">
+                            {% if s.status == 'approved' %}
+                                <span class="text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-0.5 rounded-full">
+                                    Approved ✓
+                                </span>
+                            {% elif s.status == 'rejected' %}
+                                <span class="text-[10px] font-black bg-rose-50 text-rose-600 border border-rose-100 px-2.5 py-0.5 rounded-full">
+                                    Rejected ✕
+                                </span>
+                            {% else %}
+                                <span class="text-[10px] font-black bg-amber-50 text-amber-600 border border-amber-100 px-2.5 py-0.5 rounded-full">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- Actions (Approve, Reject, Delete) -->
+                        <td class="py-3.5 px-3 text-right">
+                            <div class="flex items-center justify-end gap-1.5">
+                                
+                                {% if s.status != 'approved' %}
+                                <form action="/admin/sponsor/{{ s.id }}/approve" method="POST">
+                                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black px-2.5 py-1.5 rounded-xl text-[10px] transition shadow-sm">
+                                        Approve
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                {% if s.status != 'rejected' %}
+                                <form action="/admin/sponsor/{{ s.id }}/reject" method="POST" onsubmit="return confirm('এই আবেদনটি রিজেক্ট করতে চান?');">
+                                    <button type="submit" class="bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold px-2.5 py-1.5 rounded-xl text-[10px] transition border border-amber-200">
+                                        Reject
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                <form action="/admin/sponsor/{{ s.id }}/delete" method="POST" onsubmit="return confirm('স্থায়ীভাবে ডিলিট করতে চান?');">
+                                    <button type="submit" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-2 py-1.5 rounded-xl text-xs transition" title="মুছে ফেলুন">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-400">
+                            <i class="fa-solid fa-handshake-slash text-3xl text-slate-200 mb-2 block"></i>
+                            কোনো স্পনসরশিপ আবেদন জমা পড়েনি।
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}
