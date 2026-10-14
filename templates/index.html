@@ -4,7 +4,7 @@
     /* Card Entry Animation */
     @keyframes card-fade-up {
         from { opacity: 0; transform: translateY(16px) scale(0.98); }
-        to { opacity: 1; transform: translateY(0) scale(1); }
+        to { opacity: 1; transform: translateY(0); }
     }
     .animate-card-entry {
         animation: card-fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -41,7 +41,7 @@
 
         <!-- ================= TUTORIAL CTA BANNER ================= -->
         <a href="/tutorial" 
-           class="group relative overflow-hidden flex items-center justify-between p-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-600 text-white rounded-2xl shadow-md shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-300 mb-5">
+           class="group relative overflow-hidden flex items-center justify-between p-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-600 text-white rounded-2xl shadow-md shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all duration-300 mb-4">
             <div class="flex items-center gap-2.5">
                 <div class="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center text-white text-xs group-hover:rotate-12 transition">
                     <i class="fa-solid fa-play"></i>
@@ -54,9 +54,18 @@
             <i class="fa-solid fa-chevron-right text-xs opacity-75 group-hover:translate-x-1 transition mr-1"></i>
         </a>
 
-        <!-- ================= 1. LOGIN FORM (DEFAULT) ================= -->
-        <div id="loginSection" class="transition-opacity duration-300">
-            <h3 class="text-sm font-black text-slate-900 mb-3 text-center">
+        <!-- ================= 1. LOGIN FORM ================= -->
+        <div id="loginSection" class="transition-opacity duration-300 space-y-3.5">
+            
+            <!-- SWITCH TEXT PLACED ABOVE THE LOGIN FORM -->
+            <div class="p-2.5 rounded-2xl bg-rose-50/70 border border-rose-100 text-center">
+                <span class="text-xs text-slate-600 font-medium">একাউন্ট নেই?</span>
+                <button type="button" onclick="toggleAuth('register')" class="text-xs font-black text-[#E11D48] hover:underline ml-1">
+                    অ্যাকাউন্ট খুলতে এখানে ক্লিক করুন &raquo;
+                </button>
+            </div>
+
+            <h3 class="text-sm font-black text-slate-900 text-center pt-1">
                 অ্যাকাউন্টে প্রবেশ করুন
             </h3>
 
@@ -76,7 +85,6 @@
                         <input type="password" id="loginPassInput" name="password" required placeholder="••••••••" 
                             class="w-full px-4 py-2.5 pr-10 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
                         
-                        <!-- Show / Hide Eye Toggle -->
                         <button type="button" onclick="togglePass('loginPassInput', 'loginEyeIcon')" 
                                 class="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 transition p-0.5">
                             <i id="loginEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
@@ -84,26 +92,25 @@
                     </div>
                 </div>
                 
-                <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-3">
+                <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-2">
                     <span>লগইন করুন</span>
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </button>
             </form>
-
-            <!-- Switch to Registration -->
-            <div class="text-center mt-4 pt-3.5 border-t border-slate-100">
-                <p class="text-xs text-slate-500 font-medium">
-                    একাউন্ট নেই? 
-                    <button onclick="toggleAuth('register')" class="text-[#E11D48] font-extrabold hover:underline ml-1">
-                        একাউন্ট খুলুন
-                    </button>
-                </p>
-            </div>
         </div>
 
         <!-- ================= 2. REGISTRATION FORM ================= -->
-        <div id="registerSection" class="hidden transition-opacity duration-300">
-            <h3 class="text-sm font-black text-slate-900 mb-3 text-center">
+        <div id="registerSection" class="hidden transition-opacity duration-300 space-y-3.5">
+            
+            <!-- SWITCH TEXT PLACED ABOVE REGISTRATION FORM -->
+            <div class="p-2.5 rounded-2xl bg-slate-100 border border-slate-200 text-center">
+                <span class="text-xs text-slate-600 font-medium">ইতিমধ্যে একাউন্ট আছে?</span>
+                <button type="button" onclick="toggleAuth('login')" class="text-xs font-black text-[#E11D48] hover:underline ml-1">
+                    লগইন করতে এখানে ক্লিক করুন &raquo;
+                </button>
+            </div>
+
+            <h3 class="text-sm font-black text-slate-900 text-center pt-1">
                 নতুন অ্যাকাউন্ট খুলুন
             </h3>
 
@@ -112,7 +119,7 @@
                 
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">আপনার পূর্ণ নাম</label>
-                    <input type="text" name="name" required placeholder="আপনার নাম লিখুন" 
+                    <input type="text" id="regName" name="name" required placeholder="আপনার নাম লিখুন" 
                         class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
                 </div>
 
@@ -128,7 +135,6 @@
                         <input type="password" id="regPassInput" name="password" required placeholder="পাসওয়ার্ড তৈরি করুন" 
                             class="w-full px-4 py-2.5 pr-10 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
                         
-                        <!-- Show / Hide Eye Toggle -->
                         <button type="button" onclick="togglePass('regPassInput', 'regEyeIcon')" 
                                 class="absolute right-3.5 top-2.5 text-slate-400 hover:text-slate-600 transition p-0.5">
                             <i id="regEyeIcon" class="fa-solid fa-eye-slash text-xs"></i>
@@ -144,27 +150,17 @@
                         class="w-full px-4 py-2.5 rounded-2xl border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/30">
                 </div>
 
-                <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-3">
+                <button type="submit" class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] transition-all text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 flex items-center justify-center gap-2 text-xs mt-2">
                     <span>অ্যাকাউন্ট খুলুন</span>
                     <i class="fa-solid fa-arrow-right text-[10px]"></i>
                 </button>
             </form>
-
-            <!-- Switch to Login -->
-            <div class="text-center mt-4 pt-3.5 border-t border-slate-100">
-                <p class="text-xs text-slate-500 font-medium">
-                    ইতিমধ্যে একাউন্ট আছে? 
-                    <button onclick="toggleAuth('login')" class="text-[#E11D48] font-extrabold hover:underline ml-1">
-                        লগইন করুন
-                    </button>
-                </p>
-            </div>
         </div>
 
         <!-- Telegram Helpline Support -->
-        <div class="mt-4">
-            <a href="https://t.me/micro_earnx" target="_blank" 
-                class="w-full bg-white hover:bg-slate-50 border border-slate-200 active:scale-[0.98] transition-all text-slate-700 font-bold py-3 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 text-xs">
+        <div class="mt-4 pt-3 border-t border-slate-100">
+            <a href="https://t.me/your_support_channel" target="_blank" 
+                class="w-full bg-white hover:bg-slate-50 border border-slate-200 active:scale-[0.98] transition-all text-slate-700 font-bold py-2.5 px-4 rounded-2xl shadow-sm flex items-center justify-center gap-2 text-xs">
                 <i class="fa-brands fa-telegram text-sky-500 text-base"></i>
                 <span>টেলিগ্রাম হেল্পলাইন সাপোর্ট</span>
             </a>
@@ -174,8 +170,45 @@
 
 </div>
 
-<!-- SCRIPT CONTROLLERS -->
+<!-- ================= POPUP MODAL: EMAIL NOT FOUND ================= -->
+<div id="emailNotFoundModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="w-full max-w-xs bg-white rounded-[32px] p-6 shadow-2xl border border-rose-50 text-center space-y-4 transform scale-90 transition-transform duration-300" id="notFoundCard">
+        
+        <div class="w-14 h-14 mx-auto rounded-3xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-2xl shadow-sm animate-bounce">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+
+        <div class="space-y-1.5">
+            <h3 class="text-base font-black text-slate-900">অ্যাকাউন্ট পাওয়া যায়নি!</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                এই ইমেইলে কোনো অ্যাকাউন্ট খোলা হয়নি। আপনি কি নতুন একটি অ্যাকাউন্ট খুলতে চান?
+            </p>
+            <span id="notFoundEmailTag" class="text-[11px] font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1 rounded-xl inline-block truncate max-w-[220px]">
+                user@gmail.com
+            </span>
+        </div>
+
+        <div class="space-y-2 pt-1">
+            <!-- YES BUTTON (AUTOFILLED SIGNUP) -->
+            <button onclick="confirmSwitchToRegister()" 
+                    class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 px-4 rounded-2xl shadow-lg shadow-rose-500/25 transition">
+                Yes, অ্যাকাউন্ট খুলতে চাই
+            </button>
+            
+            <!-- NO / CANCEL BUTTON -->
+            <button onclick="closeNotFoundModal()" 
+                    class="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs py-2.5 rounded-xl transition">
+                না, বাতিল
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- ================= JAVASCRIPT CONTROLLERS ================= -->
 <script>
+let pendingUnregisteredEmail = "";
+
 // 1. Password Visibility Show/Hide Toggle
 function togglePass(inputId, iconId) {
     const input = document.getElementById(inputId);
@@ -189,7 +222,7 @@ function togglePass(inputId, iconId) {
     }
 }
 
-// 2. Secret @gmail.com Validation (Frontend এ কোথাও বলবে না, শুধু ব্লক করবে)
+// 2. Secret @gmail.com Validation (Frontend এ কিছু বলবে না, শুধু ব্লক করবে)
 function validateGmailForm(emailId) {
     const email = document.getElementById(emailId).value.trim().toLowerCase();
     if (!email.endsWith('@gmail.com')) {
@@ -214,9 +247,54 @@ function toggleAuth(type) {
     }
 }
 
-// 4. Referral URL Auto-Detection (?ref=CODE)
+// 4. Modal Controllers: Open, Close, and Yes Action
+function openNotFoundModal(email) {
+    pendingUnregisteredEmail = email;
+    document.getElementById('notFoundEmailTag').innerText = email;
+
+    const modal = document.getElementById('emailNotFoundModal');
+    const card = document.getElementById('notFoundCard');
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modal.classList.add('opacity-100');
+    card.classList.remove('scale-90');
+    card.classList.add('scale-100');
+}
+
+function closeNotFoundModal() {
+    const modal = document.getElementById('emailNotFoundModal');
+    const card = document.getElementById('notFoundCard');
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modal.classList.remove('opacity-100');
+    card.classList.add('scale-90');
+    card.classList.remove('scale-100');
+}
+
+// If User clicks "Yes": Switch to register form and autofill email
+function confirmSwitchToRegister() {
+    closeNotFoundModal();
+    toggleAuth('register');
+    
+    // Autofill email in registration input
+    if (pendingUnregisteredEmail) {
+        document.getElementById('regEmail').value = pendingUnregisteredEmail;
+        document.getElementById('regName').focus();
+    }
+
+    // Clean URL query parameter (?not_found_email=...)
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
+// 5. Check URL parameters on page load
 document.addEventListener("DOMContentLoaded", function() {
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // Auto Trigger Popup if email not found
+    const notFoundEmail = urlParams.get('not_found_email');
+    if (notFoundEmail) {
+        openNotFoundModal(notFoundEmail);
+    }
+
+    // Auto Fill Referral Code if ?ref=CODE
     const refCode = urlParams.get('ref');
     if (refCode) {
         toggleAuth('register');
