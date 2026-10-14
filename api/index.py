@@ -511,27 +511,25 @@ def gmail_lock_task(task_id):
 def gmail_submit_task(task_id):
     sb = get_supabase()
     user_id = session['user_id']
-    submitted_email = request.form.get('submitted_email', '').strip().lower()
-
-    if not submitted_email or not submitted_email.endswith('@gmail.com'):
-        flash("অনুগ্রহ করে আপনার তৈরিকৃত সঠিক জিমেইল অ্যাড্রেস দিন!", "danger")
-        return redirect(url_for('gmail_hub'))
 
     task = sb.table('gmail_tasks').select('*').eq('id', task_id).single().execute().data
     if not task or task.get('locked_by') != user_id:
         flash("অবৈধ রিকোয়েস্ট!", "danger")
         return redirect(url_for('gmail_hub'))
 
-    # সাবমিট করা হলো (অ্যাডমিন রিভিউর অপেক্ষায়)
+    # ইউজারের টাইপ করার দরকার নেই, সিস্টেম স্বয়ংক্রিয়ভাবে প্রিফিক্স দিয়ে ইমেইল সেট করবে
+    auto_email = f"{task['email_prefix']}@gmail.com"
+
+    # সাবমিট করা হলো
     sb.table('gmail_tasks').update({
         'status': 'submitted',
-        'submitted_email': submitted_email,
+        'submitted_email': auto_email,
         'submitted_at': datetime.now(timezone.utc).isoformat()
     }).eq('id', task_id).execute()
 
-    flash("🎉 জিমেইল সফলভাবে জমা হয়েছে! অ্যাডমিন চেক করে টাকা ব্যালেন্সে যুক্ত করে দেবে।", "success")
+    flash("🎉 কাজ সফলভাবে জমা হয়েছে! অ্যাডমিন চেক করে টাকা ব্যালেন্সে যোগ করে দেবে।", "success")
     return redirect(url_for('gmail_hub'))
-
+    
 @app.route('/gmail/cancel/<int:task_id>', methods=['POST'])
 @login_required
 def gmail_cancel_task(task_id):
