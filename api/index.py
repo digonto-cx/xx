@@ -384,7 +384,6 @@ def admin_change_password():
 
 
 
-
 @app.route('/login', methods=['POST'])
 def login():
     sb = get_supabase()
@@ -392,23 +391,26 @@ def login():
     password = request.form.get('password', '')
 
     user_res = sb.table('users').select('*').eq('email', email).execute().data
+    
+    # ১. যদি এই ইমেইলে কোনো অ্যাকাউন্ট না থাকে -> পপআপ ট্রিগার করার জন্য ইমেইল সহ রিডাইরেক্ট
     if not user_res:
-        flash("ইমেইল বা পাসওয়ার্ড সঠিক নয়!", "danger")
-        return redirect(url_for('index'))
+        return redirect(url_for('index', not_found_email=email))
 
     user = user_res[0]
     if user['is_banned']:
         flash("আপনার অ্যাকাউন্টটি স্থায়ীভাবে ব্যান করা হয়েছে!", "danger")
         return redirect(url_for('index'))
 
+    # ২. পাসওয়ার্ড চেক
     if check_password_hash(user['password_hash'], password):
         session.permanent = True
         session['user_id'] = user['id']
         session['user_name'] = user['name']
         return redirect(url_for('dashboard'))
     else:
-        flash("ভুল পাসওয়ার্ড দিয়েছেন!", "danger")
+        flash("ভুল পাসওয়ার্ড দিয়েছেন! পুনরায় চেষ্টা করুন।", "danger")
         return redirect(url_for('index'))
+        
 
 # ==========================================================
 # MATH QUIZ EARNING CONTROLLER (15 CHANCES / 24 HOURS)
