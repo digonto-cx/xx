@@ -1293,7 +1293,11 @@ def admin_login():
         flash("ভুল অ্যাডমিন সিক্রেট কি!", "danger")
 
     return render_template('admin/login.html')
+
     
+# ==========================================================
+# ADMIN DASHBOARD STATS CONTROLLER (UNLIMITED COUNT FIX)
+# ==========================================================
 @app.route('/admin')
 @admin_required
 def admin_dashboard():
@@ -1302,11 +1306,31 @@ def admin_dashboard():
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     yesterday_start = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
 
-    total_users = len(sb.table('users').select('id').execute().data or [])
-    today_users = len(sb.table('users').select('id').gte('created_at', today_start).execute().data or [])
-    yesterday_users = len(sb.table('users').select('id').gte('created_at', yesterday_start).lt('created_at', today_start).execute().data or [])
-    today_submissions = len(sb.table('submissions').select('id').gte('created_at', today_start).execute().data or [])
-    
+    try:
+        # ১. সঠিক ও আনলিমিটেড মোট ইউজার গণনা (count='exact')
+        total_res = sb.table('users').select('id', count='exact').execute()
+        total_users = total_res.count if total_res.count is not None else len(total_res.data or [])
+
+        # ২. আজকের সাইন-আপ গণনা
+        today_res = sb.table('users').select('id', count='exact').gte('created_at', today_start).execute()
+        today_users = today_res.count if today_res.count is not None else len(today_res.data or [])
+
+        # ৩. গতকালের সাইন-আপ গণনা
+        yest_res = sb.table('users').select('id', count='exact').gte('created_at', yesterday_start).lt('created_at', today_start).execute()
+        yesterday_users = yest_res.count if yest_res.count is not None else len(yest_res.data or [])
+
+        # ৪. আজকের টাস্ক সাবমিশন গণনা
+        sub_res = sb.table('submissions').select('id', count='exact').gte('created_at', today_start).execute()
+        today_submissions = sub_res.count if sub_res.count is not None else len(sub_res.data or [])
+
+    except Exception:
+        # ফলব্যাক হিসাব যদি কুয়েরি কাউন্ট কখনো ফেইল করে
+        total_users = len(sb.table('users').select('id').execute().data or [])
+        today_users = len(sb.table('users').select('id').gte('created_at', today_start).execute().data or [])
+        yesterday_users = len(sb.table('users').select('id').gte('created_at', yesterday_start).lt('created_at', today_start).execute().data or [])
+        today_submissions = len(sb.table('submissions').select('id').gte('created_at', today_start).execute().data or [])
+
+    # গ্লোবাল সাইট নোটিশ আনা
     notice_res = sb.table('settings').select('value').eq('key', 'site_notice').execute().data
     current_notice = notice_res[0]['value'] if notice_res else ""
 
@@ -1318,7 +1342,7 @@ def admin_dashboard():
         today_submissions=today_submissions,
         notice=current_notice
     )
-
+    
 # ==========================================================
 # GLOBAL TEMPLATE CONTEXT (হেডারে প্রোফাইল ছবি পাওয়ার জন্য)
 # ==========================================================
