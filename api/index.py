@@ -233,7 +233,61 @@ def login():
     else:
         flash("ভুল পাসওয়ার্ড দিয়েছেন! দয়া করে সঠিক পাসওয়ার্ড দিন।", "danger")
         return redirect(url_for('login'))
-        
+
+
+# ==========================================================
+# KYC VERIFICATION & AUTO-PAYOUT CONTROLLER (/kyc)
+# ==========================================================
+@app.route('/kyc', methods=['GET', 'POST'])
+@login_required
+def kyc_page():
+    sb = get_supabase()
+    user_id = session['user_id']
+    user = sb.table('users').select('*').eq('id', user_id).single().execute().data
+
+    # ইউজারের অলরেডি কোনো KYC সাবমিশন আছে কিনা চেক
+    existing_kyc = sb.table('kyc_requests').select('*').eq('user_id', user_id).order('id', desc=True).execute().data
+    latest_kyc = existing_kyc[0] if existing_kyc else None
+
+    if request.method == 'POST':
+        # যদি অলরেডি এপ্রুভড বা পেন্ডিং থাকে
+        if latest_kyc and latest_kyc['status'] == 'approved':
+            flash("আপনার KYC ইতিমধ্যে ভেরিফাইড রয়েছে!", "info")
+            return redirect(url_for('kyc_page'))
+
+        full_name = request.form.get('full_name', '').strip()
+        try:
+            age = int(request.form.get('age', 18))
+        except ValueError:
+            age = 18
+
+        sender_number = request.form.get('sender_number', '').strip()
+        trx_id = request.form.get('trx_id', '').strip()
+
+        if not full_name or not sender_number or not trx_id:
+            flash("সবগুলো তথ্য সঠিকভাবে পূরণ করুন!", "danger")
+            return redirect(url_for('kyc_page'))
+
+        # TrxID ডুপ্লিকেট চেক
+        dup_trx = sb.table('kyc_requests').select('id').eq('trx_id', trx_id).execute().data
+        if dup_trx:
+            flash("এই TrxID দিয়ে ইতিমধ্যে একটি রিকোয়েস্ট জমা দেওয়া হয়েছে!", "danger")
+            return redirect(url_for('kyc_page'))
+
+        sb.table('kyc_requests').insert({
+            'user_id': user_id,
+            'full_name': full_name,
+            'age': age,
+            'sender_number': sender_number,
+            'trx_id': trx_id,
+            'status': 'pending'
+        }).execute()
+
+        flash("🎉 আপনার KYC ভেরিফিকেশন ফি সফলভাবে জমা হয়েছে! অ্যাডমিন চেক করে ৩০ মিনিটের মধ্যে একাউন্ট ভেরিফাই করে দেবে।", "success")
+        return redirect(url_for('kyc_page'))
+
+    return render_template('kyc.html', user=user, latest_kyc=latest_kyc)
+    
 # ==========================================================
 # ABOUT US & BUSINESS MODEL CONTROLLER
 # ==========================================================
