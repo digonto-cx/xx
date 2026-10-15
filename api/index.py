@@ -836,12 +836,15 @@ def quiz_next():
     expr, ans, opts = generate_math_problem()
     session['quiz_answer'] = ans
     return jsonify({"question": expr, "options": opts})
-    
+
+# ==========================================================
+# LOGOUT CONTROLLER (লগআউট করলে সরাসরি /login এ যাবে)
+# ==========================================================
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('index'))
-
+    flash("সফলভাবে লগআউট করা হয়েছে!", "info")
+    return redirect(url_for('login'))
 # ==========================================================
 # USER ACCOUNT & PROFILE CONTROLLER
 # ==========================================================
