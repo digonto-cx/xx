@@ -1,5 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
+<style>
+    /* Premium Light Glassmorphism Card */
+    .light-glass-card {
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        border: 1.5px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 15px 35px -5px rgba(225, 29, 72, 0.05), 0 4px 15px rgba(0, 0, 0, 0.02);
+    }
+    
+    /* Interactive Credentials Copy Box */
+    .glass-copy-box {
+        background: rgba(248, 250, 252, 0.9);
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        transition: all 0.2s ease;
+    }
+    .glass-copy-box:hover {
+        border-color: #E11D48;
+        background: #ffffff;
+        box-shadow: 0 4px 15px rgba(225, 29, 72, 0.06);
+    }
+</style>
+
 <div class="max-w-xl mx-auto space-y-5 pb-16">
 
     <!-- Header & Back Button -->
@@ -8,89 +31,147 @@
             <i class="fa-solid fa-arrow-left"></i>
             <span>আর্নিং সেন্টারে ফিরুন</span>
         </a>
-        <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-3 py-1 rounded-full border border-rose-100 uppercase tracking-wider flex items-center gap-1 shadow-sm">
-            <i class="fa-solid fa-envelope text-xs"></i> জিমেইল ফার্ম
+        <span class="text-[10px] font-black bg-rose-50 text-[#E11D48] px-3 py-1 rounded-full border border-rose-100 uppercase tracking-wider flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-envelope text-xs"></i> জিমেইল ফার্মিং জব
         </span>
     </div>
 
-    <!-- Strict Instruction Notice -->
-    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 shadow-sm flex items-start gap-3">
-        <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 text-sm shadow mt-0.5">
-            <i class="fa-solid fa-triangle-exclamation"></i>
+    <!-- ================= 1. STEP-BY-STEP VISUAL GUIDELINE (কীভাবে কাজ করবেন) ================= -->
+    <div class="light-glass-card rounded-[32px] p-6 space-y-4">
+        
+        <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
+            <div class="w-8 h-8 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm shadow-sm">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+                <h3 class="text-sm font-black text-slate-900 leading-tight">কীভাবে জিমেইল তৈরি করবেন?</h3>
+                <p class="text-[10px] text-slate-400 font-medium">নিচের ৪টি সহজ ধাপ অনুসরণ করে কাজ সম্পন্ন করুন</p>
+            </div>
         </div>
-        <div class="text-xs text-amber-950 leading-relaxed">
-            <strong class="block text-amber-900 font-black mb-0.5">⚠️ কঠোর সতর্কতা ও নিয়ম:</strong>
-            জিমেইল তৈরির সময় <strong>কোনো Recovery Email বা ফোন নম্বর যোগ করবেন না</strong>! কাজ লক করার পর <strong>২ ঘণ্টার মধ্যে</strong> তৈরি করে নিচে সাবমিট বাটনে চাপ দিন।
+
+        <!-- 4 Visual Steps Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            
+            <!-- Step 1 -->
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs space-y-1 relative overflow-hidden">
+                <span class="text-[9px] font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full inline-block mb-0.5">ধাপ ১</span>
+                <h4 class="font-black text-slate-900 text-xs flex items-center gap-1">
+                    <i class="fa-regular fa-copy text-indigo-500"></i> তথ্য কপি করুন
+                </h4>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    নিচের কার্ড থেকে দেওয়া <strong>First Name</strong>, <strong>Email Prefix</strong> ও <strong>Password</strong> কপি বাটনে চাপ দিয়ে কপি করে নিন।
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="p-3.5 rounded-2xl bg-white border border-slate-100 shadow-2xs space-y-1 relative overflow-hidden">
+                <span class="text-[9px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full inline-block mb-0.5">ধাপ ২</span>
+                <h4 class="font-black text-slate-900 text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-user-plus text-blue-500"></i> অ্যাকাউন্ট তৈরি শুরু
+                </h4>
+                <p class="text-[11px] text-slate-500 leading-relaxed">
+                    ফোনের Gmail অ্যাপ বা ক্রোম ব্রাউজারের ইনকগনিটো ট্যাবে গিয়ে <strong>"Create account &gt; For personal use"</strong> এ যান।
+                </p>
+            </div>
+
+            <!-- Step 3 (Crucial Warning) -->
+            <div class="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-100 shadow-2xs space-y-1 relative overflow-hidden sm:col-span-2">
+                <span class="text-[9px] font-black text-[#E11D48] bg-white px-2 py-0.5 rounded-full inline-block mb-0.5">ধাপ ৩ (সবচেয়ে গুরুত্বপূর্ণ ⚠️)</span>
+                <h4 class="font-black text-[#E11D48] text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-triangle-exclamation"></i> রিকভারি স্কিপ (Skip) করুন
+                </h4>
+                <p class="text-[11px] text-rose-950 leading-relaxed">
+                    নাম ও পাসওয়ার্ড বসিয়ে এগিয়ে যান। জিমেইল খোলার সময় <strong>ফোন নম্বর বা Recovery Email চাইলে তা "Skip" বাটনে চাপ দিয়ে বাদ দিন</strong>। কোনো রিকভারি ইমেইল দেওয়া যাবে না।
+                </p>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="p-3.5 rounded-2xl bg-emerald-50/60 border border-emerald-100 shadow-2xs space-y-1 relative overflow-hidden sm:col-span-2">
+                <span class="text-[9px] font-black text-emerald-600 bg-white px-2 py-0.5 rounded-full inline-block mb-0.5">ধাপ ৪</span>
+                <h4 class="font-black text-emerald-950 text-xs flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check text-emerald-500"></i> ১-ক্লিকে সাবমিট
+                </h4>
+                <p class="text-[11px] text-emerald-800 leading-relaxed">
+                    জিমেইল অ্যাকাউন্ট সম্পূর্ণ খোলা হয়ে গেলে এখানে এসে সরাসরি <strong>"জিমেইল তৈরি শেষ! সাবমিট করুন (Done)"</strong> বাটনে চাপ দিন।
+                </p>
+            </div>
+
         </div>
+
     </div>
 
-    <!-- ================= 1. ACTIVE LOCKED WORKSTATION ================= -->
+    <!-- ================= 2. ACTIVE LOCKED WORKSTATION (IF USER HAS LOCKED) ================= -->
     {% if active_task %}
-    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-[32px] p-6 sm:p-7 text-white shadow-2xl border border-rose-500/40 space-y-5">
+    <div class="light-glass-card rounded-[32px] p-6 sm:p-7 shadow-2xl border-2 border-rose-200/80 space-y-5 relative overflow-hidden">
         
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-            <div>
-                <span class="text-[9px] font-mono tracking-widest text-slate-400 font-bold uppercase block">ACTIVE WORKSTATION</span>
-                <h3 class="text-base font-black text-white flex items-center gap-2">
-                    আপনার লক করা কাজ
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="leading-tight">
+                <span class="text-[9px] font-mono tracking-widest text-[#E11D48] font-black uppercase block">LOCKED WORKSTATION</span>
+                <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
+                    আপনার চলমান কাজ
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                 </h3>
             </div>
-            <span class="text-sm font-black text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/30">
+            <span class="text-xs font-black text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
                 পুরস্কার: ৳ {{ "%.2f"|format(active_task.price) }}
             </span>
         </div>
 
         {% if active_task.status == 'submitted' %}
-        <!-- Submitted Waiting State -->
-        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-2">
-            <i class="fa-solid fa-clock-rotate-left text-amber-400 text-3xl mb-1 block"></i>
-            <h4 class="text-sm font-bold text-white">জিমেইলটি পর্যালোচনায় রয়েছে!</h4>
-            <p class="text-xs text-emerald-400 font-mono font-bold">{{ active_task.email_prefix }}@gmail.com</p>
-            <p class="text-[11px] text-slate-400">অ্যাডমিন পাসওয়ার্ড ও ডাটা চেক করে আপনার অ্যাকাউন্টে টাকা যোগ করে দেবে।</p>
+        <!-- Submitted & Waiting Review State -->
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-2">
+            <i class="fa-solid fa-clock-rotate-left text-amber-500 text-3xl mb-1 block"></i>
+            <h4 class="text-sm font-black text-slate-800">জিমেইলটি পর্যালোচনায় জমা রয়েছে!</h4>
+            <span class="text-xs font-mono font-black text-indigo-600 bg-white px-3 py-1 rounded-xl border border-slate-200 inline-block">
+                {{ active_task.email_prefix }}@gmail.com
+            </span>
+            <p class="text-[11px] text-slate-400">অ্যাডমিন পাসওয়ার্ড ভেরিফাই করার সাথে সাথেই অ্যাকাউন্টে টাকা যোগ হয়ে যাবে।</p>
         </div>
         {% else %}
-        <!-- Active Doing State (Credentials to Copy) -->
+        <!-- Active Doing State: Credentials with 1-Click Copy -->
         <div class="space-y-3">
-            <p class="text-xs text-slate-300">নিচের তথ্যগুলো কপি করে নিয়ে জিমেইলটি তৈরি করুন:</p>
+            <span class="text-[11px] font-bold text-slate-500 block">নিচের তথ্যগুলো ১-ক্লিকে কপি করে জিমেইল খুলুন:</span>
 
             <!-- Credential 1: First Name -->
-            <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
+            <div class="glass-copy-box rounded-2xl p-3 flex items-center justify-between">
                 <div>
-                    <span class="text-[9px] text-slate-400 uppercase font-bold block">First Name (নাম)</span>
-                    <span class="text-xs font-black text-white font-mono" id="txtFirstName">{{ active_task.first_name }}</span>
+                    <span class="text-[9px] text-slate-400 uppercase font-black tracking-wider block">First Name (নাম)</span>
+                    <span class="text-xs font-black text-slate-900 font-mono" id="txtFirstName">{{ active_task.first_name }}</span>
                 </div>
-                <button onclick="copyText('txtFirstName')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-xl transition">
-                    <i class="fa-regular fa-copy"></i> কপি
+                <button onclick="copyToClipboard('txtFirstName')" class="bg-white hover:bg-slate-100 text-slate-700 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs transition active:scale-95 flex items-center gap-1">
+                    <i class="fa-regular fa-copy text-slate-400"></i>
+                    <span>কপি</span>
                 </button>
             </div>
 
             <!-- Credential 2: Suggested Prefix -->
-            <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
+            <div class="glass-copy-box rounded-2xl p-3 flex items-center justify-between">
                 <div>
-                    <span class="text-[9px] text-slate-400 uppercase font-bold block">Email Prefix (ইউজারনেম)</span>
-                    <span class="text-xs font-black text-sky-400 font-mono" id="txtPrefix">{{ active_task.email_prefix }}</span>
+                    <span class="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Email Prefix (ইউজারনেম)</span>
+                    <span class="text-xs font-black text-indigo-600 font-mono" id="txtPrefix">{{ active_task.email_prefix }}</span>
                 </div>
-                <button onclick="copyText('txtPrefix')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-xl transition">
-                    <i class="fa-regular fa-copy"></i> কপি
+                <button onclick="copyToClipboard('txtPrefix')" class="bg-white hover:bg-slate-100 text-slate-700 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs transition active:scale-95 flex items-center gap-1">
+                    <i class="fa-regular fa-copy text-slate-400"></i>
+                    <span>কপি</span>
                 </button>
             </div>
 
             <!-- Credential 3: Password -->
-            <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-between">
+            <div class="glass-copy-box rounded-2xl p-3 flex items-center justify-between">
                 <div>
-                    <span class="text-[9px] text-slate-400 uppercase font-bold block">Password (পাসওয়ার্ড)</span>
-                    <span class="text-xs font-black text-rose-400 font-mono" id="txtPassword">{{ active_task.password }}</span>
+                    <span class="text-[9px] text-slate-400 uppercase font-black tracking-wider block">Password (যে পাসওয়ার্ড দিবেন)</span>
+                    <span class="text-xs font-black text-[#E11D48] font-mono" id="txtPassword">{{ active_task.password }}</span>
                 </div>
-                <button onclick="copyText('txtPassword')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-1.5 rounded-xl transition">
-                    <i class="fa-regular fa-copy"></i> কপি
+                <button onclick="copyToClipboard('txtPassword')" class="bg-white hover:bg-slate-100 text-slate-700 text-xs font-extrabold px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs transition active:scale-95 flex items-center gap-1">
+                    <i class="fa-regular fa-copy text-slate-400"></i>
+                    <span>কপি</span>
                 </button>
             </div>
 
-            <!-- 1-Click Done / Submit Action Form (No Input Box) -->
+            <!-- 1-Click Done / Submit Action Form -->
             <form action="/gmail/submit/{{ active_task.id }}" method="POST" class="pt-3 space-y-2">
                 <button type="submit" 
-                    class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs sm:text-sm py-4 px-4 rounded-2xl transition shadow-xl shadow-rose-500/30 flex items-center justify-center gap-2">
+                    class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] text-white font-black text-xs sm:text-sm py-4 px-4 rounded-2xl transition shadow-xl shadow-rose-500/25 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-circle-check text-sm"></i>
                     <span>জিমেইল তৈরি শেষ! সাবমিট করুন (Done)</span>
                 </button>
@@ -98,7 +179,7 @@
 
             <!-- Cancel Button -->
             <form action="/gmail/cancel/{{ active_task.id }}" method="POST" onsubmit="return confirm('কাজটি ছেড়ে দিতে চান? এটি সবার জন্য আবার উন্মুক্ত হয়ে যাবে।');">
-                <button type="submit" class="w-full text-center text-[10px] text-slate-400 hover:text-rose-400 py-1 transition">
+                <button type="submit" class="w-full text-center text-[10px] font-bold text-slate-400 hover:text-rose-500 py-1 transition">
                     কাজটি করতে পারছি না (ছেড়ে দিন)
                 </button>
             </form>
@@ -108,18 +189,21 @@
     </div>
     {% endif %}
 
-    <!-- ================= 2. AVAILABLE GMAIL TASKS LIST ================= -->
+    <!-- ================= 3. AVAILABLE GMAIL TASKS ================= -->
     <div class="space-y-3">
         <div class="flex items-center justify-between px-1">
-            <h3 class="text-sm font-black text-slate-900">উপলব্ধ জিমেইল টাস্কসমূহ</h3>
-            <span class="text-[10px] font-bold bg-white border border-slate-200 text-slate-600 px-2.5 py-0.5 rounded-full shadow-2xs">
+            <div>
+                <h3 class="text-sm font-black text-slate-900">উপলব্ধ জিমেইল টাস্কসমূহ</h3>
+                <p class="text-[10px] text-slate-400 font-medium">কাজ শুরু করতে "লক করুন" বাটনে চাপ দিন</p>
+            </div>
+            <span class="text-[10px] font-bold bg-white border border-slate-200 text-slate-600 px-3 py-1 rounded-full shadow-2xs">
                 খোলা আছে: {{ tasks|length }} টি
             </span>
         </div>
 
         <div class="grid grid-cols-1 gap-3">
             {% for t in tasks %}
-            <div class="bg-white border border-rose-50/80 rounded-[28px] p-5 shadow-sm hover:shadow-md transition flex items-center justify-between gap-3">
+            <div class="light-glass-card rounded-[28px] p-4 sm:p-5 flex items-center justify-between gap-3 hover:shadow-md transition">
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 rounded-2xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-lg shrink-0 shadow-sm">
                         <i class="fa-solid fa-envelope-open-text"></i>
@@ -127,11 +211,11 @@
                     <div class="leading-tight">
                         <div class="flex items-center gap-2 mb-1">
                             <span class="text-xs font-black text-slate-900">Gmail Creation Job</span>
-                            <span class="text-[9px] font-bold bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-100">
+                            <span class="text-[9px] font-black bg-emerald-50 text-emerald-600 px-2.5 py-0.5 rounded-full border border-emerald-100">
                                 ৳ {{ "%.2f"|format(t.price) }}
                             </span>
                         </div>
-                        <span class="text-[11px] text-slate-500 block">নাম: <strong>{{ t.first_name }}</strong></span>
+                        <span class="text-[11px] text-slate-600 block">নাম: <strong>{{ t.first_name }}</strong></span>
                         <span class="text-[10px] text-slate-400 font-mono">{{ t.email_prefix }}@...</span>
                     </div>
                 </div>
@@ -152,10 +236,10 @@
                 {% endif %}
             </div>
             {% else %}
-            <div class="bg-white border border-rose-50/80 rounded-[32px] p-10 text-center text-slate-400 shadow-sm space-y-1">
-                <i class="fa-solid fa-envelope-circle-check text-3xl text-slate-200 mb-1 block"></i>
-                <h4 class="text-xs font-bold text-slate-700">বর্তমানে কোনো খালি কাজ নেই</h4>
-                <p class="text-[10px]">সব কাজ অন্য ইউজাররা লক করেছে। নতুন কাজ আসা মাত্রই এখানে দেখতে পাবেন।</p>
+            <div class="light-glass-card rounded-[32px] p-10 text-center text-slate-400 space-y-1.5">
+                <i class="fa-solid fa-envelope-circle-check text-3xl text-slate-300 mb-1 block"></i>
+                <h4 class="text-xs font-bold text-slate-700">বর্তমানে কোনো কাজ খালি নেই</h4>
+                <p class="text-[10px]">অন্যান্য ইউজাররা কাজ সম্পন্ন করছে। নতুন কাজ আসা মাত্রই এখানে দেখতে পাবেন।</p>
             </div>
             {% endfor %}
         </div>
@@ -163,9 +247,9 @@
 
 </div>
 
-<!-- SCRIPT: 1-CLICK COPY -->
+<!-- SCRIPT: 1-CLICK CLIPBOARD COPY -->
 <script>
-function copyText(elementId) {
+function copyToClipboard(elementId) {
     const text = document.getElementById(elementId).innerText;
     navigator.clipboard.writeText(text).then(() => {
         alert("কপি হয়েছে: " + text);
