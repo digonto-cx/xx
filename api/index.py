@@ -384,7 +384,45 @@ def register():
         flash("রেজিস্ট্রেশন ত্রুটি, অনুগ্রহ করে পুনরায় চেষ্টা করুন।", "danger")
         
     return redirect(url_for('index'))
+
+
+# ==========================================================
+# ADMIN PROMOTIONS & ADVERTISER LEADS (/admin/promote)
+# ==========================================================
+@app.route('/admin/promote')
+@admin_required
+def admin_promotions():
+    sb = get_supabase()
+    all_promos = sb.table('promotions').select('*').order('id', desc=True).execute().data or []
     
+    pending_count = sum(1 for p in all_promos if p.get('status') == 'pending')
+    completed_count = sum(1 for p in all_promos if p.get('status') == 'completed')
+
+    return render_template(
+        'admin/promote.html', 
+        promotions=all_promos,
+        pending_count=pending_count,
+        completed_count=completed_count
+    )
+
+@app.route('/admin/promote/<int:promo_id>/status/<new_status>', methods=['POST'])
+@admin_required
+def admin_promotion_status(promo_id, new_status):
+    sb = get_supabase()
+    if new_status in ['pending', 'contacted', 'completed']:
+        sb.table('promotions').update({'status': new_status}).eq('id', promo_id).execute()
+        flash(f"ক্যাম্পেইন স্ট্যাটাস সফলভাবে '{new_status}' করা হয়েছে!", "success")
+    return redirect(url_for('admin_promotions'))
+
+@app.route('/admin/promote/<int:promo_id>/delete', methods=['POST'])
+@admin_required
+def admin_promotion_delete(promo_id):
+    sb = get_supabase()
+    sb.table('promotions').delete().eq('id', promo_id).execute()
+    flash("প্রমোশন রিকোয়েস্টটি মুছে ফেলা হয়েছে!", "success")
+    return redirect(url_for('admin_promotions'))
+    
+
 # ==========================================================
 # ADMIN USER PASSWORD RESET & CARD GENERATOR (/admin/pass)
 # ==========================================================
