@@ -422,7 +422,6 @@ def admin_promotion_delete(promo_id):
     flash("প্রমোশন রিকোয়েস্টটি মুছে ফেলা হয়েছে!", "success")
     return redirect(url_for('admin_promotions'))
     
-
 # ==========================================================
 # ADMIN USER PASSWORD RESET & CARD GENERATOR (/admin/pass)
 # ==========================================================
@@ -676,6 +675,7 @@ def admin_gmail_approve(task_id):
     flash(f"জিমেইল অ্যাপ্রুভ হয়েছে এবং ইউজারের অ্যাকাউন্টে ৳{task['price']} যোগ হয়েছে!", "success")
     return redirect(url_for('admin_gmail'))
 
+    
 # ==========================================================
 # ADMIN SPONSORSHIP MANAGEMENT CONTROLLER (/admin/sponsor)
 # ==========================================================
@@ -1118,7 +1118,7 @@ def withdraw():
         flash("আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!", "danger")
         return redirect(url_for('withdraw'))
 
-    if ref_count < 0:
+    if ref_count < 4:
         flash(f"উইথড্র করতে সর্বনিম্ন ৪টি রেফারেল প্রয়োজন! আপনার বর্তমান রেফারেল: {ref_count} টি।", "danger")
         return redirect(url_for('withdraw'))
         
