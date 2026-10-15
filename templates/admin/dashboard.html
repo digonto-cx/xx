@@ -1,42 +1,206 @@
 {% extends 'admin/base_admin.html' %}
 {% block admin_content %}
-<div class="space-y-6">
+<div class="space-y-6 pb-12">
 
-    <!-- Metrics Cards Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">মোট রেজিস্টার্ড ইউজার</span>
-            <h3 class="text-3xl font-black text-slate-900">{{ total_users }}</h3>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">আজকের সাইন-আপ</span>
-            <h3 class="text-3xl font-black text-emerald-600">+{{ today_users }}</h3>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">গতকালের সাইন-আপ</span>
-            <h3 class="text-3xl font-black text-slate-700">{{ yesterday_users }}</h3>
-        </div>
-        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm">
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">আজকের টাস্ক জমা</span>
-            <h3 class="text-3xl font-black text-[#E11D48]">{{ today_submissions }}</h3>
+    <!-- ================= 1. TOP WELCOME BANNER ================= -->
+    <div class="bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-[32px] p-6 sm:p-8 text-white border border-slate-800 shadow-2xl relative overflow-hidden">
+        
+        <!-- Ambient Red Glow -->
+        <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-[#E11D48]/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-[10px] font-mono tracking-widest text-[#E11D48] font-extrabold uppercase block mb-1">
+                    ENTERPRISE CONTROL HUB
+                </span>
+                <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-2">
+                    সুপার অ্যাডমিন ড্যাশবোর্ড ⚡
+                </h1>
+                <p class="text-xs text-slate-400 mt-1 max-w-md leading-relaxed">
+                    সিস্টেমের রিয়েল-টাইম মেট্রিক্স, গ্লোবাল নোটিশ এবং ইউজার ট্রাফিকের ওভারভিউ।
+                </p>
+            </div>
+
+            <!-- Live Engine Status Badge -->
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-3.5 backdrop-blur-md flex items-center gap-3 shrink-0">
+                <div class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
+                <div class="leading-tight text-left">
+                    <span class="text-[10px] font-bold text-slate-400 block uppercase">সার্ভার স্ট্যাটাস</span>
+                    <span class="text-xs font-black text-emerald-400">100% Operational</span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Global Notice Editor -->
-    <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm">
-        <h3 class="text-sm font-extrabold text-slate-900 mb-1 flex items-center gap-2">
-            <i class="fa-solid fa-bullhorn text-amber-500"></i> সাইট নোটিশ কন্ট্রোলার
-        </h3>
-        <p class="text-xs text-slate-400 mb-4">এখানে যা লিখবেন তা প্রতিটি ইউজারের ড্যাশবোর্ডে সাথে সাথে প্রদর্শিত হবে।</p>
+    <!-- ================= 2. METRICS STAT CARDS (4-BOX) ================= -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Total Users Card -->
+        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm hover:shadow-md transition space-y-2 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">মোট রেজিস্টার্ড ইউজার</span>
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <h3 class="text-3xl font-black text-slate-900 tracking-tight tabular-nums">{{ total_users }}</h3>
+                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Active</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-medium">প্ল্যাটফর্মের মোট সদস্য সংখ্যা</p>
+        </div>
 
-        <form action="/admin/notice" method="POST" class="space-y-3">
-            <textarea name="site_notice" rows="3" required placeholder="নোটিশের টেক্সট লিখুন..." 
-                class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] outline-none">{{ notice }}</textarea>
+        <!-- Today's Signups Card -->
+        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm hover:shadow-md transition space-y-2 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">আজকের নতুন সাইন-আপ</span>
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <h3 class="text-3xl font-black text-emerald-600 tracking-tight tabular-nums">+{{ today_users }}</h3>
+                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Live</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-medium">আজকে যুক্ত হওয়া নতুন ইউজার</p>
+        </div>
+
+        <!-- Yesterday's Signups Card -->
+        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm hover:shadow-md transition space-y-2 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">গতকালের সাইন-আপ</span>
+                <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fa-solid fa-calendar-day"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight tabular-nums">{{ yesterday_users }}</h3>
+                <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">Completed</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-medium">গত ২৪ ঘণ্টায় মোট জয়েনিং</p>
+        </div>
+
+        <!-- Today Submissions Card -->
+        <div class="bg-white border border-slate-200 rounded-[28px] p-5 shadow-sm hover:shadow-md transition space-y-2 relative overflow-hidden">
+            <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">আজকের টাস্ক জমা</span>
+                <div class="w-9 h-9 rounded-xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-xs shadow-2xs">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <h3 class="text-3xl font-black text-[#E11D48] tracking-tight tabular-nums">{{ today_submissions }}</h3>
+                <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">Pending</span>
+            </div>
+            <p class="text-[10px] text-slate-400 font-medium">রিভিউ করার জন্য জমা পড়া কাজ</p>
+        </div>
+
+    </div>
+
+    <!-- ================= 3. SYSTEM HEALTH MONITOR (3-BOX) ================= -->
+    <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+            <i class="fa-solid fa-heart-pulse text-emerald-500"></i> সার্ভার হেলথ ও ডাটাবেস মেট্রিক্স
+        </h3>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">CLOUD DATABASE</span>
+                    <span class="font-black text-slate-800 text-sm">Supabase PostgreSQL</span>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Connected
+                </span>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">IMGBB FAILOVER ENGINE</span>
+                    <span class="font-black text-slate-800 text-sm">Multi-Key Rotator</span>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-indigo-50 text-indigo-600 border border-indigo-100">
+                    Active (Auto-Switch)
+                </span>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                <div>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block">SERVERLESS REGION</span>
+                    <span class="font-black text-slate-800 text-sm">Washington, D.C. (IAD)</span>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-600 border border-emerald-100">
+                    Optimal Latency
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 4. GLOBAL NOTICE CONTROLLER ================= -->
+    <div class="bg-white border border-slate-200 rounded-[32px] p-6 sm:p-8 shadow-sm space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+                <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-bullhorn text-amber-500"></i> গ্লোবাল সাইট নোটিশ কন্ট্রোলার
+                </h3>
+                <p class="text-[11px] text-slate-400 mt-0.5">এখানে যা লিখবেন তা প্রতিটি ইউজারের ড্যাশবোর্ডে সাথে সাথে ভেসে উঠবে</p>
+            </div>
+            <span class="text-[9px] font-extrabold bg-amber-50 text-amber-700 px-2.5 py-0.5 rounded-full border border-amber-200">
+                Live Broadcast
+            </span>
+        </div>
+
+        <form action="/admin/notice" method="POST" class="space-y-4">
+            <div>
+                <textarea name="site_notice" rows="3" required placeholder="ইউজারদের জন্য গুরুত্বপূর্ণ নোটিশ এখানে লিখুন..." 
+                    class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-[#E11D48] transition bg-slate-50/50 leading-relaxed">{{ notice }}</textarea>
+            </div>
             
-            <button type="submit" class="bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold px-6 py-2.5 rounded-xl shadow transition">
-                নোটিশ সেভ করুন
+            <button type="submit" 
+                class="bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3 px-6 rounded-2xl transition shadow-lg shadow-rose-500/25 flex items-center gap-2">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>নোটিশ ব্রডকাস্ট করুন</span>
             </button>
         </form>
+    </div>
+
+    <!-- ================= 5. QUICK ADMIN MODULE SHORTCUTS (GRID) ================= -->
+    <div class="bg-white border border-slate-200 rounded-[32px] p-6 shadow-sm space-y-4">
+        <h3 class="text-sm font-black text-slate-900">কুইক অ্যাডমিন শর্টকাট হাব</h3>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <a href="/admin/users" class="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition flex flex-col items-center text-center group">
+                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <span class="font-extrabold text-slate-800">ইউজার্স</span>
+                <span class="text-[10px] text-slate-400 mt-0.5">ব্যান ও ব্যালেন্স</span>
+            </a>
+
+            <a href="/admin/withdraw" class="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition flex flex-col items-center text-center group">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </div>
+                <span class="font-extrabold text-slate-800">উইথড্রয়াল</span>
+                <span class="text-[10px] text-slate-400 mt-0.5">পেমেন্ট রিকোয়েস্ট</span>
+            </a>
+
+            <a href="/admin/submit" class="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition flex flex-col items-center text-center group">
+                <div class="w-10 h-10 rounded-xl bg-yellow-50 text-yellow-600 flex items-center justify-center text-base mb-2 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <span class="font-extrabold text-slate-800">বাল্ক রিভিউ</span>
+                <span class="text-[10px] text-slate-400 mt-0.5">৩০টি কাজ একসাথে</span>
+            </a>
+
+            <a href="/admin/gmail" class="p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 transition flex flex-col items-center text-center group">
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-[#E11D48] flex items-center justify-center text-base mb-2 group-hover:scale-110 transition">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <span class="font-extrabold text-slate-800">জিমেইল ফার্ম</span>
+                <span class="text-[10px] text-slate-400 mt-0.5">জিমেইল জবস</span>
+            </a>
+        </div>
     </div>
 
 </div>
