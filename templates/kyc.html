@@ -170,13 +170,13 @@
             <div class="grid grid-cols-2 gap-3">
                 
                 <!-- bKash Card -->
-                <div id="method-bkash" onclick="selectKycMethod('bkash', '01733885354')" 
+                <div id="method-bkash" onclick="selectKycMethod('bkash', '01618897806')" 
                      class="cursor-pointer border-2 border-[#E11D48] bg-rose-50/60 rounded-2xl p-3 text-center transition shadow-sm relative flex flex-col items-center justify-center">
                     <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-2xs overflow-hidden flex items-center justify-center mb-1">
                         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy5t5aXjDFFCW4OoNdCAEJ_5dOXsEi_Em4Z9p9h3nmpA4KrVzdLbGcBtyd&s=10" alt="bKash" class="w-full h-full object-contain">
                     </div>
                     <span class="text-xs font-black text-slate-900 block">bKash Personal</span>
-                    <span class="text-[10px] font-mono font-bold text-[#E11D48]">01733885354</span>
+                    <span class="text-[10px] font-mono font-bold text-[#E11D48]">01618897806</span>
                     <span class="text-[9px] bg-[#E11D48] text-white px-2 py-0.5 rounded-full mt-1"><i class="fa-regular fa-copy mr-0.5"></i> কপি করুন</span>
                 </div>
 
@@ -293,7 +293,7 @@ function selectKycMethod(method, number) {
 
     if (number) {
         navigator.clipboard.writeText(number).then(() => {
-            alert("বিকাশ পার্সোনাল নাম্বার কপি হয়েছে: " + number + "\n\n(Send Money করে TrxID সংগ্রহ করুন)");
+            alert("বিকাশ পার্সোনাল নাম্বার কপি হয়েছে");
         });
     }
 }
