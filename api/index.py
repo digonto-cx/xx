@@ -88,6 +88,39 @@ def handle_global_error(e):
         content="সার্ভারে সাময়িক চাপ রয়েছে। অনুগ্রহ করে রিলোড দিন।"
     ), 200
 
+
+# ==========================================================
+# KYC REQUIRED DECORATOR (কেওয়াইসি ছাড়া কাজ বা উইথড্র ব্লক)
+# ==========================================================
+def kyc_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in session:
+            flash("অনুগ্রহ করে প্রথমে লগইন করুন!", "danger")
+            return redirect(url_for('index'))
+        
+        sb = get_supabase()
+        user_id = session['user_id']
+        
+        # অ্যাডমিন (@admin.com বা admin@gmail.com) হলে কেওয়াইসি লাগবে না
+        user = sb.table('users').select('email').eq('id', user_id).single().execute().data
+        if user and user.get('email') == 'admin@gmail.com':
+            return f(*args, **kwargs)
+
+        # ইউজারের কেওয়াইসি স্ট্যাটাস চেক
+        kyc_res = sb.table('kyc_requests').select('status').eq('user_id', user_id).order('id', desc=True).limit(1).execute().data
+        
+        is_approved = False
+        if kyc_res and kyc_res[0].get('status') == 'approved':
+            is_approved = True
+
+        if not is_approved:
+            flash("⚠️ এই পেজে প্রবেশ করতে ও কাজ করতে হলে প্রথমে এককালীন ৫০৳ ফি দিয়ে কেওয়াইসি (KYC) ভেরিফিকেশন সম্পন্ন করতে হবে!", "warning")
+            return redirect(url_for('kyc_page'))
+
+        return f(*args, **kwargs)
+    return decorated_function
+    
 # গ্লোবাল রেফারেল ট্র্যাকার (ইউজার যে পেজেই যাক রেফার কোড নষ্ট হবে না)
 @app.before_request
 def capture_global_referral_and_session():
@@ -259,7 +292,7 @@ def kyc_page():
         try:
             age = int(request.form.get('age', 18))
         except ValueError:
-            age = 18
+            age = 13
 
         sender_number = request.form.get('sender_number', '').strip()
         trx_id = request.form.get('trx_id', '').strip()
@@ -584,6 +617,7 @@ def auto_release_expired_gmail_tasks(sb):
 
 @app.route('/gmail')
 @login_required
+@kyc_required
 def gmail_hub():
     sb = get_supabase()
     user_id = session['user_id']
@@ -801,6 +835,7 @@ def admin_gmail_delete(task_id):
 
 @app.route('/quiz')
 @login_required
+@kyc_required
 def math_quiz():
     sb = get_supabase()
     user_id = session['user_id']
@@ -994,6 +1029,7 @@ def dashboard():
 # ==========================================================
 @app.route('/tasks')
 @login_required
+@kyc_required
 def tasks():
     sb = get_supabase()
     user_id = session['user_id']
@@ -1146,6 +1182,7 @@ def scratch_page():
     
 @app.route('/withdraw', methods=['GET', 'POST'])
 @login_required
+@kyc_required
 def withdraw():
     sb = get_supabase()
     user_id = session['user_id']
