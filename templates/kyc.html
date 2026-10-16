@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
 <style>
-    /* Clean Minimal Input Group */
     .kyc-input-box {
         background: #ffffff;
         border: 1.5px solid #e2e8f0;
@@ -44,7 +43,7 @@
         <div class="space-y-1">
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">অ্যাকাউন্ট ভেরিফিকেশন (KYC)</h1>
             <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                কোনো রেফার ছাড়াই লাইফটাইম উইথড্রয়াল সুবিধা পেতে এবং অটো-পেমেন্ট গেটওয়ে সচল করতে একবার মাত্র কেওয়াইসি ভেরিফিকেশন সম্পন্ন করুন।
+                কোনো রেফার ছাড়াই লাইফটাইম উইথড্রয়াল সুবিধা পেতে এবং অটো-পেমেন্ট গেটওয়ে সচল করতে একবার মাত্র কেওয়াইসি ফি (<strong class="text-slate-900">৳৫০</strong>) প্রদান করুন।
             </p>
         </div>
 
@@ -63,7 +62,6 @@
             <p class="text-xs text-amber-700">অ্যাডমিন আপনার পেমেন্ট ও তথ্য যাচাই করছে। ৩০ মিনিটের মধ্যে অ্যাপ্রুভ হয়ে যাবে।</p>
         </div>
         {% else %}
-        <!-- CTA BUTTON TO SCROLL TO FORM -->
         <div class="pt-2">
             <a href="#kycFormSection" class="inline-flex items-center gap-2 bg-[#E11D48] hover:bg-[#BE123C] active:scale-95 text-white font-black text-xs py-3.5 px-8 rounded-2xl shadow-lg shadow-rose-500/25 transition">
                 <span>কেওয়াইসি ফর্ম পূরণ করুন</span>
@@ -73,31 +71,38 @@
         {% endif %}
     </div>
 
-    <!-- ================= 2. WHY WE NEED KYC (কারণসমূহ: কারণ ১ + ৩) ================= -->
+    <!-- ================= 2. WHY WE NEED KYC (কারণ ১, ২ ও ৩) ================= -->
     <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-rose-50/80 space-y-5">
         <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
-            <i class="fa-solid fa-circle-question text-[#E11D48]"></i> কেন কেওয়াইসি (KYC) ফি নেওয়া হচ্ছে?
+            <i class="fa-solid fa-circle-question text-[#E11D48]"></i> কেন কেওয়াইসি (KYC) ফি (৳৫০) নেওয়া হচ্ছে?
         </h3>
 
         <div class="space-y-3 text-xs">
             <!-- Reason 1 -->
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
-                <div class="w-8 h-8 rounded-full bg-rose-100 text-[#E11D48] flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
-                    ১
-                </div>
+                <div class="w-8 h-8 rounded-full bg-rose-100 text-[#E11D48] flex items-center justify-center font-black text-xs shrink-0 mt-0.5">১</div>
                 <div>
                     <h4 class="font-black text-slate-900 text-xs mb-0.5">ফেক একাউন্ট ও মাল্টিপল ফ্রড রোধ</h4>
                     <p class="text-slate-500 leading-relaxed text-[11px]">
-                        কিছু অসাধু লোক একই ডিভাইস বা ব্রাউজার থেকে শত শত ভুয়া একাউন্ট খুলে কোম্পানির বাজেট শেষ করে দেয় এবং রিয়েল মেম্বারদের পেমেন্টে সমস্যা সৃষ্টি করে। সিস্টেম সম্পূর্ণ সুরক্ষিত রাখতে এবং শুধুমাত্র রিয়েল হিউম্যানদের একাউন্ট নিশ্চিত করতে এই সিকিউরিটি ভেরিফিকেশন।
+                        কিছু অসাধু লোক একই ডিভাইস থেকে শত শত ভুয়া একাউন্ট খুলে কোম্পানির বাজেট শেষ করে দেয় এবং রিয়েল মেম্বারদের পেমেন্টে সমস্যা সৃষ্টি করে। সিস্টেম সুরক্ষিত রাখতে এই সিকিউরিটি ভেরিফিকেশন।
+                    </p>
+                </div>
+            </div>
+
+            <!-- Reason 2 (New) -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-black text-xs shrink-0 mt-0.5">২</div>
+                <div>
+                    <h4 class="font-black text-slate-900 text-xs mb-0.5">বট এবং অটো-ক্লিক সফটওয়্যার প্রতিরোধ</h4>
+                    <p class="text-slate-500 leading-relaxed text-[11px]">
+                        আমাদের সাইটে সম্প্রতি রোবট বা অটো-ক্লিক সফটওয়্যার দিয়ে সেকেন্ডে হাজার হাজার ভুয়া কাজ সাবমিট করা হচ্ছে, যার কারণে রিয়েল মেম্বারদের পেমেন্ট দিতে দেরি হচ্ছে। হিউম্যান ট্রাফিক আলাদা করতে এবং আপনার কষ্টার্জিত টাকা সুরক্ষিত রাখতে একবার মাত্র ভেরিফিকেশন ফি নেওয়া হচ্ছে।
                     </p>
                 </div>
             </div>
 
             <!-- Reason 3 -->
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100 flex items-start gap-3">
-                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-xs shrink-0 mt-0.5">
-                    ৩
-                </div>
+                <div class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-xs shrink-0 mt-0.5">৩</div>
                 <div>
                     <h4 class="font-black text-slate-900 text-xs mb-0.5">অটো উইথড্র গেটওয়ে ও পর্যাপ্ত টাস্ক সরবরাহ</h4>
                     <p class="text-slate-500 leading-relaxed text-[11px]">
@@ -108,7 +113,7 @@
         </div>
     </div>
 
-    <!-- ================= 3. PLATFORM FACILITIES (সুবিধাসমূহ) ================= -->
+    <!-- ================= 3. PLATFORM FACILITIES ================= -->
     <div class="bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-rose-50/80 space-y-4">
         <h3 class="text-base font-black text-slate-900 flex items-center gap-2">
             <i class="fa-solid fa-bolt text-amber-500"></i> কেওয়াইসি ভেরিফিকেশনের পর সুবিধাসমূহ
@@ -145,53 +150,53 @@
         </div>
     </div>
 
-    <!-- ================= 4. HOW TO COMPLETE (ভিডিও গাইড) ================= -->
-    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-rose-600 rounded-[32px] p-6 text-white shadow-xl flex items-center justify-between gap-4">
-        <div>
-            <span class="text-[10px] font-bold text-blue-100 uppercase tracking-wider block">ভিডিও গাইড</span>
-            <h3 class="text-sm font-black text-white mt-0.5">কীভাবে কেওয়াইসি ফি পাঠাবেন ও ফর্ম পূরণ করবেন?</h3>
-            <p class="text-[11px] text-blue-100 opacity-90 mt-1">১ মিনিটের ভিডিওটি দেখে সঠিক নিয়মে সম্পন্ন করুন।</p>
-        </div>
-        <a href="/tutorial" target="_blank" 
-           class="bg-white text-indigo-600 hover:bg-slate-100 font-black text-xs py-3 px-4 rounded-2xl shadow transition shrink-0 active:scale-95">
-            ভিডিও দেখুন <i class="fa-solid fa-play ml-1"></i>
-        </a>
-    </div>
-
-    <!-- ================= 5. KYC SUBMISSION FORM ================= -->
+    <!-- ================= 4. KYC SUBMISSION FORM ================= -->
     <div id="kycFormSection" class="bg-white rounded-[32px] p-6 sm:p-8 shadow-xl border border-rose-50/80 space-y-5">
         
-        <div class="border-b border-slate-100 pb-3">
-            <h3 class="text-base font-black text-slate-900">কেওয়াইসি সাবমিশন ফর্ম</h3>
-            <p class="text-xs text-slate-400 mt-0.5">নিচের বিকাশ/নগদ নাম্বারে ফি পাঠিয়ে পেমেন্ট তথ্য প্রদান করুন</p>
+        <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-black text-slate-900">কেওয়াইসি সাবমিশন ফর্ম</h3>
+                <p class="text-xs text-slate-400 mt-0.5">কেওয়াইসি ফি: <strong class="text-emerald-600">৳৫০</strong> (Send Money)</p>
+            </div>
+            <span class="text-xs font-bold bg-rose-50 text-[#E11D48] px-3 py-1 rounded-xl">ফি: ৫০৳</span>
         </div>
 
-        <!-- Payment Gateway Logos (bKash & Nagad) -->
-        <div class="grid grid-cols-2 gap-3">
-            <div class="p-3 rounded-2xl bg-rose-50/60 border border-rose-100 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-2xs overflow-hidden flex items-center justify-center shrink-0">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy5t5aXjDFFCW4OoNdCAEJ_5dOXsEi_Em4Z9p9h3nmpA4KrVzdLbGcBtyd&s=10" alt="bKash" class="w-full h-full object-contain">
-                </div>
-                <div class="leading-tight">
-                    <span class="text-[10px] font-bold text-slate-400 block">bKash Merchant / Personal</span>
-                    <span class="text-xs font-black text-slate-900 font-mono">017XXXXXXXX</span>
-                </div>
-            </div>
+        <!-- Interactive Gateway Selector (bKash & Nagad) -->
+        <div class="space-y-2">
+            <label class="block text-[11px] font-black text-slate-700 uppercase tracking-wider ml-1">
+                পেমেন্ট মেথড সিলেক্ট করুন (ক্লিক করে নাম্বার কপি করুন)
+            </label>
 
-            <div class="p-3 rounded-2xl bg-orange-50/60 border border-orange-100 flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-2xs overflow-hidden flex items-center justify-center shrink-0">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSANGhZUJa8bsglUsBFp75gieI6sy5IF81dUhje-ewRGORhne2Ic2l2p60&s=10" alt="Nagad" class="w-full h-full object-contain">
+            <div class="grid grid-cols-2 gap-3">
+                
+                <!-- bKash Card -->
+                <div id="method-bkash" onclick="selectKycMethod('bkash', '01733885354')" 
+                     class="cursor-pointer border-2 border-[#E11D48] bg-rose-50/60 rounded-2xl p-3 text-center transition shadow-sm relative flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-2xs overflow-hidden flex items-center justify-center mb-1">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSy5t5aXjDFFCW4OoNdCAEJ_5dOXsEi_Em4Z9p9h3nmpA4KrVzdLbGcBtyd&s=10" alt="bKash" class="w-full h-full object-contain">
+                    </div>
+                    <span class="text-xs font-black text-slate-900 block">bKash Personal</span>
+                    <span class="text-[10px] font-mono font-bold text-[#E11D48]">01733885354</span>
+                    <span class="text-[9px] bg-[#E11D48] text-white px-2 py-0.5 rounded-full mt-1"><i class="fa-regular fa-copy mr-0.5"></i> কপি করুন</span>
                 </div>
-                <div class="leading-tight">
-                    <span class="text-[10px] font-bold text-slate-400 block">Nagad Merchant / Personal</span>
-                    <span class="text-xs font-black text-slate-900 font-mono">018XXXXXXXX</span>
+
+                <!-- Nagad Card (Coming Soon) -->
+                <div id="method-nagad" onclick="selectKycMethod('nagad', '')" 
+                     class="cursor-pointer border-2 border-slate-200 bg-slate-50 rounded-2xl p-3 text-center transition relative flex flex-col items-center justify-center">
+                    <div class="w-10 h-10 rounded-xl bg-white p-1 shadow-2xs overflow-hidden flex items-center justify-center mb-1 opacity-70">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSANGhZUJa8bsglUsBFp75gieI6sy5IF81dUhje-ewRGORhne2Ic2l2p60&s=10" alt="Nagad" class="w-full h-full object-contain">
+                    </div>
+                    <span class="text-xs font-black text-slate-600 block">Nagad</span>
+                    <span class="text-[10px] font-bold text-amber-600">খুব শীঘ্রই আসছে</span>
+                    <span class="text-[9px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full mt-1">বন্ধ আছে</span>
                 </div>
+
             </div>
         </div>
 
         {% if latest_kyc and latest_kyc.status == 'approved' %}
         <div class="p-6 text-center bg-slate-50 rounded-2xl text-slate-500 font-bold text-xs">
-            আপনার কেওয়াইসি ইতিমধ্যে অনুমোদিত হয়েছে। নতুন করে ফর্ম জমা দেওয়ার প্রয়োজন নেই।
+            আপনার কেওয়াইসি ইতিমধ্যে অনুমোদিত হয়েছে।
         </div>
         {% else %}
         <form action="/kyc" method="POST" class="space-y-4">
@@ -216,7 +221,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">যে নাম্বার থেকে টাকা পাঠিয়েছেন (Sender Number)</label>
+                    <label class="block text-[11px] font-bold text-slate-600 uppercase mb-1 ml-1">যে নাম্বার থেকে টাকা পাঠিয়েছেন</label>
                     <div class="kyc-input-box rounded-2xl px-4 py-3 flex items-center gap-2.5">
                         <i class="fa-solid fa-phone text-slate-400 text-xs"></i>
                         <input type="text" name="sender_number" required placeholder="017xxxxxxxx" 
@@ -237,7 +242,7 @@
             <button type="submit" 
                 class="w-full bg-[#E11D48] hover:bg-[#BE123C] active:scale-[0.98] text-white font-black text-xs sm:text-sm py-4 px-4 rounded-2xl shadow-xl shadow-rose-500/25 flex items-center justify-center gap-2 transition mt-2">
                 <i class="fa-solid fa-paper-plane text-xs"></i>
-                <span>কেওয়াইসি ভেরিফিকেশন সাবমিট করুন</span>
+                <span>কেওয়াইসি ফি (৫০ টাকা) সাবমিট করুন</span>
             </button>
         </form>
         {% endif %}
@@ -246,7 +251,7 @@
 
 </div>
 
-<!-- ================= "বিস্তারিত জানুন" MODAL POPUP ================= -->
+<!-- ================= MODAL & SCRIPT ================= -->
 <div id="detailsModal" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
     <div class="w-full max-w-sm bg-white rounded-[32px] p-6 shadow-2xl border border-rose-50 space-y-4 transform scale-95 transition-transform duration-300" id="detailsModalCard">
         
@@ -261,10 +266,10 @@
 
         <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
             <p>
-                <strong>MicroEarnX</strong> একটি উচ্চমানের মাইক্রো-আর্নিং প্ল্যাটফর্ম। আমাদের মূল লক্ষ্য হলো ইউজারদের ১০০% নিরাপদ ও দ্রুত পেমেন্ট নিশ্চিত করা।
+                <strong>MicroEarnX</strong> একটি প্রিমিয়াম মাইক্রো-আর্নিং প্ল্যাটফর্ম। আমাদের মূল লক্ষ্য হলো ইউজারদের ১০০% নিরাপদ ও দ্রুত পেমেন্ট নিশ্চিত করা।
             </p>
             <p>
-                ভুয়া একাউন্ট এবং রোবট স্ক্রিপ্ট হ্যাকিং থেকে সাইট বাঁচাতে সিকিউরিটি ফি বা কেওয়াইসি নেওয়া হয়। ভেরিফিকেশন সম্পন্ন করার পর আপনি রেফার ছাড়াই মাত্র ১০০ টাকা হলেই ১০ মিনিটের মধ্যে অটো উইথড্র করতে পারবেন।
+                বট এবং অটো-ক্লিক সফটওয়্যার হ্যাকিং থেকে সাইট বাঁচাতে মাত্র ৫০ টাকা কেওয়াইসি ফি নেওয়া হয়। ভেরিফিকেশন সম্পন্ন করার পর আপনি রেফার ছাড়াই মাত্র ১০০ টাকা হলেই ১০ মিনিটে অটো উইথড্র করতে পারবেন।
             </p>
             <div class="p-3 bg-sky-50 rounded-2xl text-sky-900 text-[11px] font-bold">
                 <i class="fa-brands fa-telegram text-sky-500 mr-1"></i> সমস্যা হলে যোগাযোগ করুন: @micro_earnx
@@ -278,8 +283,21 @@
     </div>
 </div>
 
-<!-- MODAL SCRIPT -->
 <script>
+// Select Method & Copy Number
+function selectKycMethod(method, number) {
+    if (method === 'nagad') {
+        alert("নগদ পেমেন্ট গেটওয়ে খুব শীঘ্রই চালু হবে। দয়া করে বিকাশ (01733885354) এ সেন্ড মানি করুন।");
+        return;
+    }
+
+    if (number) {
+        navigator.clipboard.writeText(number).then(() => {
+            alert("বিকাশ পার্সোনাল নাম্বার কপি হয়েছে: " + number + "\n\n(Send Money করে TrxID সংগ্রহ করুন)");
+        });
+    }
+}
+
 function openDetailsModal() {
     const modal = document.getElementById('detailsModal');
     const card = document.getElementById('detailsModalCard');
